@@ -1187,7 +1187,7 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                     <Avatar className="w-10 h-10 border-2 border-border shrink-0 mt-1">
                       <AvatarImage src={m1?.avatar} alt={selectedReplay.mind1.name} />
                       <AvatarFallback className={cn("bg-muted font-bold text-sm", m1?.color)}>
-                        {selectedReplay.mind1.name.substring(0, 2)}
+                        {getInitials(selectedReplay.mind1.name)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 space-y-1">
@@ -1208,7 +1208,7 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                     <Avatar className="w-10 h-10 border-2 border-border shrink-0 mt-1">
                       <AvatarImage src={m2?.avatar} alt={selectedReplay.mind2.name} />
                       <AvatarFallback className={cn("bg-muted font-bold text-sm", m2?.color)}>
-                        {selectedReplay.mind2.name.substring(0, 2)}
+                        {getInitials(selectedReplay.mind2.name)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 space-y-1">

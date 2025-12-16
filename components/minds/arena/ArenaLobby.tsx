@@ -9,6 +9,17 @@ import { Progress } from '../../ui/progress';
 import { CLONES } from './data';
 import { cn } from '../../../lib/utils';
 
+// Helper: Extract initials from full name (e.g., "Steve Jobs" -> "SJ")
+const getInitials = (name: string): string => {
+  return name
+    .trim()
+    .split(/\s+/)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+};
+
 interface ArenaLobbyProps {
     onCreateClick: () => void;
 }
@@ -118,18 +129,12 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({ onCreateClick }) => {
                         {i + 1}
                       </span>
                       <Avatar className="w-10 h-10 border border-border">
-                        {clone.avatar?.startsWith('/') ? (
-                          <>
-                            <AvatarImage src={clone.avatar} alt={clone.name} />
-                            <AvatarFallback className="bg-card text-xs font-bold text-muted-foreground">
-                              {clone.name.substring(0, 2).toUpperCase()}
-                            </AvatarFallback>
-                          </>
-                        ) : (
-                          <AvatarFallback className="bg-card text-xs font-bold text-muted-foreground">
-                            {clone.avatar}
-                          </AvatarFallback>
+                        {clone.avatar?.startsWith('/') && (
+                          <AvatarImage src={clone.avatar} alt={clone.name} />
                         )}
+                        <AvatarFallback className="bg-card text-xs font-bold text-muted-foreground">
+                          {clone.avatar?.startsWith('/') ? getInitials(clone.name) : clone.avatar}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <p className="text-sm font-bold text-foreground">{clone.name}</p>
