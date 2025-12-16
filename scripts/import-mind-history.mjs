@@ -87,8 +87,8 @@ async function getOrCreateProject(mindId, mindSlug) {
   return created;
 }
 
-async function upsertHistoryContent(projectId, yamlContent, sourceFile) {
-  const slug = 'history-timeline';
+async function upsertHistoryContent(projectId, mindSlug, yamlContent, sourceFile) {
+  const slug = `history-timeline-${mindSlug}`;
   const title = 'Historia e Timeline';
 
   // Check if content exists
@@ -184,7 +184,7 @@ async function main() {
   const project = await getOrCreateProject(mind.id, mindSlug);
 
   // Upsert history content
-  await upsertHistoryContent(project.id, yamlContent, yamlPath);
+  await upsertHistoryContent(project.id, mindSlug, yamlContent, yamlPath);
 
   console.log(`\nDone! History imported successfully.`);
 }

@@ -29,8 +29,8 @@ const MINDS_DIR = path.resolve(__dirname, '../../outputs/minds');
 const DRY_RUN = process.argv.includes('--dry-run');
 const PARALLEL = process.argv.includes('--parallel');
 const CONCURRENCY = parseInt(process.argv[process.argv.indexOf('--parallel') + 1]) || 5;
-const PATTERN = process.argv.find(arg =>
-  !arg.startsWith('--') && arg !== 'node' && !arg.includes('import-all-histories')
+const PATTERN = process.argv.slice(2).find(arg =>
+  !arg.startsWith('--') && !arg.match(/^\d+$/)
 ) || '*';
 
 let stats = {

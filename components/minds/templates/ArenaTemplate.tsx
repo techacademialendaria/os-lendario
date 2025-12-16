@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 import { Icon } from '../../ui/icon';
-import { Avatar, AvatarFallback } from '../../ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '../../ui/avatar';
 import { Progress } from '../../ui/progress';
 import { Input } from '../../ui/input';
 import { Select } from '../../ui/select';
@@ -15,6 +15,19 @@ import { useToast } from '../../../hooks/use-toast';
 import { Section } from '../../../types';
 import MindsTopbar from '../MindsTopbar';
 import { useDebates, type Debate, incrementDebateViews } from '../../../hooks/useDebates';
+import { debateService, DebateStatus } from '../../../services/debateService';
+import { MindCardSelect } from '../arena/MindCardSelect';
+
+// Helper: Extract initials from full name (e.g., "Steve Jobs" -> "SJ")
+const getInitials = (name: string): string => {
+  return name
+    .trim()
+    .split(/\s+/)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+};
 
 // --- TYPES ---
 
@@ -50,13 +63,16 @@ interface ArenaTemplateProps {
 
 // --- MOCK DATA ---
 
-const MINDS: Mind[] = [
+// --- INITIAL STATE ---
+
+const INITIAL_MINDS: Mind[] = [
   { id: 'elon', name: 'Elon Musk', role: 'Visionary Engineer', avatar: 'EM', winRate: 70, debates: 127, fidelity: 92, color: 'text-cyan-400' },
   { id: 'naval', name: 'Naval Ravikant', role: 'Modern Philosopher', avatar: 'NR', winRate: 65, debates: 98, fidelity: 95, color: 'text-brand-gold' },
   { id: 'sam', name: 'Sam Altman', role: 'AI Architect', avatar: 'SA', winRate: 63, debates: 145, fidelity: 88, color: 'text-blue-400' },
   { id: 'nassim', name: 'Nassim Taleb', role: 'Risk Analyst', avatar: 'NT', winRate: 60, debates: 73, fidelity: 90, color: 'text-red-400' },
   { id: 'ray', name: 'Ray Dalio', role: 'Macro Investor', avatar: 'RD', winRate: 54, debates: 54, fidelity: 85, color: 'text-green-400' },
 ];
+
 
 const FRAMEWORKS: Framework[] = [
   { id: 'oxford', name: 'Oxford Debate', rounds: 5, desc: 'Clássico: Abertura, Refutação, Encerramento.' },
@@ -241,43 +257,6 @@ That said, both matter. The debate is about emphasis, not exclusion.`
 
 // --- SUB-COMPONENTS ---
 
-const MindCardSelect: React.FC<{
-  mind: Mind;
-  selected: boolean;
-  onClick: () => void;
-}> = ({ mind, selected, onClick }) => (
-  <div
-    onClick={onClick}
-    className={cn(
-      "p-4 rounded-xl border cursor-pointer transition-all duration-300 relative group overflow-hidden",
-      selected ? "bg-white/10 border-brand-gold" : "bg-card border-border hover:border-border/80"
-    )}
-  >
-    {selected && (
-      <div className="absolute top-2 right-2 text-brand-gold">
-        <Icon name="check-circle" type="solid" />
-      </div>
-    )}
-    <div className="flex flex-col items-center text-center gap-3">
-      <Avatar className={cn("w-16 h-16 border-2", selected ? "border-brand-gold" : "border-transparent")}>
-        <AvatarFallback className={cn("bg-muted font-bold", mind.color)}>{mind.avatar}</AvatarFallback>
-      </Avatar>
-      <div>
-        <h4 className="font-bold text-foreground">{mind.name}</h4>
-        <p className="text-xs text-muted-foreground">{mind.role}</p>
-      </div>
-      <div className="flex gap-4 text-xs font-mono text-muted-foreground">
-        <span className="flex items-center gap-1">
-          <Icon name="trophy" size="size-3" /> {mind.winRate}%
-        </span>
-        <span className="flex items-center gap-1">
-          <Icon name="shield-check" size="size-3" /> {mind.fidelity}%
-        </span>
-      </div>
-    </div>
-  </div>
-);
-
 const ChatMessage: React.FC<{
   user: string;
   text: string;
@@ -327,7 +306,8 @@ const LiveDebateCard: React.FC<{
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Avatar className={cn("border-2", mind1.color.replace('text-', 'border-'))}>
-            <AvatarFallback className="bg-muted">{mind1.avatar}</AvatarFallback>
+            <AvatarImage src={mind1.avatar} alt={mind1.name} />
+            <AvatarFallback className="bg-muted text-xs">{getInitials(mind1.name)}</AvatarFallback>
           </Avatar>
           <span className="text-sm font-bold text-muted-foreground">{mind1.name.split(' ')[1]}</span>
         </div>
@@ -335,7 +315,8 @@ const LiveDebateCard: React.FC<{
         <div className="flex items-center gap-3">
           <span className="text-sm font-bold text-muted-foreground">{mind2.name.split(' ')[1]}</span>
           <Avatar className={cn("border-2", mind2.color.replace('text-', 'border-'))}>
-            <AvatarFallback className="bg-muted">{mind2.avatar}</AvatarFallback>
+            <AvatarImage src={mind2.avatar} alt={mind2.name} />
+            <AvatarFallback className="bg-muted text-xs">{getInitials(mind2.name)}</AvatarFallback>
           </Avatar>
         </div>
       </div>
@@ -372,6 +353,28 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
   const [pollVotes, setPollVotes] = useState({ c1: 45, c2: 55 });
   const [userVoted, setUserVoted] = useState(false);
   const [totalRounds] = useState(5);
+
+  // Real Data State
+  const [minds, setMinds] = useState<Mind[]>(INITIAL_MINDS);
+  const [activeDebateId, setActiveDebateId] = useState<string | null>(null);
+
+  // Fetch Minds
+  useEffect(() => {
+    async function loadMinds() {
+      try {
+        const realMinds = await debateService.getMinds();
+        if (realMinds.length > 0) {
+          // Merge with initial/mock to keep stats or replace
+          // For now replace, but safely
+          setMinds(realMinds);
+        }
+      } catch (e) {
+        console.error("Failed to load minds:", e);
+      }
+    }
+    loadMinds();
+  }, []);
+
 
   // Replay State
   const [selectedReplay, setSelectedReplay] = useState<Debate | SavedDebate | null>(null);
@@ -413,48 +416,80 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
   }, [history, streamedText]);
 
   // Mock Streaming Logic
+  // SSE Streaming
   useEffect(() => {
-    if (view === 'live' && isStreaming) {
-      const speakerId = currentRound % 2 !== 0 ? selectedMind1 : selectedMind2;
-      const speakerArgs = MOCK_ARGUMENTS[speakerId || 'elon'] || MOCK_ARGUMENTS['elon'];
-      const argIndex = Math.floor((currentRound - 1) / 2) % speakerArgs.length;
-      const fullText = speakerArgs[argIndex];
+    if (view === 'live' && isStreaming && activeDebateId) {
+      console.log("Connecting to EventStream...", activeDebateId);
+      const evtSource = debateService.getStreamSource(activeDebateId);
 
-      let i = 0;
-      const interval = setInterval(() => {
-        setStreamedText(fullText.substring(0, i));
-        i++;
-        if (i > fullText.length) {
-          clearInterval(interval);
-          setIsStreaming(false);
+      evtSource.onmessage = (event) => {
+        try {
+          const parsed = JSON.parse(event.data);
+          // Standard SSE format usually sends 'data' field
+          // but sse-starlette sends the dict directly if formatted right
+          // Actually, 'event.data' is the string payload.
 
-          const speaker = currentRound % 2 !== 0
-            ? MINDS.find(c => c.id === selectedMind1)
-            : MINDS.find(c => c.id === selectedMind2);
-
-          if (speaker) {
-            setHistory(prev => [...prev, {
-              round: Math.ceil(currentRound / 2),
-              speaker,
-              text: fullText
-            }]);
-          }
-          setStreamedText("");
-
-          if (currentRound < totalRounds * 2) {
-            setTimeout(() => {
-              setCurrentRound(prev => prev + 1);
-              setIsStreaming(true);
-            }, 1500);
-          }
+          // However, our API sends:
+          // event: status, data: "debating"
+          // event: new_round, data: {...}
+        } catch (e) {
+          console.error("Parse error", e);
         }
-      }, 25);
+      };
 
-      return () => clearInterval(interval);
+      evtSource.addEventListener("status", (event) => {
+        const status = event.data;
+        console.log("Status update:", status);
+        if (status === 'completed') {
+          setIsStreaming(false);
+          evtSource.close();
+          toast({ title: "Debate finalizado!" });
+        }
+      });
+
+      evtSource.addEventListener("new_round", (event) => {
+        const roundData = JSON.parse(event.data);
+        const roundNum = roundData.number;
+
+        // Add to history
+        // We receive full arguments for round X
+        setHistory(prev => {
+          // Avoid duplicates
+          if (prev.find(h => h.round === roundNum)) return prev;
+
+          const m1 = minds.find(m => m.id === selectedMind1) || minds[0];
+          const m2 = minds.find(m => m.id === selectedMind2) || minds[1];
+
+          return [
+            ...prev,
+            { round: roundNum, speaker: m1, text: roundData.mind1_arg },
+            { round: roundNum, speaker: m2, text: roundData.mind2_arg } // Wait, history structure is flat list of messages?
+          ];
+        });
+
+        // Update round display
+        setCurrentRound(roundNum + 1);
+      });
+
+      evtSource.addEventListener("end", () => {
+        setIsStreaming(false);
+        evtSource.close();
+      });
+
+      evtSource.onerror = (err) => {
+        console.error("EventSource failed:", err);
+        // setIsStreaming(false); 
+        // evtSource.close();
+      };
+
+      return () => {
+        evtSource.close();
+      };
     }
-  }, [view, isStreaming, currentRound, selectedMind1, selectedMind2, totalRounds]);
+  }, [view, isStreaming, activeDebateId, selectedMind1, selectedMind2]);
 
-  const handleStartDebate = () => {
+
+  const handleStartDebate = async () => {
     if (!selectedMind1 || !selectedMind2 || !topic) {
       toast({
         title: "Configuracao incompleta",
@@ -471,13 +506,36 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
       });
       return;
     }
-    setView('live');
-    setHistory([]);
-    setCurrentRound(1);
-    setUserVoted(false);
-    setPollVotes({ c1: 45, c2: 55 });
-    setTimeout(() => setIsStreaming(true), 1000);
+
+    try {
+      toast({ title: "Iniciando debate...", description: "Conectando ao Debate Engine..." });
+
+      const result = await debateService.createDebate({
+        mind1_id: selectedMind1,
+        mind2_id: selectedMind2,
+        topic: topic,
+        framework: framework,
+        rounds: 3 // MVP fixo
+      });
+
+      setActiveDebateId(result.debate_id);
+
+      setView('live');
+      setHistory([]);
+      setCurrentRound(1);
+      setUserVoted(false);
+      setPollVotes({ c1: 45, c2: 55 });
+      setIsStreaming(true);
+
+    } catch (e) {
+      toast({
+        title: "Erro ao iniciar",
+        description: String(e),
+        variant: "destructive"
+      });
+    }
   };
+
 
   const handleVote = (mind: 'c1' | 'c2') => {
     if (userVoted) return;
@@ -556,8 +614,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
           <div className="grid gap-4">
             <LiveDebateCard
               topic="A IA deve ser Open Source ou Proprietaria?"
-              mind1={MINDS[0]}
-              mind2={MINDS[2]}
+              mind1={minds[0]}
+              mind2={minds[2]}
+
               round={3}
               totalRounds={5}
               viewers={1234}
@@ -566,8 +625,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
             />
             <LiveDebateCard
               topic="O futuro do trabalho e remote ou presencial?"
-              mind1={MINDS[1]}
-              mind2={MINDS[4]}
+              mind1={minds[1]}
+              mind2={minds[4]}
+
               round={2}
               totalRounds={5}
               viewers={876}
@@ -584,7 +644,8 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
           </h3>
           <Card className="bg-card border-border">
             <CardContent className="p-0">
-              {MINDS.sort((a, b) => b.winRate - a.winRate).map((mind, i) => (
+              {minds.sort((a, b) => b.winRate - a.winRate).map((mind, i) => (
+
                 <div
                   key={mind.id}
                   className="flex items-center gap-4 p-4 border-b border-border last:border-0 hover:bg-muted/50 transition-colors"
@@ -596,8 +657,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                     {i + 1}
                   </span>
                   <Avatar className="w-10 h-10 border border-border">
+                    <AvatarImage src={mind.avatar} alt={mind.name} />
                     <AvatarFallback className="bg-muted text-xs font-bold text-muted-foreground">
-                      {mind.avatar}
+                      {getInitials(mind.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -642,66 +704,69 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
             ))}
           </div>
         ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {allDebates.map((debate) => {
-            const m1 = MINDS.find(m => m.id === debate.mind1.id);
-            const m2 = MINDS.find(m => m.id === debate.mind2.id);
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {allDebates.map((debate) => {
+              const m1 = minds.find(m => m.id === debate.mind1.id);
+              const m2 = minds.find(m => m.id === debate.mind2.id);
 
-            return (
-              <Card
-                key={debate.id}
-                className="bg-card border-border hover:border-primary/30 transition-all cursor-pointer group"
-                onClick={() => handleWatchReplay(debate)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <Badge variant="secondary" className="bg-muted">
-                      <Icon name="play" size="size-3" className="mr-1" /> Replay
-                    </Badge>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Icon name="eye" size="size-3" /> {debate.views.toLocaleString()}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Icon name="star" size="size-3" className="text-yellow-500" /> {debate.rating}
-                      </span>
+
+              return (
+                <Card
+                  key={debate.id}
+                  className="bg-card border-border hover:border-primary/30 transition-all cursor-pointer group"
+                  onClick={() => handleWatchReplay(debate)}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <Badge variant="secondary" className="bg-muted">
+                        <Icon name="play" size="size-3" className="mr-1" /> Replay
+                      </Badge>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Icon name="eye" size="size-3" /> {debate.views.toLocaleString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Icon name="star" size="size-3" className="text-yellow-500" /> {debate.rating}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  <h4 className="text-base font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                    "{debate.topic}"
-                  </h4>
+                    <h4 className="text-base font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                      "{debate.topic}"
+                    </h4>
 
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
-                    <Badge variant="outline" className="text-[10px]">{debate.framework}</Badge>
-                    <span>{debate.rounds.length} rounds</span>
-                    <span>{debate.date}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="w-8 h-8 border border-border">
-                        <AvatarFallback className={cn("bg-muted text-xs font-bold", m1?.color)}>
-                          {m1?.avatar || debate.mind1.name.substring(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-xs font-medium text-muted-foreground">{debate.mind1.name.split(' ')[1]}</span>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
+                      <Badge variant="outline" className="text-[10px]">{debate.framework}</Badge>
+                      <span>{debate.rounds.length} rounds</span>
+                      <span>{debate.date}</span>
                     </div>
-                    <span className="text-[10px] font-bold text-muted-foreground/50 uppercase">vs</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-muted-foreground">{debate.mind2.name.split(' ')[1]}</span>
-                      <Avatar className="w-8 h-8 border border-border">
-                        <AvatarFallback className={cn("bg-muted text-xs font-bold", m2?.color)}>
-                          {m2?.avatar || debate.mind2.name.substring(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="w-8 h-8 border border-border">
+                          <AvatarImage src={m1?.avatar} alt={debate.mind1.name} />
+                          <AvatarFallback className={cn("bg-muted text-xs font-bold", m1?.color)}>
+                            {getInitials(debate.mind1.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-xs font-medium text-muted-foreground">{debate.mind1.name.split(' ')[1]}</span>
+                      </div>
+                      <span className="text-[10px] font-bold text-muted-foreground/50 uppercase">vs</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-muted-foreground">{debate.mind2.name.split(' ')[1]}</span>
+                        <Avatar className="w-8 h-8 border border-border">
+                          <AvatarImage src={m2?.avatar} alt={debate.mind2.name} />
+                          <AvatarFallback className={cn("bg-muted text-xs font-bold", m2?.color)}>
+                            {getInitials(debate.mind2.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
@@ -723,10 +788,14 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
             Proponente (Thesis)
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            {MINDS.map(mind => (
+            {minds.map(mind => (
               <MindCardSelect
                 key={`c1-${mind.id}`}
-                mind={mind}
+                id={mind.id}
+                name={mind.name}
+                shortBio={mind.role}
+                avatar={mind.avatar}
+                apexScore={null}
                 selected={selectedMind1 === mind.id}
                 onClick={() => setSelectedMind1(mind.id)}
               />
@@ -740,10 +809,14 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
             Oponente (Antithesis)
           </h3>
           <div className="grid grid-cols-2 gap-4">
-            {MINDS.map(mind => (
+            {minds.map(mind => (
               <MindCardSelect
                 key={`c2-${mind.id}`}
-                mind={mind}
+                id={mind.id}
+                name={mind.name}
+                shortBio={mind.role}
+                avatar={mind.avatar}
+                apexScore={null}
                 selected={selectedMind2 === mind.id}
                 onClick={() => setSelectedMind2(mind.id)}
               />
@@ -833,8 +906,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
   );
 
   const renderLive = () => {
-    const c1 = MINDS.find(c => c.id === selectedMind1);
-    const c2 = MINDS.find(c => c.id === selectedMind2);
+    const c1 = minds.find(c => c.id === selectedMind1);
+    const c2 = minds.find(c => c.id === selectedMind2);
+
     if (!c1 || !c2) return null;
 
     const activeSpeaker = isStreaming ? (currentRound % 2 !== 0 ? c1 : c2) : null;
@@ -875,7 +949,7 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                 className={cn(
                   "flex-1 border-r border-background",
                   i + 1 < debateRound ? "bg-muted-foreground" :
-                  i + 1 === debateRound ? "bg-primary animate-pulse" : "bg-transparent"
+                    i + 1 === debateRound ? "bg-primary animate-pulse" : "bg-transparent"
                 )}
               />
             ))}
@@ -894,7 +968,8 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                   )}
                 >
                   <Avatar className="w-12 h-12 border-2 border-border shrink-0">
-                    <AvatarFallback className="bg-muted font-bold">{turn.speaker.avatar}</AvatarFallback>
+                    <AvatarImage src={turn.speaker.avatar} alt={turn.speaker.name} />
+                    <AvatarFallback className="bg-muted font-bold text-xs">{getInitials(turn.speaker.name)}</AvatarFallback>
                   </Avatar>
                   <div className={cn(
                     "flex-1 space-y-2",
@@ -1029,8 +1104,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
   const renderReplay = () => {
     if (!selectedReplay) return null;
 
-    const m1 = MINDS.find(m => m.id === selectedReplay.mind1.id);
-    const m2 = MINDS.find(m => m.id === selectedReplay.mind2.id);
+    const m1 = minds.find(m => m.id === selectedReplay.mind1.id);
+    const m2 = minds.find(m => m.id === selectedReplay.mind2.id);
+
 
     return (
       <div className="h-[calc(100vh-200px)] flex flex-col animate-in fade-in duration-500">
@@ -1066,8 +1142,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
         <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-center gap-8">
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10 border-2 border-border">
+              <AvatarImage src={m1?.avatar} alt={selectedReplay.mind1.name} />
               <AvatarFallback className={cn("bg-muted font-bold", m1?.color)}>
-                {m1?.avatar || selectedReplay.mind1.name.substring(0, 2)}
+                {getInitials(selectedReplay.mind1.name)}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -1082,8 +1159,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
               <p className="text-xs text-muted-foreground">{selectedReplay.mind2.role}</p>
             </div>
             <Avatar className="w-10 h-10 border-2 border-border">
+              <AvatarImage src={m2?.avatar} alt={selectedReplay.mind2.name} />
               <AvatarFallback className={cn("bg-muted font-bold", m2?.color)}>
-                {m2?.avatar || selectedReplay.mind2.name.substring(0, 2)}
+                {getInitials(selectedReplay.mind2.name)}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -1107,8 +1185,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                   {/* Mind 1 Argument */}
                   <div className="flex gap-4">
                     <Avatar className="w-10 h-10 border-2 border-border shrink-0 mt-1">
+                      <AvatarImage src={m1?.avatar} alt={selectedReplay.mind1.name} />
                       <AvatarFallback className={cn("bg-muted font-bold text-sm", m1?.color)}>
-                        {m1?.avatar || selectedReplay.mind1.name.substring(0, 2)}
+                        {selectedReplay.mind1.name.substring(0, 2)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 space-y-1">
@@ -1127,8 +1206,9 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                   {/* Mind 2 Argument */}
                   <div className="flex gap-4 flex-row-reverse">
                     <Avatar className="w-10 h-10 border-2 border-border shrink-0 mt-1">
+                      <AvatarImage src={m2?.avatar} alt={selectedReplay.mind2.name} />
                       <AvatarFallback className={cn("bg-muted font-bold text-sm", m2?.color)}>
-                        {m2?.avatar || selectedReplay.mind2.name.substring(0, 2)}
+                        {selectedReplay.mind2.name.substring(0, 2)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 space-y-1">
@@ -1178,11 +1258,13 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
   return (
     <div className="flex flex-col min-h-screen bg-background font-sans">
       <MindsTopbar currentSection={Section.APP_MINDS_ARENA} setSection={setSection} />
-      <div className="flex-1 p-6 max-w-[1400px] mx-auto w-full">
-        {view === 'lobby' && renderLobby()}
-        {view === 'create' && renderCreate()}
-        {view === 'live' && renderLive()}
-        {view === 'replay' && renderReplay()}
+      <div className="flex-1 w-full">
+        <div className="p-6 max-w-[1400px] mx-auto w-full h-full">
+          {view === 'lobby' && renderLobby()}
+          {view === 'create' && renderCreate()}
+          {view === 'live' && renderLive()}
+          {view === 'replay' && renderReplay()}
+        </div>
       </div>
     </div>
   );

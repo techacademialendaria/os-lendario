@@ -4,7 +4,7 @@ import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 import { Icon } from '../../ui/icon';
 import { Card, CardContent } from '../../ui/card';
-import { Avatar, AvatarFallback } from '../../ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '../../ui/avatar';
 import { Progress } from '../../ui/progress';
 import { CLONES } from './data';
 import { cn } from '../../../lib/utils';
@@ -118,9 +118,18 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({ onCreateClick }) => {
                         {i + 1}
                       </span>
                       <Avatar className="w-10 h-10 border border-border">
-                        <AvatarFallback className="bg-card text-xs font-bold text-muted-foreground">
-                          {clone.avatar}
-                        </AvatarFallback>
+                        {clone.avatar?.startsWith('/') ? (
+                          <>
+                            <AvatarImage src={clone.avatar} alt={clone.name} />
+                            <AvatarFallback className="bg-card text-xs font-bold text-muted-foreground">
+                              {clone.name.substring(0, 2).toUpperCase()}
+                            </AvatarFallback>
+                          </>
+                        ) : (
+                          <AvatarFallback className="bg-card text-xs font-bold text-muted-foreground">
+                            {clone.avatar}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
                       <div className="flex-1">
                         <p className="text-sm font-bold text-foreground">{clone.name}</p>

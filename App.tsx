@@ -377,8 +377,8 @@ const App: React.FC = () => {
           )}
         >
           {/* Apply padding only if NOT a sales/minds/creator template or external iframe */}
-          <div className={cn("max-w-[1920px] mx-auto",
-            isFullWidthPage ? "h-full p-0" : "p-6 md:p-12"
+          <div className={cn(
+            isFullWidthPage ? "h-full p-0 w-full" : "max-w-[1920px] mx-auto p-6 md:p-12"
           )}>
             {renderContent()}
           </div>

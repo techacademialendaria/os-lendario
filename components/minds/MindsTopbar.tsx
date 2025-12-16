@@ -20,8 +20,8 @@ const MindsTopbar: React.FC<MindsTopbarProps> = ({ currentSection, setSection })
   ];
 
   return (
-    <div className="h-16 border-b border-border bg-card sticky top-0 z-40 shadow-sm font-sans w-full">
-      <div className="flex items-center justify-between px-6 h-full max-w-[1400px] mx-auto w-full">
+    <div className="border-b border-border bg-card sticky top-0 z-40 shadow-sm font-sans w-full">
+      <div className="flex items-center justify-between px-6 h-16 max-w-[1400px] mx-auto w-full">
         {/* Left: Brand & Nav */}
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2">

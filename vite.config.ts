@@ -7,4 +7,13 @@ export default defineConfig({
   plugins: [react()],
   envDir: path.resolve(__dirname, '..'),
   publicDir: path.resolve(__dirname, '../public'),
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 })

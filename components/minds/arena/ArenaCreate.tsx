@@ -9,7 +9,7 @@ import { Badge } from '../../ui/badge';
 import { FRAMEWORKS } from './data';
 import { MindCardSelect } from './MindCardSelect';
 import { useToast } from '../../../hooks/use-toast';
-import { useMindsList } from '../../../hooks/useMindsList';
+import { usePublicMinds } from '../../../hooks/usePublicMinds';
 import { DebateConfig } from './types';
 
 interface ArenaCreateProps {
@@ -19,7 +19,7 @@ interface ArenaCreateProps {
 
 export const ArenaCreate: React.FC<ArenaCreateProps> = ({ onBack, onStart }) => {
     const { toast } = useToast();
-    const { minds, loading } = useMindsList();
+    const { minds, loading } = usePublicMinds();
     const [selectedClone1, setSelectedClone1] = useState<string | null>(null);
     const [selectedClone2, setSelectedClone2] = useState<string | null>(null);
     const [topic, setTopic] = useState("");
@@ -93,6 +93,7 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ onBack, onStart }) => 
                   <MindCardSelect
                     key={`c1-${mind.id}`}
                     id={mind.id}
+                    slug={mind.slug}
                     name={mind.name}
                     shortBio={mind.shortBio}
                     avatar={mind.avatar}
@@ -136,6 +137,7 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ onBack, onStart }) => 
                   <MindCardSelect
                     key={`c2-${mind.id}`}
                     id={mind.id}
+                    slug={mind.slug}
                     name={mind.name}
                     shortBio={mind.shortBio}
                     avatar={mind.avatar}
