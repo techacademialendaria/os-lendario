@@ -128,7 +128,7 @@ export interface Database {
         Row: {
           id: string;
           slug: string;
-          display_name: string;
+          name: string;
           primary_language: string | null;
           short_bio: string | null;
           privacy_level: string;
@@ -141,7 +141,7 @@ export interface Database {
         Insert: {
           id?: string;
           slug: string;
-          display_name: string;
+          name: string;
           primary_language?: string | null;
           short_bio?: string | null;
           privacy_level?: string;
@@ -154,7 +154,7 @@ export interface Database {
         Update: {
           id?: string;
           slug?: string;
-          display_name?: string;
+          name?: string;
           primary_language?: string | null;
           short_bio?: string | null;
           privacy_level?: string;

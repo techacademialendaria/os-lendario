@@ -10,6 +10,17 @@ import { useToast } from '../../../hooks/use-toast';
 import { cn } from '../../../lib/utils';
 import { ScrollArea } from '../../ui/scroll-area';
 
+// Helper: Extract initials from full name (e.g., "Steve Jobs" -> "SJ")
+const getInitials = (name: string): string => {
+  return name
+    .trim()
+    .split(/\s+/)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+};
+
 export interface DebateConfig {
     clone1Id: string;
     clone2Id: string;
@@ -39,6 +50,8 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
     const [framework, setFramework] = useState("oxford");
     const [isRandomizing, setIsRandomizing] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [imgError1, setImgError1] = useState(false);
+    const [imgError2, setImgError2] = useState(false);
 
     const handleStart = () => {
         if (!selectedClone1 || !selectedClone2 || !topic) {
@@ -58,6 +71,17 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
         });
     };
 
+    // Reset image error when selection changes
+    const handleSetClone1 = (id: string) => {
+        setSelectedClone1(id);
+        setImgError1(false);
+    };
+
+    const handleSetClone2 = (id: string) => {
+        setSelectedClone2(id);
+        setImgError2(false);
+    };
+
     const handleRandomize = () => {
         if (minds.length < 2) return;
 
@@ -66,8 +90,8 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
         let interval = setInterval(() => {
             const r1 = minds[Math.floor(Math.random() * minds.length)].id;
             const r2 = minds[Math.floor(Math.random() * minds.length)].id;
-            setSelectedClone1(r1);
-            setSelectedClone2(r2);
+            handleSetClone1(r1);
+            handleSetClone2(r2);
         }, 100);
 
         setTimeout(() => {
@@ -78,17 +102,23 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
             while (final2.id === final1.id) {
                 final2 = minds[Math.floor(Math.random() * minds.length)];
             }
-            setSelectedClone1(final1.id);
-            setSelectedClone2(final2.id);
+            handleSetClone1(final1.id);
+            handleSetClone2(final2.id);
             setIsRandomizing(false);
         }, 800);
     };
 
-    // Filter Clones
-    const filteredClones = minds.filter(clone =>
+    // Filter Clones based on search
+    const baseFiltered = minds.filter(clone =>
         clone.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         clone.role.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    // Filter for Player 1 (exclude Player 2 selection)
+    const filteredClones1 = baseFiltered.filter(clone => clone.id !== selectedClone2);
+
+    // Filter for Player 2 (exclude Player 1 selection)
+    const filteredClones2 = baseFiltered.filter(clone => clone.id !== selectedClone1);
 
     // Get selected objects for display
     const c1 = minds.find(c => c.id === selectedClone1);
@@ -119,8 +149,20 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
                         {c1 ? (
                             <>
                                 <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none"></div>
-                                <div className="w-32 h-32 rounded-full border-4 border-cyan-500/20 flex items-center justify-center bg-zinc-900 mb-4 shadow-xl z-10 transition-transform duration-500 hover:scale-110">
-                                    <span className={cn("text-4xl font-black", c1.color)}>{c1.avatar}</span>
+                                <div className="w-32 h-32 rounded-full border-4 border-cyan-500/20 flex items-center justify-center bg-zinc-900 mb-4 shadow-xl z-10 transition-transform duration-500 hover:scale-110 overflow-hidden relative">
+                                    {c1.avatar?.startsWith('/') && !imgError1 ? (
+                                        <img
+                                            src={c1.avatar}
+                                            alt={c1.name}
+                                            className="w-full h-full object-cover"
+                                            onError={() => setImgError1(true)}
+                                        />
+                                    ) : null}
+                                    {(imgError1 || !c1.avatar?.startsWith('/')) && (
+                                        <span className={cn("text-4xl font-black", c1.color)}>
+                                            {c1.avatar?.startsWith('/') ? getInitials(c1.name) : c1.avatar}
+                                        </span>
+                                    )}
                                 </div>
                                 <h2 className="text-3xl font-black text-white uppercase tracking-tight z-10 text-center">{c1.name}</h2>
                                 <p className="text-zinc-400 font-serif z-10">{c1.role}</p>
@@ -155,8 +197,20 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
                         {c2 ? (
                             <>
                                 <div className="absolute inset-0 bg-gradient-to-b from-red-500/5 to-transparent pointer-events-none"></div>
-                                <div className="w-32 h-32 rounded-full border-4 border-red-500/20 flex items-center justify-center bg-zinc-900 mb-4 shadow-xl z-10 transition-transform duration-500 hover:scale-110">
-                                    <span className={cn("text-4xl font-black", c2.color)}>{c2.avatar}</span>
+                                <div className="w-32 h-32 rounded-full border-4 border-red-500/20 flex items-center justify-center bg-zinc-900 mb-4 shadow-xl z-10 transition-transform duration-500 hover:scale-110 overflow-hidden relative">
+                                    {c2.avatar?.startsWith('/') && !imgError2 ? (
+                                        <img
+                                            src={c2.avatar}
+                                            alt={c2.name}
+                                            className="w-full h-full object-cover"
+                                            onError={() => setImgError2(true)}
+                                        />
+                                    ) : null}
+                                    {(imgError2 || !c2.avatar?.startsWith('/')) && (
+                                        <span className={cn("text-4xl font-black", c2.color)}>
+                                            {c2.avatar?.startsWith('/') ? getInitials(c2.name) : c2.avatar}
+                                        </span>
+                                    )}
                                 </div>
                                 <h2 className="text-3xl font-black text-white uppercase tracking-tight z-10 text-center">{c2.name}</h2>
                                 <p className="text-zinc-400 font-serif z-10">{c2.role}</p>
@@ -195,13 +249,13 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
                     </div>
                     <ScrollArea className="flex-1 p-2">
                         <div className="grid grid-cols-1 gap-2">
-                            {filteredClones.length > 0 ? (
-                                filteredClones.map(clone => (
+                            {filteredClones1.length > 0 ? (
+                                filteredClones1.map(clone => (
                                     <CloneCardSelect
                                         key={`c1-list-${clone.id}`}
                                         clone={clone}
                                         selected={selectedClone1 === clone.id}
-                                        onClick={() => setSelectedClone1(clone.id)}
+                                        onClick={() => handleSetClone1(clone.id)}
                                         compact
                                     />
                                 ))
@@ -255,13 +309,13 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
                     </div>
                     <ScrollArea className="flex-1 p-2">
                         <div className="grid grid-cols-1 gap-2">
-                            {filteredClones.length > 0 ? (
-                                filteredClones.map(clone => (
+                            {filteredClones2.length > 0 ? (
+                                filteredClones2.map(clone => (
                                     <CloneCardSelect
                                         key={`c2-list-${clone.id}`}
                                         clone={clone}
                                         selected={selectedClone2 === clone.id}
-                                        onClick={() => setSelectedClone2(clone.id)}
+                                        onClick={() => handleSetClone2(clone.id)}
                                         compact
                                     />
                                 ))

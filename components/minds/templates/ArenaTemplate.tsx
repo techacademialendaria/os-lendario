@@ -17,6 +17,7 @@ import MindsTopbar from '../MindsTopbar';
 import { useDebates, type Debate, incrementDebateViews } from '../../../hooks/useDebates';
 import { debateService, DebateStatus } from '../../../services/debateService';
 import { MindCardSelect } from '../arena/MindCardSelect';
+import { ArenaCreate, type DebateConfig } from './ArenaCreate';
 
 // Helper: Extract initials from full name (e.g., "Steve Jobs" -> "SJ")
 const getInitials = (name: string): string => {
@@ -66,11 +67,11 @@ interface ArenaTemplateProps {
 // --- INITIAL STATE ---
 
 const INITIAL_MINDS: Mind[] = [
-  { id: 'elon', name: 'Elon Musk', role: 'Visionary Engineer', avatar: 'EM', winRate: 70, debates: 127, fidelity: 92, color: 'text-cyan-400' },
-  { id: 'naval', name: 'Naval Ravikant', role: 'Modern Philosopher', avatar: 'NR', winRate: 65, debates: 98, fidelity: 95, color: 'text-brand-gold' },
-  { id: 'sam', name: 'Sam Altman', role: 'AI Architect', avatar: 'SA', winRate: 63, debates: 145, fidelity: 88, color: 'text-blue-400' },
-  { id: 'nassim', name: 'Nassim Taleb', role: 'Risk Analyst', avatar: 'NT', winRate: 60, debates: 73, fidelity: 90, color: 'text-red-400' },
-  { id: 'ray', name: 'Ray Dalio', role: 'Macro Investor', avatar: 'RD', winRate: 54, debates: 54, fidelity: 85, color: 'text-green-400' },
+  { id: 'elon', name: 'Elon Musk', role: 'Visionary Engineer', avatar: '/minds-profile-images/elon_musk.jpg', winRate: 70, debates: 127, fidelity: 92, color: 'text-cyan-400' },
+  { id: 'naval', name: 'Naval Ravikant', role: 'Modern Philosopher', avatar: '/minds-profile-images/naval_ravikant.jpg', winRate: 65, debates: 98, fidelity: 95, color: 'text-brand-gold' },
+  { id: 'sam', name: 'Sam Altman', role: 'AI Architect', avatar: '/minds-profile-images/sam_altman.jpg', winRate: 63, debates: 145, fidelity: 88, color: 'text-blue-400' },
+  { id: 'nassim', name: 'Nassim Taleb', role: 'Risk Analyst', avatar: '/minds-profile-images/nassim_taleb.jpg', winRate: 60, debates: 73, fidelity: 90, color: 'text-red-400' },
+  { id: 'ray', name: 'Ray Dalio', role: 'Macro Investor', avatar: '/minds-profile-images/ray_dalio.jpg', winRate: 54, debates: 54, fidelity: 85, color: 'text-green-400' },
 ];
 
 
@@ -116,8 +117,8 @@ interface SavedDebate {
   topic: string;
   framework: string;
   date: string;
-  mind1: { id: string; name: string; role: string };
-  mind2: { id: string; name: string; role: string };
+  mind1: { id: string; name: string; role: string; avatar?: string };
+  mind2: { id: string; name: string; role: string; avatar?: string };
   rounds: Array<{
     number: number;
     type: string;
@@ -134,8 +135,8 @@ const SAVED_DEBATES: SavedDebate[] = [
     topic: 'Elon Musk nao vai conseguir ir para Marte',
     framework: 'Oxford Debate',
     date: '2025-10-14',
-    mind1: { id: 'sam', name: 'Sam Altman', role: 'proposer' },
-    mind2: { id: 'elon', name: 'Elon Musk', role: 'opposer' },
+    mind1: { id: 'sam', name: 'Sam Altman', role: 'proposer', avatar: '/minds-profile-images/sam_altman.jpg' },
+    mind2: { id: 'elon', name: 'Elon Musk', role: 'opposer', avatar: '/minds-profile-images/elon_musk.jpg' },
     views: 2134,
     rating: 4.8,
     rounds: [
@@ -210,8 +211,8 @@ I'll take distributed chaos over centralized control. Every time. See you on Mar
     topic: 'O sucesso de uma startup depende mais do fundador visionario ou da execucao tecnica do time?',
     framework: 'Steel Man Debate',
     date: '2025-10-17',
-    mind1: { id: 'elon', name: 'Elon Musk', role: 'advocate_a' },
-    mind2: { id: 'sam', name: 'Sam Altman', role: 'advocate_b' },
+    mind1: { id: 'elon', name: 'Elon Musk', role: 'advocate_a', avatar: '/minds-profile-images/elon_musk.jpg' },
+    mind2: { id: 'sam', name: 'Sam Altman', role: 'advocate_b', avatar: '/minds-profile-images/sam_altman.jpg' },
     views: 1567,
     rating: 4.5,
     rounds: [
@@ -644,7 +645,7 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
           </h3>
           <Card className="bg-card border-border">
             <CardContent className="p-0">
-              {minds.sort((a, b) => b.winRate - a.winRate).map((mind, i) => (
+              {minds.sort((a, b) => b.winRate - a.winRate).slice(0, 10).map((mind, i) => (
 
                 <div
                   key={mind.id}
@@ -744,7 +745,7 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Avatar className="w-8 h-8 border border-border">
-                          <AvatarImage src={m1?.avatar} alt={debate.mind1.name} />
+                          <AvatarImage src={debate.mind1.avatar || m1?.avatar} alt={debate.mind1.name} />
                           <AvatarFallback className={cn("bg-muted text-xs font-bold", m1?.color)}>
                             {getInitials(debate.mind1.name)}
                           </AvatarFallback>
@@ -755,7 +756,7 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-muted-foreground">{debate.mind2.name.split(' ')[1]}</span>
                         <Avatar className="w-8 h-8 border border-border">
-                          <AvatarImage src={m2?.avatar} alt={debate.mind2.name} />
+                          <AvatarImage src={debate.mind2.avatar || m2?.avatar} alt={debate.mind2.name} />
                           <AvatarFallback className={cn("bg-muted text-xs font-bold", m2?.color)}>
                             {getInitials(debate.mind2.name)}
                           </AvatarFallback>
@@ -772,7 +773,39 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
     </div>
   );
 
-  const renderCreate = () => (
+  const renderCreate = () => {
+    const frameworks: any[] = [
+      { id: 'oxford', name: 'Oxford Debate', rounds: 5, desc: 'Clássico: Abertura, Refutação, Encerramento.' },
+      { id: 'socratic', name: 'Socratic Dialogue', rounds: 7, desc: 'Exploração através de perguntas profundas.' },
+      { id: 'steelman', name: 'Steel Man', rounds: 4, desc: 'Defender o melhor argumento do oponente.' },
+      { id: 'twitter', name: 'X/Twitter Thread', rounds: 6, desc: 'Batalha viral de argumentos curtos e incisivos.' },
+    ];
+
+    const handleStartDebate = (config: DebateConfig) => {
+      const mind1 = minds.find(m => m.id === config.clone1Id);
+      const mind2 = minds.find(m => m.id === config.clone2Id);
+
+      if (mind1 && mind2) {
+        setSelectedMind1(config.clone1Id);
+        setSelectedMind2(config.clone2Id);
+        setTopic(config.topic);
+        setFrameworkId(config.frameworkId);
+        // Start the debate
+        setTimeout(() => handleStartLive(config.clone1Id, config.clone2Id, config.topic), 100);
+      }
+    };
+
+    return (
+      <ArenaCreate
+        minds={minds}
+        frameworks={frameworks}
+        onBack={() => setView('lobby')}
+        onStart={handleStartDebate}
+      />
+    );
+  };
+
+  const renderCreateOld = () => (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center gap-4 mb-8">
         <Button variant="ghost" size="icon" onClick={() => setView('lobby')}>

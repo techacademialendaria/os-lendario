@@ -87,7 +87,7 @@ const transformToCourse = (project: ContentProjectWithRelations): Course => {
   const instructorFromJunction = (project as any).instructor_from_junction as { name: string; slug: string } | undefined;
 
   // Prioritize instructor from project_minds junction, fallback to persona_mind
-  const instructorName = instructorFromJunction?.name || project.persona_mind?.display_name || 'Sem instrutor';
+  const instructorName = instructorFromJunction?.name || project.persona_mind?.name || 'Sem instrutor';
   const instructorSlug = instructorFromJunction?.slug || project.persona_mind?.slug || '';
 
   return {
@@ -151,8 +151,8 @@ export function useCourses(): UseCoursesResult {
         .from('content_projects')
         .select(`
           *,
-          persona_mind:minds!content_projects_persona_mind_id_fkey(id, display_name, slug),
-          creator_mind:minds!content_projects_creator_mind_id_fkey(id, display_name, slug),
+          persona_mind:minds!content_projects_persona_mind_id_fkey(id, name, slug),
+          creator_mind:minds!content_projects_creator_mind_id_fkey(id, name, slug),
           target_audience:audience_profiles(id, name, slug)
         `)
         .eq('project_type', 'course')
@@ -172,7 +172,7 @@ export function useCourses(): UseCoursesResult {
           .select(`
             project_id,
             role,
-            mind:minds(id, display_name, slug)
+            mind:minds(id, name, slug)
           `)
           .in('project_id', projectIds)
           .eq('role', 'instructor');
@@ -182,7 +182,7 @@ export function useCourses(): UseCoursesResult {
         projectMinds?.forEach(pm => {
           if (pm.mind && pm.project_id) {
             instructorMap[pm.project_id] = {
-              name: (pm.mind as any).display_name || 'Sem instrutor',
+              name: (pm.mind as any).name || 'Sem instrutor',
               slug: (pm.mind as any).slug || '',
             };
           }

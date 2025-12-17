@@ -58,7 +58,7 @@ export const MindEditDialog: React.FC<MindEditDialogProps> = ({
             const { error } = await supabase
                 .from('minds')
                 .update({
-                    display_name: data.name,
+                    name: data.name,
                     short_bio: data.shortBio,
                     // Preserve existing metadata, merge overrides
                     mmos_metadata: {

@@ -23,12 +23,12 @@ export interface CourseData {
   updated_at: string;
   persona_mind?: {
     id: string;
-    display_name: string;
+    name: string;
     slug: string;
   } | null;
   creator_mind?: {
     id: string;
-    display_name: string;
+    name: string;
     slug: string;
   } | null;
   // Resolved framework names

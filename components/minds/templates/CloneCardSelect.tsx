@@ -1,7 +1,18 @@
 import React from 'react';
 import { cn } from '../../../lib/utils';
-import { Avatar, AvatarFallback } from '../../ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '../../ui/avatar';
 import { Icon } from '../../ui/icon';
+
+// Helper: Extract initials from full name (e.g., "Steve Jobs" -> "SJ")
+const getInitials = (name: string): string => {
+  return name
+    .trim()
+    .split(/\s+/)
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
+};
 
 // Reuse the Mind interface from ArenaTemplate or define common one
 export interface Mind {
@@ -45,8 +56,11 @@ export const CloneCardSelect: React.FC<CloneCardSelectProps> = ({ clone, selecte
                 selected ? "border-brand-gold" : "border-transparent group-hover:border-white/20",
                 compact ? "w-10 h-10" : "w-16 h-16"
             )}>
+                {clone.avatar?.startsWith('/') && (
+                  <AvatarImage src={clone.avatar} alt={clone.name} />
+                )}
                 <AvatarFallback className={cn("bg-zinc-800 font-bold text-white", clone.color)}>
-                    {clone.avatar}
+                    {clone.avatar?.startsWith('/') ? getInitials(clone.name) : clone.avatar}
                 </AvatarFallback>
             </Avatar>
 

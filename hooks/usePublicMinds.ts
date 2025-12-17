@@ -81,7 +81,7 @@ export function usePublicMinds(): UsePublicMindsResult {
     try {
       const { data: mindsData, error: mindsError } = await supabase
         .from('minds')
-        .select('id, slug, display_name, short_bio, apex_score')
+        .select('id, slug, name, short_bio, apex_score')
         .eq('privacy_level', 'public')
         .is('deleted_at', null)
         .order('updated_at', { ascending: false });
@@ -92,13 +92,15 @@ export function usePublicMinds(): UsePublicMindsResult {
 
       const transformedMinds = (mindsData || []).map((m: any) => {
         const hasRealAvatar = MINDS_WITH_AVATAR.has(m.slug);
+        // Normalize slug: replace hyphens with underscores for file lookup
+        const normalizedSlug = m.slug.replace(/-/g, '_');
         return {
           id: m.id,
           slug: m.slug,
-          name: (m.display_name || '').replace(/^["']|["']$/g, '') || m.slug,
+          name: (m.name || '').replace(/^["']|["']$/g, '') || m.slug,
           shortBio: m.short_bio || '',
           apexScore: m.apex_score,
-          avatar: `/minds-profile-images/${m.slug}.jpg`,
+          avatar: `/minds-profile-images/${normalizedSlug}.jpg`,
           hasRealAvatar,
         };
       });

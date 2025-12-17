@@ -211,12 +211,12 @@ export function useMind(slug: string | null): UseMindResult {
       })).sort((a: any, b: any) => b.importance - a.importance);
 
       // Get psychometrics
-      const psychometrics = MOCK_PSYCHOMETRICS[mindData.slug] || MOCK_PSYCHOMETRICS[mindData.display_name];
+      const psychometrics = MOCK_PSYCHOMETRICS[mindData.slug] || MOCK_PSYCHOMETRICS[mindData.name];
 
       const profile: MindProfile = {
         id: mindData.id,
         slug: mindData.slug,
-        name: mindData.display_name,
+        name: mindData.name,
         avatar: generateAvatar(mindData.slug),
         shortBio: mindData.short_bio || '',
         apexScore: mindData.apex_score,

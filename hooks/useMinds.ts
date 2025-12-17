@@ -38,7 +38,7 @@ const MINDS_WITH_AVATAR = new Set([
 interface DbMind {
   id: string;
   slug: string;
-  display_name: string;
+  name: string;
   short_bio: string | null;
   primary_language: string | null;
   privacy_level: string;
@@ -78,7 +78,7 @@ const calculateProgress = (mind: DbMindWithRelations): number => {
   let progress = 0;
 
   // Base fields (20%)
-  if (mind.display_name) progress += 5;
+  if (mind.name) progress += 5;
   if (mind.short_bio) progress += 10;
   if (mind.primary_language) progress += 5;
 
@@ -184,7 +184,7 @@ const transformToMindData = (dbMind: DbMindWithRelations): MindData => {
   const progressPercent = status === 'progress' ? calculateProgress(dbMind) : undefined;
 
   // Try to find psychometric data
-  const psychometrics = MOCK_PSYCHOMETRICS[dbMind.slug] || MOCK_PSYCHOMETRICS[dbMind.display_name] || undefined;
+  const psychometrics = MOCK_PSYCHOMETRICS[dbMind.slug] || MOCK_PSYCHOMETRICS[dbMind.name] || undefined;
 
   // Use psychometric signature skill if available, otherwise existing logic
   const signatureSkill = psychometrics?.aptitudes.zone_of_genius.title || extractSignatureSkill(dbMind.proficiencies);
@@ -192,8 +192,8 @@ const transformToMindData = (dbMind: DbMindWithRelations): MindData => {
   // Check if slug has a real avatar image
   const hasRealAvatar = MINDS_WITH_AVATAR.has(dbMind.slug);
 
-  // Clean display name (remove surrounding quotes if present)
-  const cleanName = dbMind.display_name.replace(/^["']|["']$/g, '');
+  // Clean name (remove surrounding quotes if present)
+  const cleanName = dbMind.name.replace(/^["']|["']$/g, '');
 
   return {
     id: dbMind.id,

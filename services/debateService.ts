@@ -55,7 +55,7 @@ export const debateService = {
     async getMinds() {
         const { data, error } = await supabase
             .from('minds')
-            .select('id, slug, display_name, short_bio, apex_score')
+            .select('id, slug, name, short_bio, apex_score')
             .eq('privacy_level', 'public')
             .is('deleted_at', null)
             .order('updated_at', { ascending: false });
@@ -63,16 +63,20 @@ export const debateService = {
         if (error) throw error;
 
         // Transform to match UI Clone interface
-        return (data || []).map(m => ({
-            id: m.id,
-            name: (m.display_name || '').replace(/^["']|["']$/g, '') || m.slug,
-            role: m.short_bio || 'Mente Sintética',
-            avatar: `/minds-profile-images/${m.slug}.jpg`,
-            winRate: m.apex_score ? Math.round((m.apex_score || 0) * 100) : 0,
-            debates: 0, // TODO: load from debates table when available
-            fidelity: 85, // TODO: load from real metrics when available
-            color: 'text-zinc-400',
-            personality: m.short_bio || 'Uma mente sintética em construção.'
-        }));
+        return (data || []).map(m => {
+            // Normalize slug: replace hyphens with underscores for file lookup
+            const normalizedSlug = m.slug.replace(/-/g, '_');
+            return {
+                id: m.id,
+                name: (m.name || '').replace(/^["']|["']$/g, '') || m.slug,
+                role: m.short_bio || 'Mente Sintética',
+                avatar: `/minds-profile-images/${normalizedSlug}.jpg`,
+                winRate: m.apex_score ? Math.round((m.apex_score || 0) * 100) : 0,
+                debates: 0, // TODO: load from debates table when available
+                fidelity: 85, // TODO: load from real metrics when available
+                color: 'text-zinc-400',
+                personality: m.short_bio || 'Uma mente sintética em construção.'
+            };
+        });
     }
 };

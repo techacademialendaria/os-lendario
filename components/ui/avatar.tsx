@@ -29,16 +29,30 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(
 )
 Avatar.displayName = "Avatar"
 
+interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+  onLoadError?: () => void;
+}
+
 const AvatarImage = React.forwardRef<
   HTMLImageElement,
-  React.ImgHTMLAttributes<HTMLImageElement>
->(({ className, ...props }, ref) => (
-  <img
-    ref={ref}
-    className={cn("aspect-square h-full w-full object-cover", className)}
-    {...props}
-  />
-))
+  AvatarImageProps
+>(({ className, onLoadError, onError, ...props }, ref) => {
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    // Hide the broken image
+    e.currentTarget.style.display = 'none';
+    onLoadError?.();
+    onError?.(e as any);
+  };
+
+  return (
+    <img
+      ref={ref}
+      className={cn("aspect-square h-full w-full object-cover", className)}
+      onError={handleError}
+      {...props}
+    />
+  );
+})
 AvatarImage.displayName = "AvatarImage"
 
 const AvatarFallback = React.forwardRef<
