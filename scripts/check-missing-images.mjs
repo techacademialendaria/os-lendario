@@ -25,17 +25,17 @@ if (error) {
 const imagesDir = '/Users/alan/Code/mmos/public/minds-profile-images';
 const existingImages = new Set(
   readdirSync(imagesDir)
-    .filter((f) => f.endsWith('.jpg'))
-    .map((f) => f.replace('.jpg', ''))
+    .filter(f => f.endsWith('.jpg'))
+    .map(f => f.replace('.jpg', ''))
 );
 
 // Find missing
-const missing = minds.filter((m) => !existingImages.has(m.slug));
+const missing = minds.filter(m => !existingImages.has(m.slug));
 
 console.log('Total minds:', minds.length);
 console.log('With images:', minds.length - missing.length);
 console.log('Missing images:', missing.length);
 console.log('\n=== MINDS WITHOUT IMAGES ===\n');
-missing.forEach((m) => {
+missing.forEach(m => {
   console.log(m.slug.padEnd(30) + ' | ' + m.display_name);
 });

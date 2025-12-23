@@ -1,7 +1,10 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 console.log('Adding public read policies for mind-related tables...\n');
 
@@ -38,8 +41,14 @@ for (const policy of policies) {
 console.log('Policies added. Testing...');
 
 // Test again with anon key
-const anonClient = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
+const anonClient = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_ANON_KEY
+);
 
-const { data, error } = await anonClient.from('mind_proficiencies').select('mind_id').limit(3);
+const { data, error } = await anonClient
+  .from('mind_proficiencies')
+  .select('mind_id')
+  .limit(3);
 
 console.log('mind_proficiencies with anon key:', data?.length || 0, 'rows', error?.message || 'OK');

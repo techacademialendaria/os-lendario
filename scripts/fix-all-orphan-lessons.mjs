@@ -36,13 +36,13 @@ const supabase = createClient(
 function extractModuleNumber(title, slug) {
   // Try title first - various patterns
   const patterns = [
-    /^(\d+)\.\d+/, // "1.2 - Title"
-    /^Aula\s+(\d+)\.\d+/i, // "Aula 1.2 - Title"
-    /^Lesson\s+(\d+)\.\d+/i, // "Lesson 1.2: Title"
-    /^Lição\s+(\d+)\.\d+/i, // "Lição 1.2 - Title"
-    /^Dia\s+(\d+)/i, // "Dia 3: Title"
-    /^Módulo\s+(\d+)/i, // "Módulo 1 - Title"
-    /^M(\d+)/i, // "M1 - Title"
+    /^(\d+)\.\d+/,                    // "1.2 - Title"
+    /^Aula\s+(\d+)\.\d+/i,            // "Aula 1.2 - Title"
+    /^Lesson\s+(\d+)\.\d+/i,          // "Lesson 1.2: Title"
+    /^Lição\s+(\d+)\.\d+/i,           // "Lição 1.2 - Title"
+    /^Dia\s+(\d+)/i,                  // "Dia 3: Title"
+    /^Módulo\s+(\d+)/i,               // "Módulo 1 - Title"
+    /^M(\d+)/i,                       // "M1 - Title"
   ];
 
   for (const pattern of patterns) {
@@ -54,10 +54,10 @@ function extractModuleNumber(title, slug) {
 
   // Try slug - patterns like "course-licao-1-2" or "course-1-2-title"
   const slugPatterns = [
-    /-licao-(\d+)-\d+/i, // "-licao-1-2"
-    /-lesson-(\d+)-\d+/i, // "-lesson-1-2"
-    /-(\d+)-\d+-[a-z]/i, // "-1-2-title"
-    /-modulo-(\d+)-/i, // "-modulo-1-"
+    /-licao-(\d+)-\d+/i,              // "-licao-1-2"
+    /-lesson-(\d+)-\d+/i,             // "-lesson-1-2"
+    /-(\d+)-\d+-[a-z]/i,              // "-1-2-title"
+    /-modulo-(\d+)-/i,                // "-modulo-1-"
   ];
 
   for (const pattern of slugPatterns) {
@@ -90,7 +90,7 @@ async function fixCourse(project) {
 
   // Create map: sequence_order -> module_id
   const moduleMap = {};
-  modules.forEach((m) => {
+  modules.forEach(m => {
     moduleMap[m.sequence_order] = m.id;
   });
   console.log(`  📦 ${modules.length} modules found`);
@@ -109,8 +109,8 @@ async function fixCourse(project) {
   }
 
   // Check which lessons are orphans
-  const moduleIds = new Set(modules.map((m) => m.id));
-  const orphans = lessons.filter((l) => !moduleIds.has(l.parent_content_id));
+  const moduleIds = new Set(modules.map(m => m.id));
+  const orphans = lessons.filter(l => !moduleIds.has(l.parent_content_id));
 
   if (orphans.length === 0) {
     console.log(`  ✅ ${lessons.length} lessons - all OK`);

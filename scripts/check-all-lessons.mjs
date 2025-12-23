@@ -31,7 +31,7 @@ async function check() {
       .eq('content_type', 'course_module')
       .is('deleted_at', null);
 
-    const moduleIds = modules?.map((m) => m.id) || [];
+    const moduleIds = modules?.map(m => m.id) || [];
 
     const { data: lessons } = await supabase
       .from('contents')
@@ -45,11 +45,11 @@ async function check() {
       continue;
     }
 
-    const orphans = lessons.filter((l) => !moduleIds.includes(l.parent_content_id));
+    const orphans = lessons.filter(l => !moduleIds.includes(l.parent_content_id));
 
     if (orphans.length > 0) {
       console.log(`❌ ${proj.name}: ${lessons.length} lições, ${orphans.length} ORPHANS`);
-      orphans.slice(0, 3).forEach((o) => console.log(`     - ${o.title}`));
+      orphans.slice(0, 3).forEach(o => console.log(`     - ${o.title}`));
       if (orphans.length > 3) console.log(`     ... and ${orphans.length - 3} more`);
     } else {
       console.log(`✅ ${proj.name}: ${lessons.length} lições OK`);

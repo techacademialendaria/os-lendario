@@ -163,11 +163,17 @@ export const AddArtifactModal: React.FC<AddArtifactModalProps> = ({
             <Label htmlFor="artifact-title">Titulo</Label>
             <Input
               id="artifact-title"
+              errorId={error && title.trim() === '' ? 'artifact-title-error' : undefined}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ex: Framework de Decisao, Analise Cognitiva..."
               className="text-lg"
             />
+            {error && title.trim() === '' && (
+              <div id="artifact-title-error" className="text-xs text-destructive">
+                {error}
+              </div>
+            )}
           </div>
 
           {/* Type & Category */}

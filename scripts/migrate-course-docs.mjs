@@ -32,11 +32,7 @@ dotenv.config({ path: path.join(rootDir, '.env') });
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 // Prefer service role for writes, fallback to anon key
-const supabaseKey =
-  process.env.VITE_SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  process.env.SUPABASE_ANON_KEY ||
-  process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase credentials.');
@@ -48,7 +44,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Parse CLI args
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
-const courseArg = args.find((a) => a.startsWith('--course='));
+const courseArg = args.find(a => a.startsWith('--course='));
 const SPECIFIC_COURSE = courseArg ? courseArg.split('=')[1] : null;
 
 // Migration timestamp for rollback
@@ -91,10 +87,7 @@ const FILE_MAPPINGS = [
 // ============================================================================
 
 function generateSlug(courseSlug, filename, subtype) {
-  const baseName = filename
-    .replace(/\.[^.]+$/, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-');
+  const baseName = filename.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
   return `${courseSlug}-${subtype}-${baseName}`.replace(/-+/g, '-').replace(/-$/, '');
 }
 
@@ -104,20 +97,20 @@ function generateTitle(filename, subtype) {
 
   // Map subtypes to readable titles
   const subtypeTitles = {
-    brief: 'Course Brief',
-    curriculum: 'Curriculum',
-    outline: 'Course Outline',
-    compiled: 'Full Course Content',
-    summary: 'Executive Summary',
-    readme: 'README',
-    module_content: 'Module Content',
-    progress: 'Progress Report',
-    module_report: 'Module Report',
-    context: 'Context Document',
-    prompt: 'Generation Prompt',
-    session: 'Session Notes',
-    validation: 'Validation Report',
-    review: 'Review Document',
+    'brief': 'Course Brief',
+    'curriculum': 'Curriculum',
+    'outline': 'Course Outline',
+    'compiled': 'Full Course Content',
+    'summary': 'Executive Summary',
+    'readme': 'README',
+    'module_content': 'Module Content',
+    'progress': 'Progress Report',
+    'module_report': 'Module Report',
+    'context': 'Context Document',
+    'prompt': 'Generation Prompt',
+    'session': 'Session Notes',
+    'validation': 'Validation Report',
+    'review': 'Review Document',
   };
 
   return subtypeTitles[subtype] || baseName.replace(/[-_]/g, ' ');
@@ -154,13 +147,7 @@ async function findFilesToMigrate(coursePath) {
             ...mapping,
           });
         }
-      } else if (
-        stat.isDirectory() &&
-        entry !== 'lessons' &&
-        entry !== 'assessments' &&
-        entry !== 'resources' &&
-        entry !== 'research'
-      ) {
+      } else if (stat.isDirectory() && entry !== 'lessons' && entry !== 'assessments' && entry !== 'resources' && entry !== 'research') {
         // Recurse into subdirectories (except core content folders)
         scanDirectory(fullPath, relPath);
       }
@@ -253,9 +240,7 @@ async function migrateCourse(courseSlug) {
   const project = projects[0];
 
   const files = await findFilesToMigrate(coursePath);
-  let migrated = 0,
-    skipped = 0,
-    errors = 0;
+  let migrated = 0, skipped = 0, errors = 0;
 
   for (const file of files) {
     const content = fs.readFileSync(file.fullPath, 'utf-8');
@@ -340,23 +325,19 @@ async function main() {
   const coursesDir = path.join(rootDir, 'outputs/courses');
   const SKIP_FOLDERS = ['no-migration', '.DS_Store'];
 
-  let courseSlugs = fs
-    .readdirSync(coursesDir)
-    .filter(
-      (f) => fs.statSync(path.join(coursesDir, f)).isDirectory() && !SKIP_FOLDERS.includes(f)
-    );
+  let courseSlugs = fs.readdirSync(coursesDir).filter(f =>
+    fs.statSync(path.join(coursesDir, f)).isDirectory() && !SKIP_FOLDERS.includes(f)
+  );
 
   if (SPECIFIC_COURSE) {
-    courseSlugs = courseSlugs.filter((s) => s === SPECIFIC_COURSE);
+    courseSlugs = courseSlugs.filter(s => s === SPECIFIC_COURSE);
     if (courseSlugs.length === 0) {
       console.error(`❌ Course not found: ${SPECIFIC_COURSE}`);
       process.exit(1);
     }
   }
 
-  let totalMigrated = 0,
-    totalSkipped = 0,
-    totalErrors = 0;
+  let totalMigrated = 0, totalSkipped = 0, totalErrors = 0;
 
   for (const slug of courseSlugs) {
     console.log(`\n📚 ${slug}`);

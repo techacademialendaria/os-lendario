@@ -2,6 +2,7 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Section } from '../../types';
+import { useTheme } from '../../lib/ThemeContext';
 import DesignSystemTopbar from './DesignSystemTopbar';
 
 // Lazy load all sections for code splitting
@@ -35,7 +36,6 @@ const SaasSettingsTemplate = React.lazy(() => import('../shared/templates/SaasSe
 
 interface DesignSystemRouterProps {
   setSection: (s: Section) => void;
-  isDark: boolean;
   currentTheme: string;
   language: string;
 }
@@ -89,10 +89,10 @@ const SidebarLegacyWrapper: React.FC<{
 
 const DesignSystemRouter: React.FC<DesignSystemRouterProps> = ({
   setSection,
-  isDark,
   currentTheme,
   language,
 }) => {
+  const { isDark } = useTheme();
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <DesignSystemTopbar />

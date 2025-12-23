@@ -14,7 +14,10 @@ import { createClient } from '@supabase/supabase-js';
 import { readdir, readFile, stat } from 'fs/promises';
 import { join } from 'path';
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const OUTPUTS_DIR = './outputs/minds';
 
@@ -57,10 +60,7 @@ const CONTENT_FILES = {
   'artifacts/communication-style.md': { type: 'mind_artifacts', title: 'Communication Style' },
   'artifacts/communication_templates.md': { type: 'mind_artifacts', title: 'Communication Style' },
   'synthesis/communication-style.md': { type: 'mind_artifacts', title: 'Communication Style' },
-  'analysis/layer-3-language-communication.md': {
-    type: 'mind_artifacts',
-    title: 'Communication Style',
-  },
+  'analysis/layer-3-language-communication.md': { type: 'mind_artifacts', title: 'Communication Style' },
 
   // ===== FRAMEWORKS =====
   'artifacts/frameworks.md': { type: 'mind_artifacts', title: 'Mental Frameworks' },
@@ -97,42 +97,21 @@ const CONTENT_FILES = {
   'artifacts/decision-framework.md': { type: 'mind_artifacts', title: 'Decision Framework' },
   'artifacts/decision-playbooks.md': { type: 'mind_artifacts', title: 'Decision Framework' },
   'synthesis/decision-trees.md': { type: 'mind_artifacts', title: 'Decision Framework' },
-  'analysis/layer-4-decision-architecture.md': {
-    type: 'mind_artifacts',
-    title: 'Decision Framework',
-  },
+  'analysis/layer-4-decision-architecture.md': { type: 'mind_artifacts', title: 'Decision Framework' },
 
   // ===== BEHAVIORAL PATTERNS =====
   'artifacts/behavioral_patterns.yaml': { type: 'mind_artifacts', title: 'Behavioral Patterns' },
-  'artifacts/layer-1-behavioral-patterns.md': {
-    type: 'mind_artifacts',
-    title: 'Behavioral Patterns',
-  },
-  'artifacts/layer_1_behavioral_patterns.md': {
-    type: 'mind_artifacts',
-    title: 'Behavioral Patterns',
-  },
-  'artifacts/layer1_behavioral_patterns.md': {
-    type: 'mind_artifacts',
-    title: 'Behavioral Patterns',
-  },
+  'artifacts/layer-1-behavioral-patterns.md': { type: 'mind_artifacts', title: 'Behavioral Patterns' },
+  'artifacts/layer_1_behavioral_patterns.md': { type: 'mind_artifacts', title: 'Behavioral Patterns' },
+  'artifacts/layer1_behavioral_patterns.md': { type: 'mind_artifacts', title: 'Behavioral Patterns' },
   'artifacts/layers-1-4-observable.yaml': { type: 'mind_artifacts', title: 'Behavioral Patterns' },
   'artifacts/layers_1-4_observable.yaml': { type: 'mind_artifacts', title: 'Behavioral Patterns' },
-  'analysis/layer-1-2-behavioral-communication.md': {
-    type: 'mind_artifacts',
-    title: 'Behavioral Patterns',
-  },
+  'analysis/layer-1-2-behavioral-communication.md': { type: 'mind_artifacts', title: 'Behavioral Patterns' },
 
   // ===== RECOGNITION PATTERNS =====
   'artifacts/recognition_patterns.yaml': { type: 'mind_artifacts', title: 'Recognition Patterns' },
-  'artifacts/layer-4-recognition-patterns.yaml': {
-    type: 'mind_artifacts',
-    title: 'Recognition Patterns',
-  },
-  'artifacts/layer4_recognition_patterns.yaml': {
-    type: 'mind_artifacts',
-    title: 'Recognition Patterns',
-  },
+  'artifacts/layer-4-recognition-patterns.yaml': { type: 'mind_artifacts', title: 'Recognition Patterns' },
+  'artifacts/layer4_recognition_patterns.yaml': { type: 'mind_artifacts', title: 'Recognition Patterns' },
 
   // ===== TOOLS =====
   'artifacts/tools.md': { type: 'mind_artifacts', title: 'Tools & Methods' },
@@ -171,23 +150,22 @@ const CONTENT_FILES = {
   // ===== ROUTINE =====
   'artifacts/routine.md': { type: 'mind_artifacts', title: 'Routine & Habits' },
   'artifacts/routine_analysis.yaml': { type: 'mind_artifacts', title: 'Routine & Habits' },
-  'analysis/layer-3-4-routines-recognition.md': {
-    type: 'mind_artifacts',
-    title: 'Routine & Habits',
-  },
+  'analysis/layer-3-4-routines-recognition.md': { type: 'mind_artifacts', title: 'Routine & Habits' },
 };
 
 // Slug mapping (outputs folder → db slug)
 const SLUG_MAP = {
-  adriano_de_marqui: 'adriano-de-marqui',
-  jose_amorim: 'jose-carlos-amorim',
+  'adriano_de_marqui': 'adriano-de-marqui',
+  'jose_amorim': 'jose-carlos-amorim'
 };
 
 async function getMindsFromDb() {
-  const { data, error } = await supabase.from('minds').select('id, slug, display_name');
+  const { data, error } = await supabase
+    .from('minds')
+    .select('id, slug, display_name');
 
   if (error) throw error;
-  return new Map(data.map((m) => [m.slug, m]));
+  return new Map(data.map(m => [m.slug, m]));
 }
 
 async function getExistingProjects() {
@@ -197,7 +175,7 @@ async function getExistingProjects() {
     .eq('project_type', 'mind_artifacts');
 
   if (error) throw error;
-  return new Map(data?.map((p) => [p.persona_mind_id, p]) || []);
+  return new Map(data?.map(p => [p.persona_mind_id, p]) || []);
 }
 
 async function getExistingContents(projectId) {
@@ -207,7 +185,7 @@ async function getExistingContents(projectId) {
     .eq('project_id', projectId);
 
   if (error) throw error;
-  return new Set(data?.map((c) => c.title) || []);
+  return new Set(data?.map(c => c.title) || []);
 }
 
 async function fileExists(path) {
@@ -251,7 +229,7 @@ async function getOrCreateProject(mind) {
       project_type: 'mind_artifacts',
       status: 'completed',
       creator_mind_id: CREATOR_MIND_ID,
-      persona_mind_id: mind.id,
+      persona_mind_id: mind.id
     })
     .select('id, slug')
     .single();
@@ -262,30 +240,28 @@ async function getOrCreateProject(mind) {
 
 // Convert filename to readable title
 function fileNameToTitle(filename) {
-  return (
-    filename
-      // Remove extension
-      .replace(/\.(md|yaml|yml)$/, '')
-      // Remove numbered prefixes (01_, 1_, 1. etc.)
-      .replace(/^\d+[_.\s-]*/g, '')
-      // Remove Layer X patterns (layer-5-, layer_6_, etc.)
-      .replace(/layer[_-]?\d+[_-]?/gi, '')
-      // Remove layers-X-Y patterns
-      .replace(/layers[_-]?\d+[_-]?\d*[_-]?/gi, '')
-      // Replace underscores and hyphens with spaces
-      .replace(/[_-]/g, ' ')
-      // Remove double asterisks
-      .replace(/\*+/g, '')
-      // Remove parentheses content like (twitter)
-      .replace(/\([^)]*\)/g, '')
-      // Capitalize words
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ')
-      // Clean up extra spaces
-      .replace(/\s+/g, ' ')
-      .trim()
-  );
+  return filename
+    // Remove extension
+    .replace(/\.(md|yaml|yml)$/, '')
+    // Remove numbered prefixes (01_, 1_, 1. etc.)
+    .replace(/^\d+[_.\s-]*/g, '')
+    // Remove Layer X patterns (layer-5-, layer_6_, etc.)
+    .replace(/layer[_-]?\d+[_-]?/gi, '')
+    // Remove layers-X-Y patterns
+    .replace(/layers[_-]?\d+[_-]?\d*[_-]?/gi, '')
+    // Replace underscores and hyphens with spaces
+    .replace(/[_-]/g, ' ')
+    // Remove double asterisks
+    .replace(/\*+/g, '')
+    // Remove parentheses content like (twitter)
+    .replace(/\([^)]*\)/g, '')
+    // Capitalize words
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+    // Clean up extra spaces
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 // Scan artifacts directory and return all importable files
@@ -303,7 +279,7 @@ async function scanArtifactsDirectory(dir) {
         files.push({
           path: `artifacts/${entry}`,
           fullPath: join(artifactsDir, entry),
-          title: fileNameToTitle(entry),
+          title: fileNameToTitle(entry)
         });
       }
     }
@@ -326,19 +302,16 @@ async function scanAllSystemPrompts(dir) {
     for (const entry of entries) {
       if (entry.isFile() && entry.name.endsWith('.md')) {
         // Skip meta files
-        if (
-          entry.name.includes('CHANGELOG') ||
-          entry.name.includes('DEPRECATED') ||
-          entry.name.includes('VALIDATION') ||
-          entry.name.includes('README')
-        )
-          continue;
+        if (entry.name.includes('CHANGELOG') ||
+            entry.name.includes('DEPRECATED') ||
+            entry.name.includes('VALIDATION') ||
+            entry.name.includes('README')) continue;
 
         const title = systemPromptFileToTitle(entry.name);
         prompts.push({
           path: `system_prompts/${entry.name}`,
           fullPath: join(systemPromptsDir, entry.name),
-          title,
+          title
         });
       }
     }
@@ -358,7 +331,7 @@ async function scanAllSystemPrompts(dir) {
             prompts.push({
               path: `system_prompts/${entry.name}/${subEntry.name}`,
               fullPath: join(subdirPath, subEntry.name),
-              title,
+              title
             });
           }
 
@@ -373,7 +346,7 @@ async function scanAllSystemPrompts(dir) {
                   prompts.push({
                     path: `system_prompts/${entry.name}/${subEntry.name}/${nestedFile}`,
                     fullPath: join(nestedPath, nestedFile),
-                    title,
+                    title
                   });
                 }
               }
@@ -408,7 +381,7 @@ function systemPromptFileToTitle(filename, versionFile = null) {
   // Capitalize words
   baseName = baseName
     .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 
   // Add version info if from versioned file
@@ -441,7 +414,7 @@ async function importMindContents(mindSlug, mind) {
 
     const fullPath = join(dir, filePath);
 
-    if (!(await fileExists(fullPath))) continue;
+    if (!await fileExists(fullPath)) continue;
 
     // Skip if already exists in DB
     if (existingTitles.has(config.title)) {
@@ -455,25 +428,10 @@ async function importMindContents(mindSlug, mind) {
     const slug = `${mind.slug}-${config.title.toLowerCase().replace(/\s+/g, '-')}`;
 
     // Insert content
-    const { error } = await supabase.from('contents').insert({
-      slug,
-      title: config.title,
-      content_type: config.type,
-      content,
-      ai_generated: true,
-      status: 'published',
-      project_id: project.id,
-      metadata: {
-        source_file: filePath,
-        imported_at: new Date().toISOString(),
-        mind_slug: mind.slug,
-      },
-    });
-
-    if (error) {
-      // Try with timestamp suffix if slug conflict
-      const { error: retryError } = await supabase.from('contents').insert({
-        slug: `${slug}-${Date.now()}`,
+    const { error } = await supabase
+      .from('contents')
+      .insert({
+        slug,
         title: config.title,
         content_type: config.type,
         content,
@@ -483,9 +441,28 @@ async function importMindContents(mindSlug, mind) {
         metadata: {
           source_file: filePath,
           imported_at: new Date().toISOString(),
-          mind_slug: mind.slug,
-        },
+          mind_slug: mind.slug
+        }
       });
+
+    if (error) {
+      // Try with timestamp suffix if slug conflict
+      const { error: retryError } = await supabase
+        .from('contents')
+        .insert({
+          slug: `${slug}-${Date.now()}`,
+          title: config.title,
+          content_type: config.type,
+          content,
+          ai_generated: true,
+          status: 'published',
+          project_id: project.id,
+          metadata: {
+            source_file: filePath,
+            imported_at: new Date().toISOString(),
+            mind_slug: mind.slug
+          }
+        });
 
       if (retryError) {
         console.log(`    ERROR ${config.title}: ${retryError.message}`);
@@ -512,30 +489,12 @@ async function importMindContents(mindSlug, mind) {
     const content = await readTextFile(file.fullPath);
     if (!content || content.length < 50) continue;
 
-    const slug = `${mind.slug}-${file.title
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '')}`;
+    const slug = `${mind.slug}-${file.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
 
-    const { error } = await supabase.from('contents').insert({
-      slug,
-      title: file.title,
-      content_type: 'mind_artifacts',
-      content,
-      ai_generated: true,
-      status: 'published',
-      project_id: project.id,
-      metadata: {
-        source_file: file.path,
-        imported_at: new Date().toISOString(),
-        mind_slug: mind.slug,
-      },
-    });
-
-    if (error) {
-      // Try with timestamp suffix if slug conflict
-      const { error: retryError } = await supabase.from('contents').insert({
-        slug: `${slug}-${Date.now()}`,
+    const { error } = await supabase
+      .from('contents')
+      .insert({
+        slug,
         title: file.title,
         content_type: 'mind_artifacts',
         content,
@@ -545,9 +504,28 @@ async function importMindContents(mindSlug, mind) {
         metadata: {
           source_file: file.path,
           imported_at: new Date().toISOString(),
-          mind_slug: mind.slug,
-        },
+          mind_slug: mind.slug
+        }
       });
+
+    if (error) {
+      // Try with timestamp suffix if slug conflict
+      const { error: retryError } = await supabase
+        .from('contents')
+        .insert({
+          slug: `${slug}-${Date.now()}`,
+          title: file.title,
+          content_type: 'mind_artifacts',
+          content,
+          ai_generated: true,
+          status: 'published',
+          project_id: project.id,
+          metadata: {
+            source_file: file.path,
+            imported_at: new Date().toISOString(),
+            mind_slug: mind.slug
+          }
+        });
 
       if (retryError) {
         console.log(`    ERROR ${file.title}: ${retryError.message}`);
@@ -575,25 +553,10 @@ async function importMindContents(mindSlug, mind) {
       .replace(/[^a-z0-9-]/g, '');
     const slug = `${mind.slug}-prompt-${slugBase}`;
 
-    const { error } = await supabase.from('contents').insert({
-      slug,
-      title: prompt.title,
-      content_type: 'mind_prompts',
-      content,
-      ai_generated: true,
-      status: 'published',
-      project_id: project.id,
-      metadata: {
-        source_file: prompt.path,
-        imported_at: new Date().toISOString(),
-        mind_slug: mind.slug,
-      },
-    });
-
-    if (error) {
-      // Try with timestamp suffix if slug conflict
-      const { error: retryError } = await supabase.from('contents').insert({
-        slug: `${slug}-${Date.now()}`,
+    const { error } = await supabase
+      .from('contents')
+      .insert({
+        slug,
         title: prompt.title,
         content_type: 'mind_prompts',
         content,
@@ -603,9 +566,28 @@ async function importMindContents(mindSlug, mind) {
         metadata: {
           source_file: prompt.path,
           imported_at: new Date().toISOString(),
-          mind_slug: mind.slug,
-        },
+          mind_slug: mind.slug
+        }
       });
+
+    if (error) {
+      // Try with timestamp suffix if slug conflict
+      const { error: retryError } = await supabase
+        .from('contents')
+        .insert({
+          slug: `${slug}-${Date.now()}`,
+          title: prompt.title,
+          content_type: 'mind_prompts',
+          content,
+          ai_generated: true,
+          status: 'published',
+          project_id: project.id,
+          metadata: {
+            source_file: prompt.path,
+            imported_at: new Date().toISOString(),
+            mind_slug: mind.slug
+          }
+        });
 
       if (retryError) {
         console.log(`    ERROR ${prompt.title}: ${retryError.message}`);
@@ -634,8 +616,8 @@ async function main() {
   // Get output directories
   const entries = await readdir(OUTPUTS_DIR, { withFileTypes: true });
   const outputDirs = entries
-    .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
-    .map((e) => e.name);
+    .filter(e => e.isDirectory() && !e.name.startsWith('.'))
+    .map(e => e.name);
 
   console.log(`Found ${outputDirs.length} minds in outputs/`);
   console.log();
@@ -655,7 +637,7 @@ async function main() {
 
       if (imported.length > 0) {
         console.log(`${mind.slug}: +${imported.length} contents`);
-        imported.forEach((t) => console.log(`    + ${t}`));
+        imported.forEach(t => console.log(`    + ${t}`));
         stats.contents += imported.length;
         stats.projects++;
       }

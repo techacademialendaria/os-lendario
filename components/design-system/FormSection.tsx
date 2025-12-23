@@ -18,6 +18,7 @@ import { Calendar } from '../ui/calendar';
 import { DatePicker } from '../ui/date-picker'; // New Import
 import { AutosizeTextarea } from '../ui/autosize-textarea'; // New Import
 import { Combobox } from '../ui/combobox';
+import { FormField } from '../ui/form-field';
 
 const FormSection: React.FC = () => {
   // State for interactive examples
@@ -25,6 +26,8 @@ const FormSection: React.FC = () => {
   const [rating, setRating] = useState(4);
   const [date, setDate] = useState<Date>();
   const [chatMessage, setChatMessage] = useState('');
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
 
   return (
     <div className="animate-fade-in space-y-16">
@@ -271,6 +274,56 @@ const FormSection: React.FC = () => {
             <CardFooter className="justify-end gap-2">
               <Button variant="ghost">Cancelar</Button>
               <Button>Enviar Arquivos</Button>
+            </CardFooter>
+          </Card>
+        </section>
+
+        {/* --- ACCESSIBILITY: VALIDATION --- */}
+        <section className="space-y-8">
+          <h3 className="border-b border-border pb-2 font-sans text-xl font-semibold">
+            ♿ Validação com Acessibilidade
+          </h3>
+          <Card>
+            <CardHeader>
+              <CardTitle>Exemplo: Email com aria-describedby</CardTitle>
+              <CardDescription>
+                Campo de email com validação que anuncia erros para screen readers via aria-describedby
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="max-w-md space-y-4">
+              <FormField
+                label="Email"
+                fieldId="form-email"
+                error={emailError}
+                description="Use um endereço de email válido"
+                required
+              >
+                <Input
+                  type="email"
+                  placeholder="você@exemplo.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (e.target.value && !e.target.value.includes('@')) {
+                      setEmailError('Email inválido');
+                    } else {
+                      setEmailError('');
+                    }
+                  }}
+                />
+              </FormField>
+            </CardContent>
+            <CardFooter className="gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEmail('');
+                  setEmailError('');
+                }}
+              >
+                Limpar
+              </Button>
+              <Button disabled={!!emailError || !email}>Enviar</Button>
             </CardFooter>
           </Card>
         </section>

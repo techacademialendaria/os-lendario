@@ -11,28 +11,24 @@
 ### ✅ Sistema de Tokenização Implementado
 
 **1. Master Tokens File** (`app/lib/tokens.ts`)
-
 - ✅ 6 Studios com paletas completas
 - ✅ 22 propriedades de cor por Studio
 - ✅ Função `getStudioTokensForSection()` para mapeamento
 - ✅ Função `applyStudioTokens()` para aplicação dinâmica
 
 **2. CSS Variables & Classes** (`app/index.css`)
-
 - ✅ 40+ classes utilitárias dinâmicas criadas
 - ✅ `bg-studio-primary`, `text-studio-primary`, etc.
 - ✅ Compatibilidade com cores legacy
 - ✅ Padrões comuns (btn-studio-primary, card-studio, etc)
 
 **3. Tailwind Config Centralizado** (`app/tailwind.config.ts`)
-
 - ✅ Novo arquivo TypeScript
 - ✅ Todas as cores dinâmicas definidas
 - ✅ Support para 6 Studios
 - ✅ Compatible com Vite
 
 **4. Guia de Refatoração** (`app/REFACTORING_GUIDE.md`)
-
 - ✅ Documento completo com estratégia
 - ✅ Mapeamento de 155+ cores hardcoded
 - ✅ Checklist de 55+ componentes
@@ -41,7 +37,6 @@
 ### ✅ Course Creator Refatorado (100%)
 
 **Arquivos Modificados:**
-
 - ✅ `components/creator/studio-tokens.ts` - Classes dinâmicas
 - ✅ `components/creator/CreatorTopbar.tsx` - 1 cor dinâmica
 - ✅ `components/creator/views/CourseOverview.tsx` - 4 cores dinâmicas
@@ -51,7 +46,6 @@
 **Total:** 12 cores hardcoded → classes dinâmicas
 
 **Documentação:**
-
 - ✅ `components/creator/REFACTORED.md` - Status completo
 
 ---
@@ -59,7 +53,6 @@
 ## 📊 Status Atual
 
 ### Sistema de Tokenização
-
 ```
 ✅ PRONTO
 ├── lib/tokens.ts                    [6 Studios, 132 propriedades]
@@ -70,7 +63,6 @@
 ```
 
 ### Course Creator
-
 ```
 ✅ REFATORADO (100%)
 ├── studio-tokens.ts                 [Dinâmico]
@@ -82,7 +74,6 @@
 ```
 
 ### Outros Studios
-
 ```
 ⏳ NÃO INICIADO
 ├── Sales Intelligence              [15+ cores hardcoded]
@@ -112,7 +103,6 @@ app/
 ## 🎨 Como Funciona o Sistema
 
 ### Fluxo Automático
-
 ```
 1. Usuário navega para Course Creator
                 ↓
@@ -132,7 +122,6 @@ app/
 ```
 
 ### Mudança de Studio
-
 ```
 Design System (Gold)
     ↓ (mesma classe)
@@ -150,7 +139,6 @@ bg-studio-primary
 ## 🚀 Próximos Passos Para Próxima Sessão
 
 ### Fase 1: Validação Visual (30 min)
-
 ```
 [ ] Teste em Dev Server
     npm run dev
@@ -172,7 +160,6 @@ bg-studio-primary
 ```
 
 ### Fase 2: Refatorar Sales Intelligence (1-2h)
-
 ```
 [ ] Analisar componentes em components/sales/
 [ ] Encontrar cores hardcoded
@@ -184,7 +171,6 @@ bg-studio-primary
 ```
 
 ### Fase 3: Refatorar Remaining Studios (2-3h)
-
 ```
 [ ] Synthetic Minds (Teal)
 [ ] PRD Studio (Petróleo)
@@ -193,7 +179,6 @@ bg-studio-primary
 ```
 
 ### Fase 4: Testes & Documentação (1h)
-
 ```
 [ ] Testar todos Studios
 [ ] Validar hovers e interações
@@ -206,7 +191,6 @@ bg-studio-primary
 ## 📋 Checklist de Validação
 
 ### Course Creator
-
 - [x] Studio tokens refatorado
 - [x] CreatorTopbar refatorado
 - [x] CourseOverview refatorado
@@ -216,7 +200,6 @@ bg-studio-primary
 - [x] Documentação completa
 
 ### Sistema de Tokenização
-
 - [x] Master tokens criado
 - [x] CSS variables definidas
 - [x] Tailwind config criado
@@ -228,7 +211,6 @@ bg-studio-primary
 ## 🎯 Key Insights
 
 ### ✨ O Que Funcionou Bem
-
 1. **Abordagem Incremental** - Course Creator refatorado primeiro validou o sistema
 2. **Zero Breaking Changes** - Visual idêntico ao original
 3. **App.tsx Já Suportava** - Não precisou alterar, já aplicava CSS variables
@@ -236,7 +218,6 @@ bg-studio-primary
 5. **Documentação Completa** - Guia claro para próximos Studios
 
 ### 🚀 Próximas Velocidades
-
 - Sales Intelligence: ~45 min (maior que Creator)
 - Minds: ~30 min (menor)
 - PRD: ~20 min (menor)
@@ -248,7 +229,6 @@ bg-studio-primary
 ## 💾 Como Retomar na Próxima Sessão
 
 ### 1. Revisar Estado Atual
-
 ```bash
 # Verificar modificações
 git status
@@ -258,7 +238,6 @@ git log --oneline | head -5
 ```
 
 ### 2. Testar Course Creator
-
 ```bash
 npm run dev
 # Acessar: http://localhost:5173/creator/cursos
@@ -266,9 +245,7 @@ npm run dev
 ```
 
 ### 3. Escolher Próximo Studio
-
 Usar `REFACTORING_GUIDE.md` como referência:
-
 ```
 Sales Intelligence → 15+ cores
 Synthetic Minds → 12+ cores
@@ -278,7 +255,6 @@ Design System → 20+ cores
 ```
 
 ### 4. Refatorar Studio Seguindo Padrão
-
 ```
 1. Analisar: grep -r "bg-\[#\|text-\[#\|border-\[#" components/sales/
 2. Refatorar: studio-tokens.ts → classes → componentes
@@ -291,7 +267,6 @@ Design System → 20+ cores
 ## 📚 Documentos Importantes
 
 ### Para Consultar
-
 - **REFACTORING_GUIDE.md** - Guia completo de estratégia
 - **REFACTORED.md** (creator) - Status do que foi feito
 - **lib/tokens.ts** - Master de cores por Studio
@@ -299,7 +274,6 @@ Design System → 20+ cores
 - **tailwind.config.ts** - Configuração centralizada
 
 ### Para Referência
-
 - **App.tsx** (linhas 111-147) - Theme effect já funciona!
 - **lib/theme.ts** - Cores originais (compatibilidade)
 - **REFACTORING_GUIDE.md** - Mapeamento de 155+ cores
@@ -309,7 +283,6 @@ Design System → 20+ cores
 ## 🎓 Learnings
 
 ### Sistema Criado
-
 ✅ **Escalável** - Novo Studio = 1 entrada em tokens.ts + componentes
 ✅ **Automático** - CSS variables aplicadas dinamicamente
 ✅ **Consistente** - Mesmo padrão para todos os Studios
@@ -317,7 +290,6 @@ Design System → 20+ cores
 ✅ **Testado** - Course Creator validou o sistema
 
 ### Padrão Estabelecido
-
 1. Criar classes dinâmicas em `index.css`
 2. Refatorar `studio-tokens.ts` primeiro
 3. Depois refatorar componentes (views + templates)
@@ -329,19 +301,16 @@ Design System → 20+ cores
 ## 🎬 Contexto Para Próxima Sessão
 
 **O Que Fazer:**
-
 - Refatorar Sales Intelligence, Minds, PRD, Marketing
 - Testar todos os Studios juntos
 - Validar zero breaking changes
 
 **O Que NÃO Fazer:**
-
 - Alterar App.tsx (já funciona!)
 - Criar novas variáveis CSS (já existem)
 - Mudar o padrão de tokens.ts
 
 **Estado Seguro:**
-
 - ✅ Código compilável
 - ✅ Sem breaking changes
 - ✅ Sistema bem documentado
@@ -352,7 +321,6 @@ Design System → 20+ cores
 ## 📞 Quick Reference
 
 ### Refatorar um Studio
-
 ```bash
 # 1. Encontrar cores
 grep -r "bg-\[#\|text-\[#\|border-\[#" components/[studio]/
@@ -375,7 +343,6 @@ npm run dev
 ```
 
 ### Classes Dinâmicas Disponíveis
-
 ```
 bg-studio-primary          // Cor principal do Studio
 bg-studio-primary-dark     // Variante escura

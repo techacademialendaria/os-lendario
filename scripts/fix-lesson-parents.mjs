@@ -24,12 +24,12 @@ const supabase = createClient(
 
 // Mapping from curriculum.yaml: lesson ID prefix -> module sequence_order
 const LESSON_MODULE_MAP = {
-  1: 1, // 1.1, 1.2, 1.3, 1.4 -> Módulo 1
-  2: 2, // 2.1, 2.2, 2.3 -> Módulo 2
-  3: 3, // 3.1, 3.2, 3.3, 3.4 -> Módulo 3
-  4: 4, // 4.1, 4.2, 4.3 -> Módulo 4
-  5: 5, // 5.1, 5.2, 5.3, 5.4 -> Módulo 5
-  6: 6, // 6.1, 6.2, 6.3, 6.4 -> Módulo 6
+  '1': 1, // 1.1, 1.2, 1.3, 1.4 -> Módulo 1
+  '2': 2, // 2.1, 2.2, 2.3 -> Módulo 2
+  '3': 3, // 3.1, 3.2, 3.3, 3.4 -> Módulo 3
+  '4': 4, // 4.1, 4.2, 4.3 -> Módulo 4
+  '5': 5, // 5.1, 5.2, 5.3, 5.4 -> Módulo 5
+  '6': 6, // 6.1, 6.2, 6.3, 6.4 -> Módulo 6
 };
 
 async function fix() {
@@ -64,7 +64,7 @@ async function fix() {
 
   console.log('\n📦 Modules found:');
   const moduleMap = {}; // sequence_order -> id
-  modules.forEach((m) => {
+  modules.forEach(m => {
     console.log(`  ${m.sequence_order}. ${m.title} (id: ${m.id})`);
     moduleMap[m.sequence_order] = m.id;
   });

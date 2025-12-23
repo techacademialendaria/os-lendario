@@ -22,15 +22,21 @@ const SOURCES = {
     'https://lh3.googleusercontent.com/a-/AFdZucotBIv-XYZ', // placeholder
   ],
 
-  russel_brunson: ['https://upload.wikimedia.org/wikipedia/commons/3/3e/Russell_Brunson.jpg'],
+  russel_brunson: [
+    'https://upload.wikimedia.org/wikipedia/commons/3/3e/Russell_Brunson.jpg',
+  ],
 
-  marty_cagan: ['https://www.svpg.com/wp-content/uploads/2022/02/Marty-2022-600x600.jpg'],
+  marty_cagan: [
+    'https://www.svpg.com/wp-content/uploads/2022/02/Marty-2022-600x600.jpg',
+  ],
 
   jeff_patton: [
     'https://www.jpattonassociates.com/wp-content/uploads/2015/01/Jeff-Patton-Headshot-1.jpg',
   ],
 
-  dan_kennedy: ['https://nobsinnercircle.com/wp-content/uploads/2021/03/dan-kennedy-photo.jpg'],
+  dan_kennedy: [
+    'https://nobsinnercircle.com/wp-content/uploads/2021/03/dan-kennedy-photo.jpg',
+  ],
 
   jon_benson: [
     // VSL/copywriting sites
@@ -49,46 +55,46 @@ const SOURCES = {
 
   // ** SPECIAL **
   cagan_patton: [], // Use Marty Cagan later
-  ricky_and_morty: ['https://upload.wikimedia.org/wikipedia/en/a/a6/Rick_and_Morty_title_card.png'],
+  ricky_and_morty: [
+    'https://upload.wikimedia.org/wikipedia/en/a/a6/Rick_and_Morty_title_card.png',
+  ],
 };
 
 async function downloadImage(url, outputPath, slug) {
   return new Promise((resolve, reject) => {
-    const request = https.get(
-      url,
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-          Accept: 'image/*',
-        },
-        timeout: 5000,
+    const request = https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
+        'Accept': 'image/*',
       },
-      (response) => {
-        // Handle redirects manually
-        if (response.statusCode === 301 || response.statusCode === 302) {
-          const redirectUrl = response.headers.location;
-          console.log(`REDIR ${slug}: ${url.split('/').slice(0, 3).join('/')}/...`);
-          return downloadImage(redirectUrl, outputPath, slug).then(resolve).catch(reject);
-        }
-
-        if (response.statusCode !== 200) {
-          reject(new Error(`HTTP ${response.statusCode}`));
-          return;
-        }
-
-        const file = createWriteStream(outputPath);
-
-        file.on('error', (err) => {
-          reject(err);
-        });
-
-        response.pipe(file);
-        file.on('finish', () => {
-          file.close();
-          resolve();
-        });
+      timeout: 5000,
+    }, (response) => {
+      // Handle redirects manually
+      if (response.statusCode === 301 || response.statusCode === 302) {
+        const redirectUrl = response.headers.location;
+        console.log(`REDIR ${slug}: ${url.split('/').slice(0, 3).join('/')}/...`);
+        return downloadImage(redirectUrl, outputPath, slug)
+          .then(resolve)
+          .catch(reject);
       }
-    );
+
+      if (response.statusCode !== 200) {
+        reject(new Error(`HTTP ${response.statusCode}`));
+        return;
+      }
+
+      const file = createWriteStream(outputPath);
+
+      file.on('error', (err) => {
+        reject(err);
+      });
+
+      response.pipe(file);
+      file.on('finish', () => {
+        file.close();
+        resolve();
+      });
+    });
 
     request.on('timeout', () => {
       request.destroy();

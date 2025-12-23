@@ -68,7 +68,7 @@ const generateTitle = (filename) => {
   return filename
     .replace(/\.(md|yaml|json)$/, '')
     .split(/[-_]/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 };
 
@@ -107,7 +107,7 @@ const getContentFiles = (dir, baseDir = dir) => {
         files.push({
           fullPath,
           relativePath: path.relative(baseDir, fullPath),
-          filename: entry.name,
+          filename: entry.name
         });
       }
     }
@@ -179,9 +179,9 @@ async function importMindContents(mindSlug) {
   const kbDir = path.join(mindsDir, 'kb');
 
   const allFiles = [
-    ...getContentFiles(artifactsDir).map((f) => ({ ...f, source: 'artifacts' })),
-    ...getContentFiles(promptsDir).map((f) => ({ ...f, source: 'system_prompts' })),
-    ...getContentFiles(kbDir).map((f) => ({ ...f, source: 'kb' })),
+    ...getContentFiles(artifactsDir).map(f => ({ ...f, source: 'artifacts' })),
+    ...getContentFiles(promptsDir).map(f => ({ ...f, source: 'system_prompts' })),
+    ...getContentFiles(kbDir).map(f => ({ ...f, source: 'kb' })),
   ];
 
   console.log(`\n📁 Found ${allFiles.length} files to import\n`);
@@ -218,22 +218,24 @@ async function importMindContents(mindSlug) {
     }
 
     // Insert content
-    const { error: insertError } = await supabase.from('contents').insert({
-      project_id: project.id,
-      slug,
-      title,
-      content,
-      content_type: contentType,
-      ai_generated: false, // IMPORTANT: Original content, not AI generated
-      status: 'published',
-      metadata: {
-        category,
-        source_file: file.relativePath,
-        source_dir: file.source,
-        imported_at: new Date().toISOString(),
-        file_extension: path.extname(file.filename),
-      },
-    });
+    const { error: insertError } = await supabase
+      .from('contents')
+      .insert({
+        project_id: project.id,
+        slug,
+        title,
+        content,
+        content_type: contentType,
+        ai_generated: false, // IMPORTANT: Original content, not AI generated
+        status: 'published',
+        metadata: {
+          category,
+          source_file: file.relativePath,
+          source_dir: file.source,
+          imported_at: new Date().toISOString(),
+          file_extension: path.extname(file.filename),
+        },
+      });
 
     if (insertError) {
       console.error(`❌ Error importing ${file.relativePath}:`, insertError.message);

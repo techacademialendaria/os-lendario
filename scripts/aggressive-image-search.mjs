@@ -20,7 +20,7 @@ const OUTPUT_DIR = '/Users/alan/Code/mmos/public/minds-profile-images';
 const MINDS = {
   // *** ENGLISH-SPEAKING ENTREPRENEURS ***
 
-  alex_hormozi: {
+  'alex_hormozi': {
     label: 'Alex Hormozi',
     urls: [
       // Official sites
@@ -32,10 +32,10 @@ const MINDS = {
       'https://yt3.ggpht.com/-AlexHormozi/AAAAAAAAAAI/AAAAAAAAAAA/profile.jpg',
       // LinkedIn (historical cache)
       'https://media.licdn.com/dms/image/C4E03AQEzRx3A7aCw_A/profile-displayphoto-shrink_400_400/0/1234567890',
-    ],
+    ]
   },
 
-  russel_brunson: {
+  'russel_brunson': {
     label: 'Russell Brunson',
     urls: [
       // ClickFunnels official
@@ -46,10 +46,10 @@ const MINDS = {
       'https://russellbrunson.com/assets/russell.jpg',
       // YouTube CDN
       'https://yt3.ggpht.com/-RussellBrunson/AAAAAAAAAAI/profile.jpg',
-    ],
+    ]
   },
 
-  marty_cagan: {
+  'marty_cagan': {
     label: 'Marty Cagan',
     urls: [
       // SVPG official (different paths)
@@ -59,10 +59,10 @@ const MINDS = {
       'https://svpg.com/assets/images/marty-cagan.jpg',
       // Book publisher Amazon
       'https://m.media-amazon.com/images/S/amzn-author-media-prod/images/marty_cagan.jpg',
-    ],
+    ]
   },
 
-  jeff_patton: {
+  'jeff_patton': {
     label: 'Jeff Patton',
     urls: [
       // His consulting site
@@ -73,10 +73,10 @@ const MINDS = {
       'https://www.oreilly.com/library/view/author-photos/jeff-patton.jpg',
       // Agile Alliance
       'https://www.agilealliance.org/images/members/jeff-patton.jpg',
-    ],
+    ]
   },
 
-  dan_kennedy: {
+  'dan_kennedy': {
     label: 'Dan Kennedy',
     urls: [
       // No B.S. Inner Circle
@@ -87,10 +87,10 @@ const MINDS = {
       'https://m.media-amazon.com/images/S/amzn-author-media-prod/images/dan_kennedy.jpg',
       // Business publications
       'https://www.entrepreneur.com/images/authors/dan-kennedy.jpg',
-    ],
+    ]
   },
 
-  jon_benson: {
+  'jon_benson': {
     label: 'Jon Benson',
     urls: [
       // VSL (Video Sales Letter)
@@ -101,10 +101,10 @@ const MINDS = {
       'https://jonbenson.com/assets/jon.jpg',
       // YouTube channel
       'https://yt3.ggpht.com/-JonBenson/AAAAAAAAAAI/profile.jpg',
-    ],
+    ]
   },
 
-  dan_koe: {
+  'dan_koe': {
     label: 'Dan Koe',
     urls: [
       // Creator economy sites
@@ -115,12 +115,12 @@ const MINDS = {
       'https://yt3.ggpht.com/ktA6V-V8U5k/AAAAAAAAAAAI/AAAAAAAAAAA/video_profile.jpg',
       // Twitter/X (archive)
       'https://pbs.twimg.com/profile_images/theDanKoe.jpg',
-    ],
+    ]
   },
 
   // *** BRAZILIAN FIGURES ***
 
-  pedro_valerio: {
+  'pedro_valerio': {
     label: 'Pedro Valério',
     urls: [
       // Search Brazilian marketing blogs
@@ -130,7 +130,7 @@ const MINDS = {
       'https://hotmart.s3.amazonaws.com/profile/pedro-valerio.jpg',
       // LinkedIn (pt.linkedin)
       'https://media.licdn.com/dms/image/pedrovaleriomarketing.jpg',
-    ],
+    ]
   },
 
   'adriano-de-marqui': {
@@ -144,10 +144,10 @@ const MINDS = {
       'https://adrianodemarqui.com.br/assets/adriano.jpg',
       // YouTube (Portuguese creators)
       'https://yt3.ggpht.com/-AdrianodeMarqui/AAAAAAAAAAI/profile.jpg',
-    ],
+    ]
   },
 
-  joao_lozano: {
+  'joao_lozano': {
     label: 'João Lozano',
     urls: [
       // Personal/business website
@@ -157,10 +157,10 @@ const MINDS = {
       'https://instagram.com/joaolozano/picture.jpg',
       // YouTube Brazilian creators
       'https://yt3.ggpht.com/-JoaoLozano/AAAAAAAAAAI/profile.jpg',
-    ],
+    ]
   },
 
-  rafa_medeiros: {
+  'rafa_medeiros': {
     label: 'Rafa Medeiros',
     urls: [
       // Business/coaching site
@@ -170,10 +170,10 @@ const MINDS = {
       'https://instagram.com/rafamedeiros/picture.jpg',
       // LinkedIn
       'https://media.licdn.com/dms/image/rafa-medeiros.jpg',
-    ],
+    ]
   },
 
-  thiago_finch: {
+  'thiago_finch': {
     label: 'Thiago Finch',
     urls: [
       // Personal site/portfolio
@@ -183,22 +183,22 @@ const MINDS = {
       'https://yt3.ggpht.com/-ThiagoFinch/AAAAAAAAAAI/profile.jpg',
       // Instagram
       'https://instagram.com/thiagofinchmind/picture.jpg',
-    ],
+    ]
   },
 
   // *** SPECIAL CASES ***
 
-  cagan_patton: {
+  'cagan_patton': {
     label: 'Cagan + Patton',
     urls: [
       // Use Marty Cagan's image (partial person)
       'https://www.svpg.com/images/team/marty-cagan.jpg',
       // Or combined image (if exists)
       'https://www.svpg.com/images/combined/cagan-patton.jpg',
-    ],
+    ]
   },
 
-  ricky_and_morty: {
+  'ricky_and_morty': {
     label: 'Rick and Morty',
     urls: [
       // Adult Swim official
@@ -208,47 +208,43 @@ const MINDS = {
       'https://m.media-imdb.com/images/M/MV5BMjRiNDJhMTUtOWEyZS00NzAxLWI2YTAtNzA5ZDhhYTYxOTY5XkEyXkFqcGdeQXVyEzKG93zQy9HHAA@@._V1_.jpg',
       // Cartoon Network
       'https://www.cartoonnetwork.com/images/rick-and-morty.jpg',
-    ],
+    ]
   },
 };
 
 async function downloadImage(url, outputPath, slug) {
   return new Promise((resolve, reject) => {
-    const request = https.get(
-      url,
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          Accept: 'image/*',
-          Referer: 'https://google.com/',
-        },
-        timeout: 8000,
+    const request = https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'image/*',
+        'Referer': 'https://google.com/',
       },
-      (response) => {
-        // Handle redirects
-        if (response.statusCode === 301 || response.statusCode === 302) {
-          const redirectUrl = response.headers.location;
-          return downloadImage(redirectUrl, outputPath, slug)
-            .then(resolve)
-            .catch(() => reject(new Error('Redirect failed')));
-        }
-
-        if (response.statusCode !== 200) {
-          reject(new Error(`HTTP ${response.statusCode}`));
-          return;
-        }
-
-        const file = createWriteStream(outputPath);
-        response.pipe(file);
-
-        file.on('finish', () => {
-          file.close();
-          resolve();
-        });
-
-        file.on('error', reject);
+      timeout: 8000,
+    }, (response) => {
+      // Handle redirects
+      if (response.statusCode === 301 || response.statusCode === 302) {
+        const redirectUrl = response.headers.location;
+        return downloadImage(redirectUrl, outputPath, slug)
+          .then(resolve)
+          .catch(() => reject(new Error('Redirect failed')));
       }
-    );
+
+      if (response.statusCode !== 200) {
+        reject(new Error(`HTTP ${response.statusCode}`));
+        return;
+      }
+
+      const file = createWriteStream(outputPath);
+      response.pipe(file);
+
+      file.on('finish', () => {
+        file.close();
+        resolve();
+      });
+
+      file.on('error', reject);
+    });
 
     request.on('timeout', () => {
       request.destroy();
@@ -295,7 +291,7 @@ async function main() {
     const result = await processMind(slug, config);
     results[result.status].push(result.label || slug);
     // Small delay to avoid rate limiting
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 500));
   }
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -310,7 +306,7 @@ async function main() {
 
   if (results.fail.length > 0) {
     console.log('Still need:');
-    results.fail.forEach((name) => console.log(`  • ${name}`));
+    results.fail.forEach(name => console.log(`  • ${name}`));
   }
 }
 

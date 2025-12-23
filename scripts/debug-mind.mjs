@@ -1,20 +1,21 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 // Check if proficiencies are loaded correctly
 const { data, error } = await supabase
   .from('minds')
-  .select(
-    `
+  .select(`
     slug, display_name,
     proficiencies:mind_proficiencies(
       level_10,
       skill:skills(name, code)
     )
-  `
-  )
+  `)
   .eq('slug', 'naval_ravikant')
   .single();
 

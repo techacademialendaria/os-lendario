@@ -85,7 +85,7 @@ export function validateStory(story: StoryData): ValidationResult {
       message: 'User story muito curta ou vazia',
       suggestion: 'Use o formato: "Como [persona], quero [ação], para [benefício]"',
     });
-    // @ts-ignore - StoryData type mismatch with userStory property
+  // @ts-ignore - StoryData type mismatch with userStory property
   } else if (!USER_STORY_PATTERN.test(story.userStory.trim())) {
     errors.push({
       field: 'userStory',

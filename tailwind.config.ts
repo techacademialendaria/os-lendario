@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss';
-import { colors, typography } from './tokens';
 
 const config: Config = {
   darkMode: 'class',
@@ -19,7 +18,12 @@ const config: Config = {
       },
     },
     extend: {
-      fontFamily: typography.fontFamily,
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['"Source Serif 4"', 'serif'],
+        display: ['Rajdhani', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -92,17 +96,7 @@ const config: Config = {
         'status-error': 'hsl(var(--status-error))',
         'status-info': 'hsl(var(--status-info))',
 
-        /* ====================================================================
-           Semantic Design Tokens
-           Brand, semantic, neutral, and state colors from tokens system
-           ==================================================================== */
-        brand: colors.brand,
-        semantic: colors.semantic,
-        neutral: colors.neutral,
-        state: colors.state,
-
         /* Brand Palette - Guide (Static) */
-        palette: colors.palette,
         'brand-gold': {
           DEFAULT: '#C9B298',
           dark: '#C9B298',
@@ -120,7 +114,8 @@ const config: Config = {
         'brand-brown': { DEFAULT: '#A2845E', dark: '#AC8E68' },
       },
       backgroundImage: {
-        'gold-gradient': 'linear-gradient(135deg, #E4D8CA 0%, #C9B298 50%, #8D7556 100%)',
+        'gold-gradient':
+          'linear-gradient(135deg, #E4D8CA 0%, #C9B298 50%, #8D7556 100%)',
         'gold-shimmer':
           'linear-gradient(45deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 60%)',
       },

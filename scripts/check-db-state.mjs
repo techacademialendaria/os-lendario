@@ -23,10 +23,7 @@ async function check() {
   console.log('✓ fragments.relevance:', fragErr ? '❌ ' + fragErr.message : '✅ exists');
 
   // 2. content_projects.creator_mind_id (20251028120000)
-  const { error: cpErr } = await supabase
-    .from('content_projects')
-    .select('creator_mind_id')
-    .limit(1);
+  const { error: cpErr } = await supabase.from('content_projects').select('creator_mind_id').limit(1);
   console.log('✓ content_projects.creator_mind_id:', cpErr ? '❌ ' + cpErr.message : '✅ exists');
 
   // 3. project_minds table (20251210190000)

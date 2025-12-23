@@ -15,7 +15,10 @@ import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 
 // Use service role key for write operations
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const OUTPUTS_DIR = './outputs/minds';
 
@@ -26,16 +29,16 @@ const SKIP_SLUGS = new Set([
 
 // Slug mapping (outputs folder name -> preferred DB slug)
 const SLUG_MAP = {
-  adriano_de_marqui: 'adriano-de-marqui',
-  jose_amorim: 'jose-carlos-amorim',
+  'adriano_de_marqui': 'adriano-de-marqui',
+  'jose_amorim': 'jose-carlos-amorim'
 };
 
 async function getOutputMinds() {
   const entries = await readdir(OUTPUTS_DIR, { withFileTypes: true });
   return entries
-    .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
-    .map((e) => e.name)
-    .filter((slug) => !SKIP_SLUGS.has(slug));
+    .filter(e => e.isDirectory() && !e.name.startsWith('.'))
+    .map(e => e.name)
+    .filter(slug => !SKIP_SLUGS.has(slug));
 }
 
 async function getDbMinds() {
@@ -44,7 +47,7 @@ async function getDbMinds() {
     .select('id, slug, display_name, short_bio, apex_score');
 
   if (error) throw error;
-  return new Map(data.map((m) => [m.slug, m]));
+  return new Map(data.map(m => [m.slug, m]));
 }
 
 async function readYamlFile(path) {
@@ -92,7 +95,7 @@ async function extractMindData(slug) {
     profiles: [],
     values: [],
     obsessions: [],
-    sources: [],
+    sources: []
   };
 
   // Read metadata.yaml
@@ -113,18 +116,18 @@ async function extractMindData(slug) {
 
     // Extract sources (handle different metadata formats)
     if (Array.isArray(metadata.sources_collected)) {
-      data.sources = metadata.sources_collected.map((s) => ({
+      data.sources = metadata.sources_collected.map(s => ({
         title: s.title,
         type: s.type || 'article',
         url: s.url,
-        quality: 'primary',
+        quality: 'primary'
       }));
     }
 
     // Handle combo clones with primary_candidates
     if (metadata.primary_candidates) {
       data.display_name = metadata.primary_candidates
-        .map((c) => c.name.split(' ').pop())
+        .map(c => c.name.split(' ').pop())
         .join(' + ');
       data.short_bio = metadata.strategic_synergy || metadata.use_case_primary;
     }
@@ -140,7 +143,7 @@ async function extractMindData(slug) {
     { path: 'analysis/identity-core.yaml', type: 'identity_core' },
     { path: 'analysis/cognitive-spec.yaml', type: 'cognitive_spec' },
     { path: 'analysis/values-analysis.yaml', type: 'values_analysis' },
-    { path: 'analysis/obsessions-map.yaml', type: 'obsessions_map' },
+    { path: 'analysis/obsessions-map.yaml', type: 'obsessions_map' }
   ];
 
   for (const f of analysisFiles) {
@@ -151,7 +154,7 @@ async function extractMindData(slug) {
         data.profiles.push({
           profile_type: f.type,
           storage_format: 'yaml',
-          content_text: content,
+          content_text: content
         });
       }
     }
@@ -163,7 +166,7 @@ async function extractMindData(slug) {
     { path: 'synthesis/frameworks.md', type: 'frameworks' },
     { path: 'synthesis/singularity.md', type: 'singularity' },
     { path: 'synthesis/paradoxes.md', type: 'paradoxes' },
-    { path: 'synthesis/mental-models.md', type: 'mental_models' },
+    { path: 'synthesis/mental-models.md', type: 'mental_models' }
   ];
 
   for (const f of synthesisFiles) {
@@ -174,7 +177,7 @@ async function extractMindData(slug) {
         data.profiles.push({
           profile_type: f.type,
           storage_format: 'md',
-          content_text: content,
+          content_text: content
         });
       }
     }
@@ -193,7 +196,7 @@ async function extractMindData(slug) {
             data.profiles.push({
               profile_type: promptType,
               storage_format: 'md',
-              content_text: content,
+              content_text: content
             });
           }
         }
@@ -238,10 +241,14 @@ async function createMind(data) {
     short_bio: data.short_bio,
     apex_score: data.apex_score,
     privacy_level: 'public',
-    primary_language: 'pt',
+    primary_language: 'pt'
   };
 
-  const { data: mind, error } = await supabase.from('minds').insert(mindData).select().single();
+  const { data: mind, error } = await supabase
+    .from('minds')
+    .insert(mindData)
+    .select()
+    .single();
 
   if (error) throw error;
   return mind;
@@ -250,17 +257,16 @@ async function createMind(data) {
 async function upsertProfiles(mindId, profiles) {
   let count = 0;
   for (const profile of profiles) {
-    const { error } = await supabase.from('mind_profiles').upsert(
-      {
+    const { error } = await supabase
+      .from('mind_profiles')
+      .upsert({
         mind_id: mindId,
         profile_type: profile.profile_type,
         storage_format: profile.storage_format,
-        content_text: profile.content_text,
-      },
-      {
-        onConflict: 'mind_id,profile_type,storage_format',
-      }
-    );
+        content_text: profile.content_text
+      }, {
+        onConflict: 'mind_id,profile_type,storage_format'
+      });
 
     if (!error) count++;
   }
@@ -271,15 +277,18 @@ async function upsertValues(mindId, values) {
   if (!values.length) return 0;
 
   // Delete existing values first
-  await supabase.from('mind_values').delete().eq('mind_id', mindId);
+  await supabase
+    .from('mind_values')
+    .delete()
+    .eq('mind_id', mindId);
 
-  const { error } = await supabase.from('mind_values').insert(
-    values.map((v) => ({
+  const { error } = await supabase
+    .from('mind_values')
+    .insert(values.map(v => ({
       mind_id: mindId,
       name: v.name,
-      importance_10: v.importance_10,
-    }))
-  );
+      importance_10: v.importance_10
+    })));
 
   return error ? 0 : values.length;
 }
@@ -288,15 +297,18 @@ async function upsertObsessions(mindId, obsessions) {
   if (!obsessions.length) return 0;
 
   // Delete existing obsessions first
-  await supabase.from('mind_obsessions').delete().eq('mind_id', mindId);
+  await supabase
+    .from('mind_obsessions')
+    .delete()
+    .eq('mind_id', mindId);
 
-  const { error } = await supabase.from('mind_obsessions').insert(
-    obsessions.map((o) => ({
+  const { error } = await supabase
+    .from('mind_obsessions')
+    .insert(obsessions.map(o => ({
       mind_id: mindId,
       name: o.name,
-      intensity_10: o.intensity_10,
-    }))
-  );
+      intensity_10: o.intensity_10
+    })));
 
   return error ? 0 : obsessions.length;
 }
@@ -321,7 +333,7 @@ async function main() {
     profiles: 0,
     values: 0,
     obsessions: 0,
-    errors: [],
+    errors: []
   };
 
   for (const slug of outputMinds) {
@@ -346,7 +358,10 @@ async function main() {
           if (data.apex_score && !mind.apex_score) updates.apex_score = data.apex_score;
 
           if (Object.keys(updates).length) {
-            await supabase.from('minds').update(updates).eq('id', mind.id);
+            await supabase
+              .from('minds')
+              .update(updates)
+              .eq('id', mind.id);
             stats.updated++;
             console.log(`  ~ Updated: ${Object.keys(updates).join(', ')}`);
           }
@@ -373,6 +388,7 @@ async function main() {
         stats.obsessions += obsCount;
         console.log(`  + Obsessions: ${obsCount}`);
       }
+
     } catch (e) {
       console.log(`  ERROR: ${e.message}`);
       stats.errors.push({ slug, error: e.message });

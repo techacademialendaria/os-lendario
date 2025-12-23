@@ -24,7 +24,9 @@ const __dirname = path.dirname(__filename);
 
 const MINDS_DIR = path.resolve(__dirname, '../../outputs/minds');
 const FIX_MODE = process.argv[2] === '--fix';
-const PATTERN = process.argv[2] && process.argv[2] !== '--fix' ? process.argv[2] : '*';
+const PATTERN = process.argv[2] && process.argv[2] !== '--fix'
+  ? process.argv[2]
+  : '*';
 
 let stats = {
   total: 0,
@@ -32,7 +34,7 @@ let stats = {
   invalid: 0,
   warnings: 0,
   errors: [],
-  warnings_list: [],
+  warnings_list: []
 };
 
 function validateHistoryYaml(filePath, mindSlug) {
@@ -46,14 +48,14 @@ function validateHistoryYaml(filePath, mindSlug) {
     } catch (e) {
       return {
         valid: false,
-        error: `YAML Parse Error: ${e.message}`,
+        error: `YAML Parse Error: ${e.message}`
       };
     }
 
     if (!data) {
       return {
         valid: false,
-        error: 'Empty YAML file',
+        error: 'Empty YAML file'
       };
     }
 
@@ -62,10 +64,8 @@ function validateHistoryYaml(filePath, mindSlug) {
     // Check required fields
     if (!data.version) issues.push('Missing: version');
     if (!data.quote) issues.push('Missing: quote');
-    if (!data.events || !Array.isArray(data.events))
-      issues.push('Missing or invalid: events (must be array)');
-    if (!data.achievements || !Array.isArray(data.achievements))
-      issues.push('Warning: missing achievements array');
+    if (!data.events || !Array.isArray(data.events)) issues.push('Missing or invalid: events (must be array)');
+    if (!data.achievements || !Array.isArray(data.achievements)) issues.push('Warning: missing achievements array');
 
     // Validate events
     if (data.events && Array.isArray(data.events)) {
@@ -86,9 +86,7 @@ function validateHistoryYaml(filePath, mindSlug) {
         if (!event.description) issues.push(`${eventPath}: Missing description`);
         if (!event.type) issues.push(`${eventPath}: Missing type`);
         if (event.type && !eventTypes.includes(event.type)) {
-          issues.push(
-            `${eventPath}: Invalid type "${event.type}" (must be one of: ${eventTypes.join(', ')})`
-          );
+          issues.push(`${eventPath}: Invalid type "${event.type}" (must be one of: ${eventTypes.join(', ')})`);
         }
 
         // Relevance should be 1-10
@@ -117,8 +115,8 @@ function validateHistoryYaml(filePath, mindSlug) {
     }
 
     // Categorize issues
-    const errors = issues.filter((i) => !i.startsWith('Warning:'));
-    const warnings = issues.filter((i) => i.startsWith('Warning:'));
+    const errors = issues.filter(i => !i.startsWith('Warning:'));
+    const warnings = issues.filter(i => i.startsWith('Warning:'));
 
     return {
       valid: errors.length === 0,
@@ -127,13 +125,13 @@ function validateHistoryYaml(filePath, mindSlug) {
       stats: {
         events: data.events?.length || 0,
         achievements: data.achievements?.length || 0,
-        themes: data.journey_themes?.length || 0,
-      },
+        themes: data.journey_themes?.length || 0
+      }
     };
   } catch (error) {
     return {
       valid: false,
-      error: `Unexpected error: ${error.message}`,
+      error: `Unexpected error: ${error.message}`
     };
   }
 }
@@ -145,9 +143,10 @@ async function main() {
   console.log(`---\n`);
 
   // Find all mind directories
-  const mindDirs = fs.readdirSync(MINDS_DIR).filter((dir) => {
+  const mindDirs = fs.readdirSync(MINDS_DIR).filter(dir => {
     const fullPath = path.join(MINDS_DIR, dir);
-    return fs.statSync(fullPath).isDirectory() && (PATTERN === '*' || dir.includes(PATTERN));
+    return fs.statSync(fullPath).isDirectory() &&
+           (PATTERN === '*' || dir.includes(PATTERN));
   });
 
   if (mindDirs.length === 0) {
@@ -172,9 +171,7 @@ async function main() {
     if (result.valid) {
       stats.valid++;
       console.log(`✅ ${mindSlug}`);
-      console.log(
-        `   Events: ${result.stats.events} | Achievements: ${result.stats.achievements} | Themes: ${result.stats.themes}`
-      );
+      console.log(`   Events: ${result.stats.events} | Achievements: ${result.stats.achievements} | Themes: ${result.stats.themes}`);
     } else {
       stats.invalid++;
       console.log(`❌ ${mindSlug}`);
@@ -185,7 +182,7 @@ async function main() {
       }
 
       if (result.errors && result.errors.length > 0) {
-        result.errors.forEach((err) => {
+        result.errors.forEach(err => {
           console.log(`   ❌ ${err}`);
         });
         stats.errors.push({ mind: mindSlug, issues: result.errors });
@@ -193,7 +190,7 @@ async function main() {
 
       if (result.warnings && result.warnings.length > 0) {
         stats.warnings += result.warnings.length;
-        result.warnings.forEach((warn) => {
+        result.warnings.forEach(warn => {
           console.log(`   ⚠️  ${warn}`);
         });
       }
@@ -204,9 +201,7 @@ async function main() {
   console.log(`\n---\n`);
   console.log(`📊 VALIDATION SUMMARY`);
   console.log(`Total:   ${stats.total}`);
-  console.log(
-    `✅ Valid:   ${stats.valid}/${stats.total} (${Math.round((stats.valid / stats.total) * 100)}%)`
-  );
+  console.log(`✅ Valid:   ${stats.valid}/${stats.total} (${Math.round(stats.valid/stats.total*100)}%)`);
   console.log(`❌ Invalid: ${stats.invalid}/${stats.total}`);
   console.log(`⚠️  Warnings: ${stats.warnings}`);
 
@@ -219,7 +214,7 @@ async function main() {
   }
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('Error:', err);
   process.exit(1);
 });

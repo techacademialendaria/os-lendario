@@ -90,7 +90,7 @@ export const frameworkService = {
     const by_complexity: Record<string, number> = {};
     const by_participants: Record<string, number> = {};
 
-    frameworks.forEach((fw) => {
+    frameworks.forEach(fw => {
       const complexity = fw.framework_schema.complexity || 'Média';
       by_complexity[complexity] = (by_complexity[complexity] || 0) + 1;
 
@@ -104,7 +104,7 @@ export const frameworkService = {
     return {
       total_frameworks: frameworks.length,
       by_complexity,
-      by_participants,
+      by_participants
     };
   },
 
@@ -135,5 +135,5 @@ export const frameworkService = {
       default:
         return 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20';
     }
-  },
+  }
 };

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, Suspense } from 'react';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './components/shared/layout/Sidebar';
@@ -7,66 +8,74 @@ import { Icon } from './components/ui/icon';
 import { Toaster } from './components/ui/toaster';
 import { TooltipProvider } from './components/ui/tooltip';
 import { cn } from './lib/utils';
+import { TemplateSkeleton } from './components/TemplateSkeleton';
+import { trackWebVitals } from './lib/vitals';
+import { useTheme } from './lib/ThemeContext';
 
 // Design System Router (lazy loads 22 sections internally)
 import DesignSystemRouter, { DocsRouter } from './components/design-system/DesignSystemRouter';
 
 // Shared Templates (only used outside design system)
-import SaasSettingsTemplate from './components/shared/templates/SaasSettingsTemplate';
+const SaasSettingsTemplate = React.lazy(() => import('./components/shared/templates/SaasSettingsTemplate'));
 const CmsTemplate = React.lazy(() => import('./components/shared/templates/CmsTemplate'));
 
 // Creator Templates
 import CoursesRouter from './components/creator/CoursesRouter';
-import PersonasTemplate from './components/creator/templates/PersonasTemplate';
-import FrameworksTemplate from './components/creator/templates/FrameworksTemplate';
+const PersonasTemplate = React.lazy(() => import('./components/creator/templates/PersonasTemplate'));
+const FrameworksTemplate = React.lazy(() => import('./components/creator/templates/FrameworksTemplate'));
 import CreatorTopbar from './components/creator/CreatorTopbar';
 
 // PRD Studio
 import PRDRouter from './components/prd/PRDRouter';
 
 // Sales Templates
-import SalesDashboardTemplate from './components/sales/templates/SalesDashboardTemplate';
-import SalesCallsTemplate from './components/sales/templates/SalesCallsTemplate';
-import SalesCallDetailsTemplate from './components/sales/templates/SalesCallDetailsTemplate';
-import SalesMarketingTemplate from './components/sales/templates/SalesMarketingTemplate';
-import SalesProductTemplate from './components/sales/templates/SalesProductTemplate';
-import SalesSettingsTemplate from './components/sales/templates/SalesSettingsTemplate';
-import SalesObjectionsTemplate from './components/sales/templates/SalesObjectionsTemplate';
+const SalesDashboardTemplate = React.lazy(() => import('./components/sales/templates/SalesDashboardTemplate'));
+const SalesCallsTemplate = React.lazy(() => import('./components/sales/templates/SalesCallsTemplate'));
+const SalesCallDetailsTemplate = React.lazy(() => import('./components/sales/templates/SalesCallDetailsTemplate'));
+const SalesMarketingTemplate = React.lazy(() => import('./components/sales/templates/SalesMarketingTemplate'));
+const SalesProductTemplate = React.lazy(() => import('./components/sales/templates/SalesProductTemplate'));
+const SalesSettingsTemplate = React.lazy(() => import('./components/sales/templates/SalesSettingsTemplate'));
+const SalesObjectionsTemplate = React.lazy(() => import('./components/sales/templates/SalesObjectionsTemplate'));
 
 // Minds Templates (New)
-import MindsGalleryTemplate from './components/minds/templates/MindsGalleryTemplate';
-import MindProfileTemplate from './components/minds/templates/MindProfileTemplate';
-import MindComparisonTemplate from './components/minds/templates/MindComparisonTemplate';
-import ArtifactEditorTemplate from './components/minds/templates/ArtifactEditorTemplate';
-import ArenaTemplate from './components/minds/templates/ArenaTemplate';
+const MindsGalleryTemplate = React.lazy(() => import('./components/minds/templates/MindsGalleryTemplate'));
+const MindProfileTemplate = React.lazy(() => import('./components/minds/templates/MindProfileTemplate'));
+const MindComparisonTemplate = React.lazy(() => import('./components/minds/templates/MindComparisonTemplate'));
+const ArtifactEditorTemplate = React.lazy(() => import('./components/minds/templates/ArtifactEditorTemplate'));
+const ArenaTemplate = React.lazy(() => import('./components/minds/templates/ArenaTemplate'));
 
 // Marketing Templates
-import MarketingTemplatesPage from './components/marketing/templates/MarketingTemplatesPage';
-import LandingPageTemplate from './components/marketing/templates/LandingPageTemplate';
-import AdvertorialTemplate from './components/marketing/templates/AdvertorialTemplate';
-import EbookTemplate from './components/marketing/templates/EbookTemplate';
-import VSLTemplate from './components/marketing/templates/VSLTemplate';
-import WebinarTemplate from './components/marketing/templates/WebinarTemplate';
-import ThankYouTemplate from './components/marketing/templates/ThankYouTemplate';
-import CommunityTemplatesPage from './components/marketing/templates/CommunityTemplatesPage';
-import CommunityCaptureTemplate from './components/marketing/templates/CommunityCaptureTemplate';
-import CommunityAdvertorialTemplate from './components/marketing/templates/CommunityAdvertorialTemplate';
-import CommunitySalesTemplate from './components/marketing/templates/CommunitySalesTemplate';
-import CommunityVSLTemplate from './components/marketing/templates/CommunityVSLTemplate';
-import SalesPageTemplate from './components/sales/templates/SalesPageTemplate';
+const MarketingTemplatesPage = React.lazy(() => import('./components/marketing/templates/MarketingTemplatesPage'));
+const LandingPageTemplate = React.lazy(() => import('./components/marketing/templates/LandingPageTemplate'));
+const AdvertorialTemplate = React.lazy(() => import('./components/marketing/templates/AdvertorialTemplate'));
+const EbookTemplate = React.lazy(() => import('./components/marketing/templates/EbookTemplate'));
+const VSLTemplate = React.lazy(() => import('./components/marketing/templates/VSLTemplate'));
+const WebinarTemplate = React.lazy(() => import('./components/marketing/templates/WebinarTemplate'));
+const ThankYouTemplate = React.lazy(() => import('./components/marketing/templates/ThankYouTemplate'));
+const CommunityTemplatesPage = React.lazy(() => import('./components/marketing/templates/CommunityTemplatesPage'));
+const CommunityCaptureTemplate = React.lazy(() => import('./components/marketing/templates/CommunityCaptureTemplate'));
+const CommunityAdvertorialTemplate = React.lazy(() => import('./components/marketing/templates/CommunityAdvertorialTemplate'));
+const CommunitySalesTemplate = React.lazy(() => import('./components/marketing/templates/CommunitySalesTemplate'));
+const CommunityVSLTemplate = React.lazy(() => import('./components/marketing/templates/CommunityVSLTemplate'));
+const SalesPageTemplate = React.lazy(() => import('./components/sales/templates/SalesPageTemplate'));
 
 import { SECTION_ROUTES, getSectionFromPath } from './routes';
 
 const App: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isDark, setIsDark } = useTheme();
   const [currentSection, setCurrentSection] = useState<Section>(Section.TEMPLATE_SALES_DASHBOARD);
-  const [isDark, setIsDark] = useState(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [currentTheme, setCurrentTheme] = useState<ThemeName>('Gold');
   const [language, setLanguage] = useState<Language>('pt');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [selectedMindSlug, setSelectedMindSlug] = useState<string | null>(null);
+
+  // Track Web Vitals on mount
+  useEffect(() => {
+    trackWebVitals();
+  }, []);
 
   // Sync URL -> State (Initial Load + Back/Forward)
   useEffect(() => {
@@ -104,11 +113,7 @@ const App: React.FC = () => {
 
   // Helper to check if it's an external iframe section
   const isExternal = (section: Section) => {
-    return (
-      section === Section.EXTERNAL_CHALLENGES ||
-      section === Section.EXTERNAL_PROMPT_OPS ||
-      section === Section.EXTERNAL_VAULT
-    );
+    return section === Section.EXTERNAL_CHALLENGES || section === Section.EXTERNAL_PROMPT_OPS || section === Section.EXTERNAL_VAULT;
   };
 
   // Apply Theme & Dark Mode
@@ -143,40 +148,23 @@ const App: React.FC = () => {
     if (themeConfig) {
       root.style.setProperty('--primary', themeConfig.primary);
       root.style.setProperty('--primary-light', themeConfig.light);
-      // Optional: adjust foreground if needed based on theme brightness,
+      // Optional: adjust foreground if needed based on theme brightness, 
       // but usually Design System keeps foreground consistent.
     }
+
   }, [isDark, currentTheme, currentSection]);
 
   // Helper to check if current section is part of Design System
   const isDesignSystemApp = (section: Section) => {
     const dsRoutes = [
-      Section.CONCEPT,
-      Section.IDENTITY,
-      Section.LEGENDARY_VS_MEDIOCRE,
-      Section.COLORS,
-      Section.TYPOGRAPHY,
-      Section.SPACING,
-      Section.ICONS,
-      Section.LISTS,
-      Section.MOTION,
-      Section.GRAPHS,
-      Section.CHARTS,
-      Section.COMPONENTS,
-      Section.BUTTONS,
-      Section.ADVANCED,
-      Section.FEEDBACK,
-      Section.STATES,
-      Section.CARDS,
-      Section.FORMS,
-      Section.TABLES,
-      Section.TEMPLATE_APP_CMS,
-      Section.TEMPLATE_APP_KANBAN,
-      Section.TEMPLATE_APP_SETTINGS,
-      Section.TEMPLATE_SIDEBAR_LEGACY,
-      Section.TOKENS,
-      Section.DOCS,
-      Section.AI_MANUAL,
+      Section.CONCEPT, Section.IDENTITY, Section.LEGENDARY_VS_MEDIOCRE,
+      Section.COLORS, Section.TYPOGRAPHY, Section.SPACING, Section.ICONS,
+      Section.LISTS, Section.MOTION, Section.GRAPHS, Section.CHARTS,
+      Section.COMPONENTS, Section.BUTTONS, Section.ADVANCED, Section.FEEDBACK,
+      Section.STATES, Section.CARDS, Section.FORMS, Section.TABLES,
+      Section.TEMPLATE_APP_CMS, Section.TEMPLATE_APP_KANBAN,
+      Section.TEMPLATE_APP_SETTINGS, Section.TEMPLATE_SIDEBAR_LEGACY,
+      Section.TOKENS, Section.DOCS, Section.AI_MANUAL
     ];
     return dsRoutes.includes(section);
   };
@@ -185,29 +173,11 @@ const App: React.FC = () => {
     switch (currentSection) {
       // External Iframes
       case Section.EXTERNAL_CHALLENGES:
-        return (
-          <iframe
-            src="https://halloween.lendario.ai/"
-            className="h-full w-full border-0"
-            title="Desafios"
-          />
-        );
+        return <iframe src="https://halloween.lendario.ai/" className="w-full h-full border-0" title="Desafios" />;
       case Section.EXTERNAL_PROMPT_OPS:
-        return (
-          <iframe
-            src="https://prompts.academialendaria.ai/"
-            className="h-full w-full border-0"
-            title="Prompt Ops"
-          />
-        );
+        return <iframe src="https://prompts.academialendaria.ai/" className="w-full h-full border-0" title="Prompt Ops" />;
       case Section.EXTERNAL_VAULT:
-        return (
-          <iframe
-            src="https://vault.academialendaria.com.br/"
-            className="h-full w-full border-0"
-            title="Vault"
-          />
-        );
+        return <iframe src="https://vault.academialendaria.com.br/" className="w-full h-full border-0" title="Vault" />;
 
       // Design System (all sections handled by router)
       case Section.CONCEPT:
@@ -235,17 +205,13 @@ const App: React.FC = () => {
       case Section.TEMPLATE_SIDEBAR_LEGACY:
         return (
           <Routes>
-            <Route
-              path="/design/*"
-              element={
-                <DesignSystemRouter
-                  setSection={handleSetSection}
-                  isDark={isDark}
-                  currentTheme={currentTheme}
-                  language={language}
-                />
-              }
-            />
+            <Route path="/design/*" element={
+              <DesignSystemRouter
+                setSection={handleSetSection}
+                currentTheme={currentTheme}
+                language={language}
+              />
+            } />
           </Routes>
         );
 
@@ -283,55 +249,14 @@ const App: React.FC = () => {
       case Section.APP_MINDS_ARENA:
         return (
           <Routes>
-            <Route
-              path="/minds/gallery"
-              element={
-                <MindsGalleryTemplate
-                  setSection={handleSetSection}
-                  onSelectMind={(slug) => {
-                    setSelectedMindSlug(slug);
-                    navigate(`/minds/${slug}`);
-                  }}
-                />
-              }
-            />
-            <Route
-              path="/minds/matrix"
-              element={<MindComparisonTemplate setSection={handleSetSection} />}
-            />
+            <Route path="/minds/gallery" element={<MindsGalleryTemplate setSection={handleSetSection} onSelectMind={(slug) => { setSelectedMindSlug(slug); navigate(`/minds/${slug}`); }} />} />
+            <Route path="/minds/matrix" element={<MindComparisonTemplate setSection={handleSetSection} />} />
             <Route path="/minds/arena" element={<ArenaTemplate setSection={handleSetSection} />} />
-            <Route
-              path="/minds/wizard"
-              element={
-                <div className="p-12 text-center text-muted-foreground">
-                  Wizard de Criacao (Em Desenvolvimento)
-                </div>
-              }
-            />
-            <Route
-              path="/minds/:mindSlug/artifacts/new"
-              element={<ArtifactEditorTemplate setSection={handleSetSection} />}
-            />
-            <Route
-              path="/minds/:mindSlug/artifacts/:artifactId"
-              element={<ArtifactEditorTemplate setSection={handleSetSection} />}
-            />
-            <Route
-              path="/minds/:mindSlug"
-              element={<MindProfileTemplate setSection={handleSetSection} />}
-            />
-            <Route
-              path="/minds"
-              element={
-                <MindsGalleryTemplate
-                  setSection={handleSetSection}
-                  onSelectMind={(slug) => {
-                    setSelectedMindSlug(slug);
-                    navigate(`/minds/${slug}`);
-                  }}
-                />
-              }
-            />
+            <Route path="/minds/wizard" element={<div className="p-12 text-center text-muted-foreground">Wizard de Criacao (Em Desenvolvimento)</div>} />
+            <Route path="/minds/:mindSlug/artifacts/new" element={<ArtifactEditorTemplate setSection={handleSetSection} />} />
+            <Route path="/minds/:mindSlug/artifacts/:artifactId" element={<ArtifactEditorTemplate setSection={handleSetSection} />} />
+            <Route path="/minds/:mindSlug" element={<MindProfileTemplate setSection={handleSetSection} />} />
+            <Route path="/minds" element={<MindsGalleryTemplate setSection={handleSetSection} onSelectMind={(slug) => { setSelectedMindSlug(slug); navigate(`/minds/${slug}`); }} />} />
           </Routes>
         );
 
@@ -339,29 +264,16 @@ const App: React.FC = () => {
       case Section.APP_CREATOR_COURSES:
         return (
           <Routes>
-            <Route
-              path="/creator/courses/*"
-              element={<CoursesRouter setSection={handleSetSection} />}
-            />
-            <Route
-              path="/creator/cursos/*"
-              element={<CoursesRouter setSection={handleSetSection} />}
-            />
+            <Route path="/creator/courses/*" element={<CoursesRouter setSection={handleSetSection} />} />
+            <Route path="/creator/cursos/*" element={<CoursesRouter setSection={handleSetSection} />} />
           </Routes>
         );
       case Section.APP_CREATOR_CONTENT:
         return (
-          <div className="flex min-h-screen flex-col bg-background font-sans">
-            <CreatorTopbar
-              currentSection={Section.APP_CREATOR_CONTENT}
-              setSection={handleSetSection}
-            />
+          <div className="flex flex-col min-h-screen bg-background font-sans">
+            <CreatorTopbar currentSection={Section.APP_CREATOR_CONTENT} setSection={handleSetSection} />
             <div className="p-6">
-              <Suspense
-                fallback={
-                  <div className="p-12 text-center text-muted-foreground">Carregando...</div>
-                }
-              >
+              <Suspense fallback={<div className="p-12 text-center text-muted-foreground">Carregando...</div>}>
                 <CmsTemplate />
               </Suspense>
             </div>
@@ -373,24 +285,16 @@ const App: React.FC = () => {
         return <FrameworksTemplate setSection={handleSetSection} />;
       case Section.APP_CREATOR_PERFORMANCE:
         return (
-          <div className="flex min-h-screen flex-col bg-background font-sans">
-            <CreatorTopbar
-              currentSection={Section.APP_CREATOR_PERFORMANCE}
-              setSection={handleSetSection}
-            />
-            <div className="p-12 text-center text-muted-foreground">
-              Analytics & Performance (Em Desenvolvimento)
-            </div>
+          <div className="flex flex-col min-h-screen bg-background font-sans">
+            <CreatorTopbar currentSection={Section.APP_CREATOR_PERFORMANCE} setSection={handleSetSection} />
+            <div className="p-12 text-center text-muted-foreground">Analytics & Performance (Em Desenvolvimento)</div>
           </div>
         );
       case Section.APP_CREATOR_SETTINGS:
         return (
-          <div className="flex min-h-screen flex-col bg-background font-sans">
-            <CreatorTopbar
-              currentSection={Section.APP_CREATOR_SETTINGS}
-              setSection={handleSetSection}
-            />
-            <div className="mx-auto w-full max-w-4xl p-6">
+          <div className="flex flex-col min-h-screen bg-background font-sans">
+            <CreatorTopbar currentSection={Section.APP_CREATOR_SETTINGS} setSection={handleSetSection} />
+            <div className="p-6 max-w-4xl mx-auto w-full">
               <SaasSettingsTemplate />
             </div>
           </div>
@@ -438,29 +342,20 @@ const App: React.FC = () => {
         return <CommunityTemplatesPage />;
 
       default:
-        return (
-          <div className="p-12 text-center text-muted-foreground">
-            Em desenvolvimento: {currentSection}
-          </div>
-        );
+        return <div className="p-12 text-center text-muted-foreground">Em desenvolvimento: {currentSection}</div>;
     }
   };
 
-  const isFullWidthPage =
-    isSalesApp(currentSection) ||
-    isMindsApp(currentSection) ||
-    isCreatorApp(currentSection) ||
-    isPRDApp(currentSection) ||
-    isExternal(currentSection) ||
-    isDesignSystemApp(currentSection);
+  const isFullWidthPage = isSalesApp(currentSection) || isMindsApp(currentSection) || isCreatorApp(currentSection) || isPRDApp(currentSection) || isExternal(currentSection) || isDesignSystemApp(currentSection);
 
   return (
     <TooltipProvider>
-      <div className="flex min-h-screen flex-col bg-background font-sans text-foreground selection:bg-primary/20 md:flex-row">
+      <div className="flex flex-col md:flex-row min-h-screen bg-background text-foreground font-sans selection:bg-primary/20">
+
         {/* Mobile Header */}
-        <div className="sticky top-0 z-50 flex items-center justify-between border-b border-border bg-card p-4 md:hidden">
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card sticky top-0 z-50">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold">Lendár[IA]</span>
+            <span className="font-bold text-lg">Lendár[IA]</span>
           </div>
           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-muted-foreground">
             <Icon name="menu-burger" size="size-5" />
@@ -470,8 +365,6 @@ const App: React.FC = () => {
         <Sidebar
           currentSection={currentSection}
           setSection={handleSetSection}
-          isDark={isDark}
-          toggleTheme={() => setIsDark(!isDark)}
           isCollapsed={isSidebarCollapsed}
           toggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           currentThemeName={currentTheme}
@@ -484,17 +377,17 @@ const App: React.FC = () => {
 
         <main
           className={cn(
-            'custom-scrollbar h-screen flex-1 overflow-y-auto transition-all duration-300 ease-in-out',
-            isSidebarCollapsed ? 'md:ml-20' : 'md:ml-64'
+            "flex-1 transition-all duration-300 ease-in-out h-screen overflow-y-auto custom-scrollbar",
+            isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
           )}
         >
           {/* Apply padding only if NOT a sales/minds/creator template or external iframe */}
-          <div
-            className={cn(
-              isFullWidthPage ? 'h-full w-full p-0' : 'mx-auto max-w-[1920px] p-6 md:p-12'
-            )}
-          >
-            {renderContent()}
+          <div className={cn(
+            isFullWidthPage ? "h-full p-0 w-full" : "max-w-[1920px] mx-auto p-6 md:p-12"
+          )}>
+            <Suspense fallback={<TemplateSkeleton />}>
+              {renderContent()}
+            </Suspense>
           </div>
         </main>
 

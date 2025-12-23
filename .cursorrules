@@ -1,0 +1,505 @@
+# .cursorrules: AIOS-FULLSTACK Development Standards
+
+You are an expert TypeScript, React, and Tailwind CSS developer for AIOS-FULLSTACK.
+
+## Stack Overview
+
+- **Framework:** React 19 + TypeScript 5.2 (strict mode enabled)
+- **Styling:** Tailwind CSS v4.1.18 (CSS-first configuration)
+- **Routing:** React Router v7.10.1
+- **Forms:** react-hook-form v7.68.0
+- **UI Components:** Custom + Radix UI primitives
+- **Build:** Vite 5.1.6 (instant HMR)
+- **Package Manager:** npm (monorepo-ready)
+
+## Code Style & Structure
+
+### File Organization
+
+```
+app/
+├── components/          # React components
+│   ├── ui/             # Base UI components (button, input, etc.)
+│   ├── shared/         # Layout components (Sidebar, Header)
+│   ├── {studio}/       # Studio-specific components
+│   └── {feature}/      # Feature-specific components
+├── lib/                # Utilities & helpers
+│   ├── tokens.ts       # Design tokens (studio palettes)
+│   └── utils.ts        # General utilities (cn, etc.)
+├── pages/              # Page components (if using file-based routing)
+├── types/              # TypeScript type definitions
+├── App.tsx             # Root component
+├── index.tsx           # Entry point
+├── index.css           # Global styles
+└── tailwind.config.ts  # Tailwind configuration
+```
+
+### Component Template
+
+```typescript
+import React from 'react';
+import { cn } from '@/lib/utils';
+
+interface ComponentNameProps {
+  children?: React.ReactNode;
+  className?: string;
+  // Specific props
+}
+
+export const ComponentName: React.FC<ComponentNameProps> = ({
+  children,
+  className,
+  ...props
+}) => {
+  return (
+    <div className={cn('base-classes', className)} {...props}>
+      {children}
+    </div>
+  );
+};
+
+ComponentName.displayName = 'ComponentName';
+export default React.memo(ComponentName);
+```
+
+### Naming Conventions
+
+- **Directories:** lowercase-with-dashes (e.g., `components/design-system/`)
+- **Components:** PascalCase (e.g., `MindCard.tsx`)
+- **Utilities:** camelCase (e.g., `getStudioTokens()`)
+- **Constants:** UPPER_SNAKE_CASE (e.g., `STUDIO_TOKENS`)
+- **Interfaces:** PascalCase with `Props` suffix (e.g., `ButtonProps`)
+- **TypeScript types:** Use `interface` over `type` (preferred)
+
+## Tailwind CSS v4.1.18 Usage
+
+### Core Principles
+
+1. **Utility-first:** Use Tailwind classes directly, not custom CSS
+2. **No overuse of @apply:** Only for reuseability (3+ instances)
+3. **Responsive mobile-first:** sm:, md:, lg:, xl: prefixes
+4. **Dark mode aware:** Use `dark:` prefix for dark theme
+5. **Design tokens:** Reference colors from `lib/tokens.ts`
+
+### Class Composition
+
+```typescript
+// ✅ GOOD: Using cn() for conditional classes
+<button className={cn(
+  'px-4 py-2 rounded-md font-medium transition-colors',
+  'bg-primary text-white',
+  'hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-offset-2',
+  'disabled:opacity-50 disabled:cursor-not-allowed',
+  isActive && 'bg-primary-dark',
+  className
+)} />
+
+// ✅ GOOD: Using tailwind-merge for variant composition
+import { twMerge } from 'tailwind-merge';
+const merged = twMerge('px-4', 'px-8'); // Result: 'px-8'
+
+// ❌ AVOID: Conditional template strings
+<button className={isActive ? 'bg-blue-600' : 'bg-gray-400'} />
+
+// ❌ AVOID: Overusing @apply
+<style>
+  .btn-custom {
+    @apply px-4 py-2 rounded-md; /* Only for highly reusable patterns */
+  }
+</style>
+```
+
+### Color System & Design Tokens
+
+**Semantic colors (prefer these):**
+```typescript
+// Use semantic color names from config
+className="bg-primary text-foreground"
+className="border-muted-foreground/30"
+```
+
+**Studio-specific colors (for theme switching):**
+```typescript
+// Dynamic colors that change per studio
+className="bg-studio-primary text-studio-text"
+className="border-studio-primary-dark"
+
+// Available via lib/tokens.ts STUDIO_TOKENS
+```
+
+**Dark mode:**
+```typescript
+className="bg-white dark:bg-slate-950"
+className="text-gray-900 dark:text-gray-50"
+
+// Always test both light and dark modes
+```
+
+### Responsive Design (Mobile-First)
+
+```typescript
+// ✅ GOOD: Mobile-first approach
+className="flex flex-col gap-2 sm:flex-row sm:gap-4 lg:gap-6"
+
+// ❌ AVOID: Desktop-first
+className="flex-row gap-6 max-lg:flex-col max-lg:gap-2"
+
+// Container queries (v4 feature)
+className="@container @sm:grid-cols-2 @lg:grid-cols-4"
+```
+
+## Component Patterns
+
+### Creating Component Variants with CVA
+
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority';
+
+const button = cva('font-semibold border rounded transition-colors', {
+  variants: {
+    intent: {
+      primary: 'bg-primary text-white hover:bg-primary/90',
+      secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90',
+      ghost: 'bg-transparent text-foreground hover:bg-muted',
+    },
+    size: {
+      sm: 'px-3 py-1.5 text-sm',
+      md: 'px-4 py-2 text-base',
+      lg: 'px-6 py-3 text-lg',
+    },
+  },
+  defaultVariants: { intent: 'primary', size: 'md' },
+});
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof button>;
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, intent, size, ...props }, ref) => (
+    <button
+      ref={ref}
+      className={button({ intent, size, className })}
+      {...props}
+    />
+  )
+);
+
+Button.displayName = 'Button';
+export default React.memo(Button);
+```
+
+### List Components (Performance Critical)
+
+```typescript
+// ✅ GOOD: Wrap list items with React.memo
+interface CardProps {
+  data: Item;
+}
+
+const Card = React.memo(({ data }: CardProps) => (
+  <div className="rounded-lg bg-card p-4">
+    {data.name}
+  </div>
+));
+
+export const CardList = ({ items }: { items: Item[] }) => (
+  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+    {items.map((item) => (
+      <Card key={item.id} data={item} />
+    ))}
+  </div>
+);
+```
+
+### Lazy Loading Components
+
+```typescript
+// ✅ GOOD: Code splitting with React.lazy + Suspense
+import { Suspense, lazy } from 'react';
+
+const HeavyComponent = lazy(() => import('./HeavyComponent'));
+const Skeleton = () => <div className="animate-pulse bg-muted h-64 rounded" />;
+
+export const App = () => (
+  <Suspense fallback={<Skeleton />}>
+    <HeavyComponent />
+  </Suspense>
+);
+```
+
+### Form Handling
+
+```typescript
+// ✅ GOOD: react-hook-form integration
+import { useForm } from 'react-hook-form';
+
+interface FormData {
+  email: string;
+  password: string;
+}
+
+export const LoginForm = () => {
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <input
+          {...register('email', {
+            required: 'Email required',
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: 'Invalid email',
+            },
+          })}
+          className="w-full px-4 py-2 border border-input rounded-md"
+          aria-describedby={errors.email ? 'email-error' : undefined}
+        />
+        {errors.email && (
+          <p id="email-error" className="mt-1 text-sm text-status-error">
+            {errors.email.message}
+          </p>
+        )}
+      </div>
+    </form>
+  );
+};
+```
+
+## Accessibility (WCAG 2.2)
+
+### Essential Patterns
+
+```typescript
+// ✅ GOOD: focus-visible for keyboard-only indication
+<button className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+  Click me
+</button>
+
+// ✅ GOOD: aria-label for icon-only buttons
+<button aria-label="Close menu" onClick={closeMenu}>
+  <X className="w-4 h-4" />
+</button>
+
+// ✅ GOOD: aria-describedby for form errors
+<input
+  id="email-input"
+  aria-describedby={errors.email ? 'email-error' : undefined}
+/>
+<span id="email-error" className="text-status-error text-sm">
+  {errors.email?.message}
+</span>
+
+// ✅ GOOD: sr-only for screen readers
+<span className="sr-only">Loading...</span>
+```
+
+### Testing Accessibility
+
+```typescript
+// Install: npm install --save-dev jest-axe
+import { axe, toHaveNoViolations } from 'jest-axe';
+
+test('button has no a11y violations', async () => {
+  const { container } = render(<Button>Click</Button>);
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
+```
+
+### Color Contrast
+
+- Minimum: 4.5:1 ratio for normal text (WCAG AA)
+- Enhanced: 7:1 ratio (WCAG AAA)
+- Use tools: ContrastChecker.com, InclusiveColors.com
+- Always test dark mode separately
+
+### Dark Mode Testing
+
+```typescript
+// Component should work in both light and dark
+<div className="bg-white dark:bg-slate-950 text-gray-900 dark:text-white">
+  {/* Verify both modes are readable */}
+</div>
+
+// Test: Toggle dark mode in DevTools → check contrast
+```
+
+## TypeScript Best Practices
+
+### Type Safety
+
+```typescript
+// ✅ GOOD: Explicit types
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+const getUser = async (id: string): Promise<User> => {
+  // Implementation
+};
+
+// ❌ AVOID: Using any
+const user: any = fetchUser(); // No type safety
+
+// ✅ GOOD: Type guards
+function isUser(value: unknown): value is User {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'id' in value &&
+    'name' in value
+  );
+}
+```
+
+### Props Interface Naming
+
+```typescript
+// Component file: MindCard.tsx
+interface MindCardProps {
+  mind: Mind;
+  isSelected?: boolean;
+  onSelect?: (id: string) => void;
+}
+
+export const MindCard: React.FC<MindCardProps> = ({ mind, isSelected, onSelect }) => (
+  // ...
+);
+```
+
+## Performance Optimization
+
+### Code Splitting
+
+```typescript
+// ✅ GOOD: Lazy load heavy components
+const AdminPanel = lazy(() => import('./AdminPanel'));
+const UserDashboard = lazy(() => import('./UserDashboard'));
+
+export const App = () => (
+  <Routes>
+    <Route path="/admin" element={
+      <Suspense fallback={<LoadingSpinner />}>
+        <AdminPanel />
+      </Suspense>
+    } />
+  </Routes>
+);
+```
+
+### Memoization
+
+```typescript
+// ✅ GOOD: Memoize expensive list items
+export const MindCard = React.memo(({ mind }: MindCardProps) => (
+  <div className="rounded-lg bg-card p-4">
+    {mind.name}
+  </div>
+));
+
+// ✅ GOOD: useCallback for event handlers
+const handleClick = useCallback(() => {
+  onSelect(id);
+}, [id, onSelect]);
+```
+
+### Image Optimization
+
+```typescript
+// ✅ GOOD: Lazy loading + srcSet
+<img
+  src="/images/hero-sm.webp"
+  srcSet="/images/hero-sm.webp 640w, /images/hero-lg.webp 1280w"
+  sizes="(max-width: 640px) 100vw, 1280px"
+  loading="lazy"
+  alt="Hero banner"
+/>
+```
+
+## Build & Deployment
+
+### Build Script
+
+```bash
+npm run build      # TypeScript + Vite build
+npm run typecheck  # Type checking
+npm run lint       # ESLint
+npm run format     # Prettier
+```
+
+### Pre-commit Checks
+
+```bash
+# Runs automatically via husky
+npm run lint-staged
+```
+
+## Tailwind v4 Migration Notes
+
+### Changed Utilities (if coming from v3)
+
+- `shadow` → `shadow-sm` (no bare shadows)
+- `outline-none` → `outline-hidden`
+- `blur` → `blur-sm` (no bare blur)
+- `rounded` → `rounded-sm` (no bare rounded)
+
+### New Features (v4.1.18)
+
+- Container queries: `@container`, `@sm:`, `@lg:`
+- 3D transforms: `rotate-x-*`, `rotate-y-*`, `perspective-*`
+- OKLCH colors: Coming in next color system update
+
+### Running Build
+
+```bash
+npm run build
+# Expected: Fast builds (<100ms incremental)
+```
+
+## Debugging & Troubleshooting
+
+### Common Issues
+
+**Classes not applying:**
+- Check `content` paths in `tailwind.config.ts`
+- Clear node_modules: `rm -rf node_modules && npm install`
+- Rebuild: `npm run build`
+
+**Contrast issues:**
+- Use ContrastChecker.com or InclusiveColors.com
+- Test in both light and dark mode
+- Aim for 4.5:1 minimum ratio
+
+**Performance problems:**
+- Profile with React DevTools Profiler
+- Check for unnecessary re-renders
+- Use React.memo on expensive components
+- Profile bundle size: `npm run build && npx source-map-explorer 'dist/**'`
+
+## Resources
+
+- **Tailwind:** https://tailwindcss.com/docs (v4.1.18)
+- **React:** https://react.dev
+- **TypeScript:** https://www.typescriptlang.org/docs
+- **Accessibility:** https://www.w3.org/WAI/WCAG21/quickref/
+- **Colors:** https://oklch.com, https://www.contrast-checker.com
+
+## When Using AI Tools (Cursor, Claude, v0.dev)
+
+- Reference this `.cursorrules` file for consistency
+- Provide design token examples from `lib/tokens.ts`
+- Share similar component patterns from codebase
+- Always review AI-generated code for security/performance
+- Test accessibility: Run jest-axe on generated components
+- Verify dark mode works correctly
+
+---
+
+**Last Updated:** 2025-12-23
+**Tailwind Version:** 4.1.18
+**React Version:** 19
+**TypeScript Version:** 5.2 (strict)
+

@@ -8,7 +8,10 @@ import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_ANON_KEY
+);
 
 async function checkSources(mindSlug) {
   // Get mind
@@ -47,42 +50,31 @@ async function checkSources(mindSlug) {
 
   // Group by type
   const byType = {};
-  sources.forEach((s) => {
+  sources.forEach(s => {
     byType[s.type] = (byType[s.type] || 0) + 1;
   });
 
   console.log('\n📂 Por tipo:');
-  Object.entries(byType)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([type, count]) => {
-      console.log('  -', type + ':', count);
-    });
+  Object.entries(byType).sort((a, b) => b[1] - a[1]).forEach(([type, count]) => {
+    console.log('  -', type + ':', count);
+  });
 
   // Group by quality
   const byQuality = {};
-  sources.forEach((s) => {
+  sources.forEach(s => {
     byQuality[s.quality] = (byQuality[s.quality] || 0) + 1;
   });
 
   console.log('\n⭐ Por qualidade:');
-  Object.entries(byQuality)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([q, count]) => {
-      console.log('  -', q + ':', count);
-    });
+  Object.entries(byQuality).sort((a, b) => b[1] - a[1]).forEach(([q, count]) => {
+    console.log('  -', q + ':', count);
+  });
 
   // List sources
   console.log('\n📝 Lista de sources:');
   sources.forEach((s, i) => {
-    console.log(i + 1 + '. [' + s.type + '] ' + s.title);
-    console.log(
-      '   Autor:',
-      s.author || '-',
-      '| Data:',
-      s.published_date,
-      '| Qualidade:',
-      s.quality
-    );
+    console.log((i+1) + '. [' + s.type + '] ' + s.title);
+    console.log('   Autor:', s.author || '-', '| Data:', s.published_date, '| Qualidade:', s.quality);
     if (s.url) console.log('   URL:', s.url);
   });
 }
@@ -134,64 +126,61 @@ async function checkContents(mindSlug) {
 
   // Group by category
   const byCategory = {};
-  contents.forEach((c) => {
+  contents.forEach(c => {
     const cat = c.metadata?.category || 'unknown';
     byCategory[cat] = (byCategory[cat] || 0) + 1;
   });
 
   console.log('\n📂 Por categoria:');
-  Object.entries(byCategory)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([cat, count]) => {
-      console.log('  -', cat + ':', count);
-    });
+  Object.entries(byCategory).sort((a, b) => b[1] - a[1]).forEach(([cat, count]) => {
+    console.log('  -', cat + ':', count);
+  });
 
   // Group by source dir
   const bySource = {};
-  contents.forEach((c) => {
+  contents.forEach(c => {
     const src = c.metadata?.source_dir || 'unknown';
     bySource[src] = (bySource[src] || 0) + 1;
   });
 
   console.log('\n📂 Por diretório fonte:');
-  Object.entries(bySource)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([src, count]) => {
-      console.log('  -', src + ':', count);
-    });
+  Object.entries(bySource).sort((a, b) => b[1] - a[1]).forEach(([src, count]) => {
+    console.log('  -', src + ':', count);
+  });
 
   // List all contents
   console.log('\n📝 Lista completa de conteúdos:');
   contents.forEach((c, i) => {
     const cat = c.metadata?.category || 'unknown';
     const srcFile = c.metadata?.source_file || '';
-    console.log(i + 1 + '. [' + cat + '] ' + c.title);
+    console.log((i+1) + '. [' + cat + '] ' + c.title);
     console.log('   -> ' + srcFile);
   });
 }
 
 async function checkContentTypes() {
-  const { data, error } = await supabase.from('contents').select('content_type').limit(1000);
+  const { data, error } = await supabase
+    .from('contents')
+    .select('content_type')
+    .limit(1000);
 
   if (error) {
     console.error('Error:', error.message);
     return;
   }
 
-  const types = [...new Set(data.map((d) => d.content_type))];
+  const types = [...new Set(data.map(d => d.content_type))];
   console.log('📊 Content types in use:', types);
 
   // Count per type
   const counts = {};
-  data.forEach((d) => {
+  data.forEach(d => {
     counts[d.content_type] = (counts[d.content_type] || 0) + 1;
   });
   console.log('\n📂 Count per type:');
-  Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([t, c]) => {
-      console.log('  -', t + ':', c);
-    });
+  Object.entries(counts).sort((a,b) => b[1] - a[1]).forEach(([t, c]) => {
+    console.log('  -', t + ':', c);
+  });
 }
 
 async function checkProjectTypes() {
@@ -205,23 +194,21 @@ async function checkProjectTypes() {
     return;
   }
 
-  const types = [...new Set(data.map((d) => d.project_type))];
+  const types = [...new Set(data.map(d => d.project_type))];
   console.log('📊 Project types in use:', types);
 
-  const statuses = [...new Set(data.map((d) => d.status))];
+  const statuses = [...new Set(data.map(d => d.status))];
   console.log('📊 Statuses in use:', statuses);
 
   // Count per type
   const counts = {};
-  data.forEach((d) => {
+  data.forEach(d => {
     counts[d.project_type] = (counts[d.project_type] || 0) + 1;
   });
   console.log('\n📂 Count per type:');
-  Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([t, c]) => {
-      console.log('  -', t + ':', c);
-    });
+  Object.entries(counts).sort((a,b) => b[1] - a[1]).forEach(([t, c]) => {
+    console.log('  -', t + ':', c);
+  });
 }
 
 const mindSlug = process.argv[2] || 'alan_nicolas';

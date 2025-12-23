@@ -2,19 +2,22 @@
  * Find prompt files in outputs that are not in the DB
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 import { readdir, lstat } from 'fs/promises';
 import { join, basename, dirname } from 'path';
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const OUTPUTS_DIR = '../outputs/minds';
 const META_FILES = ['CHANGELOG', 'DEPRECATED', 'VALIDATION', 'README'];
 
 // Mapping from folder names to DB slugs
 const SLUG_MAP = {
-  adriano_de_marqui: 'adriano-de-marqui',
-  jose_amorim: 'jose-carlos-amorim',
+  'adriano_de_marqui': 'adriano-de-marqui',
+  'jose_amorim': 'jose-carlos-amorim'
 };
 
 async function getAllPromptFiles() {
@@ -47,7 +50,7 @@ async function scanDir(dir, mindSlug, relativePath, files) {
       await scanDir(fullPath, mindSlug, relPath, files);
     } else if (entry.name.endsWith('.md')) {
       // Skip meta files
-      if (META_FILES.some((m) => entry.name.includes(m))) continue;
+      if (META_FILES.some(m => entry.name.includes(m))) continue;
 
       // Check if symlink
       const stats = await lstat(fullPath);
@@ -56,7 +59,7 @@ async function scanDir(dir, mindSlug, relativePath, files) {
       files.push({
         mindSlug,
         sourcePath: `system_prompts/${relPath}`,
-        fullPath,
+        fullPath
       });
     }
   }
@@ -85,7 +88,7 @@ async function main() {
   console.log();
 
   // Find missing
-  const missing = files.filter((f) => !dbPaths.has(`${f.mindSlug}:${f.sourcePath}`));
+  const missing = files.filter(f => !dbPaths.has(`${f.mindSlug}:${f.sourcePath}`));
 
   if (missing.length > 0) {
     console.log(`=== ${missing.length} MISSING FILES ===`);

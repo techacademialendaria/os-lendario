@@ -17,34 +17,41 @@ import { config } from 'dotenv';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: resolve(__dirname, '../../.env') });
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
 const SLUGS = [
-  'adriano_de_marqui',
-  'alan_nicolas',
-  'alex_hormozi',
-  'dan_koe',
-  'daniel_kahneman',
-  'elon_musk',
-  'gary_vee',
-  'jesus_cristo',
-  'joao_lozano',
-  'jose-carlos-amorim',
-  'mark_manson',
-  'napoleon_hill',
-  'naval_ravikant',
-  'paul_graham',
-  'peter_thiel',
-  'ray_kurzweil',
-  'sam_altman',
-  'steve_jobs',
-  'thiago_finch',
+  "adriano_de_marqui",
+  "alan_nicolas",
+  "alex_hormozi",
+  "dan_koe",
+  "daniel_kahneman",
+  "elon_musk",
+  "gary_vee",
+  "jesus_cristo",
+  "joao_lozano",
+  "jose-carlos-amorim",
+  "mark_manson",
+  "napoleon_hill",
+  "naval_ravikant",
+  "paul_graham",
+  "peter_thiel",
+  "ray_kurzweil",
+  "sam_altman",
+  "steve_jobs",
+  "thiago_finch"
 ];
 
 async function getMindId(slug) {
-  const { data, error } = await supabase.from('minds').select('id').eq('slug', slug).single();
+  const { data, error } = await supabase
+    .from('minds')
+    .select('id')
+    .eq('slug', slug)
+    .single();
 
   if (error) return null;
   return data?.id;
@@ -76,16 +83,13 @@ function extractProfileData(json) {
       analysis_date: metadata.analysis_date || new Date().toISOString().split('T')[0],
       confidence: metadata.confidence || null,
       analyzer: metadata.analyzer || 'imported',
-      import_date: new Date().toISOString(),
-    },
+      import_date: new Date().toISOString()
+    }
   };
 }
 
 async function importProfile(slug) {
-  const filePath = resolve(
-    __dirname,
-    `../../outputs/minds/${slug}/artifacts/psychometric_profile.json`
-  );
+  const filePath = resolve(__dirname, `../../outputs/minds/${slug}/artifacts/psychometric_profile.json`);
 
   if (!existsSync(filePath)) {
     console.log(`  [SKIP] ${slug} - file not found`);
@@ -103,27 +107,26 @@ async function importProfile(slug) {
     const data = extractProfileData(json);
 
     if (DRY_RUN) {
-      console.log(
-        `  [DRY] ${slug} -> ${data.mbti_type || '?'} / ${data.disc_pattern || '?'} / ${data.enneagram_type || '?'}`
-      );
+      console.log(`  [DRY] ${slug} -> ${data.mbti_type || '?'} / ${data.disc_pattern || '?'} / ${data.enneagram_type || '?'}`);
       return { status: 'dry', data };
     }
 
-    const { error } = await supabase.from('mind_psychometrics').upsert({
-      mind_id: mindId,
-      ...data,
-      updated_at: new Date().toISOString(),
-    });
+    const { error } = await supabase
+      .from('mind_psychometrics')
+      .upsert({
+        mind_id: mindId,
+        ...data,
+        updated_at: new Date().toISOString()
+      });
 
     if (error) {
       console.log(`  [ERR] ${slug} - ${error.message}`);
       return { status: 'error', error: error.message };
     }
 
-    console.log(
-      `  [OK]  ${slug} -> ${data.mbti_type || '?'} / ${data.disc_pattern || '?'} / ${data.enneagram_type || '?'}`
-    );
+    console.log(`  [OK]  ${slug} -> ${data.mbti_type || '?'} / ${data.disc_pattern || '?'} / ${data.enneagram_type || '?'}`);
     return { status: 'ok', data };
+
   } catch (err) {
     console.log(`  [ERR] ${slug} - ${err.message}`);
     return { status: 'error', error: err.message };

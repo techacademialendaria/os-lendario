@@ -12,9 +12,12 @@
  * - apply-avatar-migration.mjs (update avatars logic)
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const SLUGS_WITH_PHOTOS = [
   'aaron_beck',
@@ -139,7 +142,7 @@ const SLUGS_WITH_PHOTOS = [
   'winston_churchill',
   'wolfgang_mozart',
   'yuval_harari',
-  'zig_ziglar',
+  'zig_ziglar'
 ];
 
 async function main() {
@@ -204,7 +207,7 @@ async function main() {
 
   if (notFoundSlugs.length > 0 && notFoundSlugs.length <= 20) {
     console.log('\nSlugs not found:');
-    notFoundSlugs.forEach((s) => console.log(`  - ${s}`));
+    notFoundSlugs.forEach(s => console.log(`  - ${s}`));
   }
 
   // Validation
@@ -215,7 +218,9 @@ async function main() {
     .select('id', { count: 'exact' })
     .not('avatar_url', 'is', null);
 
-  const { count: total } = await supabase.from('minds').select('id', { count: 'exact' });
+  const { count: total } = await supabase
+    .from('minds')
+    .select('id', { count: 'exact' });
 
   console.log(`Minds with avatar_url: ${withAvatar}/${total}`);
   const percentage = total > 0 ? ((withAvatar / total) * 100).toFixed(1) : 0;

@@ -74,7 +74,7 @@ function mapFilename(original) {
     'naval.json': 'naval_ravikant.json',
     'peter-thiel-json-fixed.json': 'peter_thiel.json',
     'steve-jobs.json': 'steve_jobs.json',
-    'warren-buffett-profile.json': 'warren_buffett.json',
+    'warren-buffett-profile.json': 'warren_buffett.json'
   };
   return mapping[original];
 }
@@ -101,26 +101,17 @@ async function compareFile(originalFile) {
   const normTexts = extractTextContent(normalizedProfile);
 
   // Find missing texts (in original but not in normalized)
-  const missingTexts = origTexts.filter(
-    (t) => !normTexts.some((nt) => nt.includes(t) || t.includes(nt))
-  );
+  const missingTexts = origTexts.filter(t => !normTexts.some(nt => nt.includes(t) || t.includes(nt)));
 
   // Check specific important fields
   const importantFields = [
-    'disc.D',
-    'disc.I',
-    'disc.S',
-    'disc.C',
-    'enneagram.type',
-    'enneagram.core_fear',
-    'enneagram.instinct_stack',
-    'mbti.type',
-    'mbti.cognitive_stack',
+    'disc.D', 'disc.I', 'disc.S', 'disc.C',
+    'enneagram.type', 'enneagram.core_fear', 'enneagram.instinct_stack',
+    'mbti.type', 'mbti.cognitive_stack',
     'cognitive_stratum.level',
-    'big_five.openness.total',
-    'big_five.conscientiousness.total',
+    'big_five.openness.total', 'big_five.conscientiousness.total',
     'dark_triad.narcissism.score',
-    'unique_characteristics.superpower',
+    'unique_characteristics.superpower'
   ];
 
   const fieldCheck = [];
@@ -151,7 +142,7 @@ async function compareFile(originalFile) {
     normalizedTexts: normTexts.length,
     missingTexts: missingTexts.length,
     missingTextSamples: missingTexts.slice(0, 3),
-    fieldIssues: fieldCheck,
+    fieldIssues: fieldCheck
   };
 }
 
@@ -162,7 +153,7 @@ async function main() {
   console.log();
 
   const files = await readdir(ORIGINAL_DIR);
-  const jsonFiles = files.filter((f) => f.endsWith('.json') && !f.startsWith('_'));
+  const jsonFiles = files.filter(f => f.endsWith('.json') && !f.startsWith('_'));
 
   let totalIssues = 0;
 
@@ -174,14 +165,12 @@ async function main() {
     const status = hasIssues ? '⚠️' : '✅';
 
     console.log(`${status} ${result.file}`);
-    console.log(
-      `   Valores: ${result.originalValues} → ${result.normalizedValues} (${result.valueDiff >= 0 ? '+' : ''}${result.valueDiff})`
-    );
+    console.log(`   Valores: ${result.originalValues} → ${result.normalizedValues} (${result.valueDiff >= 0 ? '+' : ''}${result.valueDiff})`);
     console.log(`   Textos: ${result.originalTexts} → ${result.normalizedTexts}`);
 
     if (result.missingTexts > 0) {
       console.log(`   ⚠️  Textos possivelmente perdidos: ${result.missingTexts}`);
-      result.missingTextSamples.forEach((t) => {
+      result.missingTextSamples.forEach(t => {
         console.log(`      - "${t.slice(0, 60)}..."`);
       });
       totalIssues++;
@@ -189,7 +178,7 @@ async function main() {
 
     if (result.fieldIssues.length > 0) {
       console.log(`   ⚠️  Campos alterados:`);
-      result.fieldIssues.forEach((i) => {
+      result.fieldIssues.forEach(i => {
         console.log(`      - ${i.field}: ${i.status}`);
       });
       totalIssues++;

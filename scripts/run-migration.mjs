@@ -32,7 +32,7 @@ async function runMigration() {
               RAISE NOTICE 'Dropped constraint: %', v_constraint_name;
           END IF;
       END $$;
-    `,
+    `
   });
 
   if (dropError) {
@@ -60,7 +60,7 @@ async function runMigration() {
               'prd'
           )
       );
-    `,
+    `
   });
 
   if (addError) {

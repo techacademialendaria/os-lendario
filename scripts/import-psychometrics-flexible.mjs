@@ -18,7 +18,10 @@ import YAML from 'yaml';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 config({ path: resolve(__dirname, '../.env.local') });
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_ANON_KEY
+);
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const MINDS_DIR = resolve(__dirname, '../../outputs/minds');
@@ -81,76 +84,58 @@ function normalizeProfile(content, filePath) {
     const cp = content.psychometric_profile.cognitive_profile || {};
 
     const profile = {
-      disc: ps.disc
-        ? {
-            D: ps.disc.scores?.D || ps.disc.D,
-            I: ps.disc.scores?.I || ps.disc.I,
-            S: ps.disc.scores?.S || ps.disc.S,
-            C: ps.disc.scores?.C || ps.disc.C,
-            pattern: ps.disc.pattern,
-            pattern_name: ps.disc.pattern_name,
-          }
-        : null,
-      mbti: ps.mbti
-        ? {
-            type: ps.mbti.type?.split(' ')[0] || ps.mbti.type, // "ISTP-A (The Virtuoso)" -> "ISTP-A"
-            type_name: ps.mbti.type?.match(/\(([^)]+)\)/)?.[1], // Extract "The Virtuoso"
-            cognitive_stack: ps.mbti.cognitive_functions
-              ? {
-                  dominant: { function: ps.mbti.cognitive_functions.dominant?.split(' ')[0] },
-                  auxiliary: { function: ps.mbti.cognitive_functions.auxiliary?.split(' ')[0] },
-                  tertiary: { function: ps.mbti.cognitive_functions.tertiary?.split(' ')[0] },
-                  inferior: { function: ps.mbti.cognitive_functions.inferior?.split(' ')[0] },
-                }
-              : null,
-          }
-        : null,
-      enneagram: ps.enneagram
-        ? {
-            type: ps.enneagram.core_type?.split(' ')[0] || ps.enneagram.type, // "5w4 (The Iconoclast)" -> "5w4"
-            type_name: ps.enneagram.core_type?.match(/\(([^)]+)\)/)?.[1],
-            instinct_stack: ps.enneagram.instinct_stack,
-            stress_direction: ps.enneagram.disintegration?.toString(),
-            growth_direction: ps.enneagram.integration?.toString(),
-          }
-        : null,
-      big_five: ps.big_five
-        ? {
-            O: ps.big_five.openness,
-            C: ps.big_five.conscientiousness,
-            E: ps.big_five.extraversion,
-            A: ps.big_five.agreeableness,
-            N: ps.big_five.neuroticism,
-          }
-        : null,
+      disc: ps.disc ? {
+        D: ps.disc.scores?.D || ps.disc.D,
+        I: ps.disc.scores?.I || ps.disc.I,
+        S: ps.disc.scores?.S || ps.disc.S,
+        C: ps.disc.scores?.C || ps.disc.C,
+        pattern: ps.disc.pattern,
+        pattern_name: ps.disc.pattern_name
+      } : null,
+      mbti: ps.mbti ? {
+        type: ps.mbti.type?.split(' ')[0] || ps.mbti.type, // "ISTP-A (The Virtuoso)" -> "ISTP-A"
+        type_name: ps.mbti.type?.match(/\(([^)]+)\)/)?.[1], // Extract "The Virtuoso"
+        cognitive_stack: ps.mbti.cognitive_functions ? {
+          dominant: { function: ps.mbti.cognitive_functions.dominant?.split(' ')[0] },
+          auxiliary: { function: ps.mbti.cognitive_functions.auxiliary?.split(' ')[0] },
+          tertiary: { function: ps.mbti.cognitive_functions.tertiary?.split(' ')[0] },
+          inferior: { function: ps.mbti.cognitive_functions.inferior?.split(' ')[0] }
+        } : null
+      } : null,
+      enneagram: ps.enneagram ? {
+        type: ps.enneagram.core_type?.split(' ')[0] || ps.enneagram.type, // "5w4 (The Iconoclast)" -> "5w4"
+        type_name: ps.enneagram.core_type?.match(/\(([^)]+)\)/)?.[1],
+        instinct_stack: ps.enneagram.instinct_stack,
+        stress_direction: ps.enneagram.disintegration?.toString(),
+        growth_direction: ps.enneagram.integration?.toString()
+      } : null,
+      big_five: ps.big_five ? {
+        O: ps.big_five.openness,
+        C: ps.big_five.conscientiousness,
+        E: ps.big_five.extraversion,
+        A: ps.big_five.agreeableness,
+        N: ps.big_five.neuroticism
+      } : null,
       cognitive_stratum: {
-        level: cp.stratum || cp.level,
+        level: cp.stratum || cp.level
       },
-      intelligence: cp.iq_estimated
-        ? {
-            iq_estimated: { range: cp.iq_estimated },
-          }
-        : null,
-      unique_characteristics: content.psychometric_profile.statistical_rarity
-        ? {
-            statistical_rarity: content.psychometric_profile.statistical_rarity.combined_profile,
-          }
-        : null,
+      intelligence: cp.iq_estimated ? {
+        iq_estimated: { range: cp.iq_estimated }
+      } : null,
+      unique_characteristics: content.psychometric_profile.statistical_rarity ? {
+        statistical_rarity: content.psychometric_profile.statistical_rarity.combined_profile
+      } : null
     };
 
     return { profile, _source_format: 'cognitive-spec' };
   }
 
   // Format 3: psychometrics root level (joao_lozano style)
-  if (
-    content.psychometrics?.disc ||
-    content.psychometrics?.mbti ||
-    content.psychometrics?.enneagram
-  ) {
+  if (content.psychometrics?.disc || content.psychometrics?.mbti || content.psychometrics?.enneagram) {
     const ps = content.psychometrics;
 
     // Convert text scores to numbers
-    const scoreMap = { high: 80, medium: 50, low: 20, 'very high': 90, 'very low': 10 };
+    const scoreMap = { 'high': 80, 'medium': 50, 'low': 20, 'very high': 90, 'very low': 10 };
     const parseScore = (val) => {
       if (typeof val === 'number') return val;
       if (typeof val === 'string') return scoreMap[val.toLowerCase()] || 50;
@@ -158,51 +143,29 @@ function normalizeProfile(content, filePath) {
     };
 
     const profile = {
-      disc: ps.disc
-        ? {
-            D: parseScore(ps.disc.dimensions?.dominant_d?.score || ps.disc.D),
-            I: parseScore(ps.disc.dimensions?.influential_i?.score || ps.disc.I),
-            S: parseScore(ps.disc.dimensions?.steady_s?.score || ps.disc.S),
-            C: parseScore(ps.disc.dimensions?.conscientious_c?.score || ps.disc.C),
-            pattern: ps.disc.type || ps.disc.pattern,
-          }
-        : null,
-      mbti: ps.mbti
-        ? {
-            type: ps.mbti.type,
-            type_name: ps.mbti.type_name,
-            cognitive_stack:
-              ps.mbti.cognitive_stack || ps.mbti.cognitive_functions
-                ? {
-                    dominant: {
-                      function:
-                        ps.mbti.cognitive_stack?.dominant || ps.mbti.cognitive_functions?.dominant,
-                    },
-                    auxiliary: {
-                      function:
-                        ps.mbti.cognitive_stack?.auxiliary ||
-                        ps.mbti.cognitive_functions?.auxiliary,
-                    },
-                    tertiary: {
-                      function:
-                        ps.mbti.cognitive_stack?.tertiary || ps.mbti.cognitive_functions?.tertiary,
-                    },
-                    inferior: {
-                      function:
-                        ps.mbti.cognitive_stack?.inferior || ps.mbti.cognitive_functions?.inferior,
-                    },
-                  }
-                : null,
-          }
-        : null,
-      enneagram: ps.enneagram
-        ? {
-            type: ps.enneagram.integration || ps.enneagram.core_type || ps.enneagram.type,
-            type_name: ps.enneagram.type_name,
-            instinct_stack: ps.enneagram.instinct_stack,
-          }
-        : null,
-      big_five: ps.big_five || ps.ocean || null,
+      disc: ps.disc ? {
+        D: parseScore(ps.disc.dimensions?.dominant_d?.score || ps.disc.D),
+        I: parseScore(ps.disc.dimensions?.influential_i?.score || ps.disc.I),
+        S: parseScore(ps.disc.dimensions?.steady_s?.score || ps.disc.S),
+        C: parseScore(ps.disc.dimensions?.conscientious_c?.score || ps.disc.C),
+        pattern: ps.disc.type || ps.disc.pattern
+      } : null,
+      mbti: ps.mbti ? {
+        type: ps.mbti.type,
+        type_name: ps.mbti.type_name,
+        cognitive_stack: ps.mbti.cognitive_stack || ps.mbti.cognitive_functions ? {
+          dominant: { function: ps.mbti.cognitive_stack?.dominant || ps.mbti.cognitive_functions?.dominant },
+          auxiliary: { function: ps.mbti.cognitive_stack?.auxiliary || ps.mbti.cognitive_functions?.auxiliary },
+          tertiary: { function: ps.mbti.cognitive_stack?.tertiary || ps.mbti.cognitive_functions?.tertiary },
+          inferior: { function: ps.mbti.cognitive_stack?.inferior || ps.mbti.cognitive_functions?.inferior }
+        } : null
+      } : null,
+      enneagram: ps.enneagram ? {
+        type: ps.enneagram.integration || ps.enneagram.core_type || ps.enneagram.type,
+        type_name: ps.enneagram.type_name,
+        instinct_stack: ps.enneagram.instinct_stack
+      } : null,
+      big_five: ps.big_five || ps.ocean || null
     };
 
     return { profile, _source_format: 'psychometrics-root' };
@@ -255,10 +218,10 @@ function findProfileFile(mindSlug) {
     /profile\.json$/i,
     /cognitive-spec/i,
     /cognitive.*spec/i,
-    /profile/i,
+    /profile/i
   ];
 
-  const scoredFiles = files.map((f) => {
+  const scoredFiles = files.map(f => {
     let score = 0;
     for (let i = 0; i < priorityOrder.length; i++) {
       if (priorityOrder[i].test(f)) {
@@ -303,8 +266,8 @@ function getAllMindSlugs() {
   }
 
   return readdirSync(MINDS_DIR, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && !d.name.startsWith('.'))
-    .map((d) => d.name);
+    .filter(d => d.isDirectory() && !d.name.startsWith('.'))
+    .map(d => d.name);
 }
 
 // Get mind ID from database
@@ -316,11 +279,15 @@ async function getMindId(slug) {
     slug.replace(/-/g, '_'),
     slug.toLowerCase(),
     slug.toLowerCase().replace(/_/g, '-'),
-    slug.toLowerCase().replace(/-/g, '_'),
+    slug.toLowerCase().replace(/-/g, '_')
   ];
 
   for (const s of slugVariants) {
-    const { data, error } = await supabase.from('minds').select('id, slug').eq('slug', s).single();
+    const { data, error } = await supabase
+      .from('minds')
+      .select('id, slug')
+      .eq('slug', s)
+      .single();
 
     if (data) {
       return { id: data.id, dbSlug: data.slug };
@@ -370,8 +337,8 @@ function extractProfileData(json) {
       confidence: metadata.confidence || null,
       analyzer: metadata.analyzer || 'imported',
       import_date: new Date().toISOString(),
-      source_file: json._source_file || null,
-    },
+      source_file: json._source_file || null
+    }
   };
 }
 
@@ -400,11 +367,13 @@ async function importProfile(mindSlug) {
       return { status: 'dry', data };
     }
 
-    const { error } = await supabase.from('mind_psychometrics').upsert({
-      mind_id: mindInfo.id,
-      ...data,
-      updated_at: new Date().toISOString(),
-    });
+    const { error } = await supabase
+      .from('mind_psychometrics')
+      .upsert({
+        mind_id: mindInfo.id,
+        ...data,
+        updated_at: new Date().toISOString()
+      });
 
     if (error) {
       console.log(`  [ERR] ${mindSlug} - ${error.message}`);
@@ -413,6 +382,7 @@ async function importProfile(mindSlug) {
 
     console.log(`  [OK]  ${mindSlug} -> ${summary}`);
     return { status: 'ok', data };
+
   } catch (err) {
     console.log(`  [ERR] ${mindSlug} - ${err.message}`);
     return { status: 'error', error: err.message };

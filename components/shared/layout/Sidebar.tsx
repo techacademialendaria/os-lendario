@@ -3,6 +3,7 @@ import { Section, Language } from '../../../types';
 import { Icon } from '../../ui/icon';
 import { cn } from '../../../lib/utils';
 import { THEMES, ThemeName } from '../../../lib/theme';
+import { useTheme } from '../../../lib/ThemeContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,8 +17,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 interface SidebarProps {
   currentSection: Section;
   setSection: (s: Section) => void;
-  isDark: boolean;
-  toggleTheme: () => void;
   isCollapsed: boolean;
   toggleCollapse: () => void;
   currentThemeName: ThemeName;
@@ -40,8 +39,6 @@ interface NavItem {
 const Sidebar: React.FC<SidebarProps> = ({
   currentSection,
   setSection,
-  isDark,
-  toggleTheme,
   isCollapsed,
   toggleCollapse,
   currentThemeName,
@@ -51,6 +48,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   isMobileOpen,
   closeMobileMenu,
 }) => {
+  const { isDark, setIsDark } = useTheme();
   // Default expanded menus
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
@@ -951,7 +949,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   <DropdownMenuItem onClick={() => handleSectionClick(Section.EXTERNAL_VAULT)}>
                     <Icon name="lock" className="mr-2 h-4 w-4" /> Acessos e Senhas
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={toggleTheme}>
+                  <DropdownMenuItem onClick={() => setIsDark(!isDark)}>
                     <Icon name={isDark ? 'sun' : 'moon'} className="mr-2 h-4 w-4" />
                     Tema: {isDark ? 'Escuro' : 'Claro'}
                   </DropdownMenuItem>
@@ -1012,7 +1010,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
               {/* Quick Theme Toggle */}
               <button
-                onClick={toggleTheme}
+                onClick={() => setIsDark(!isDark)}
                 className="shrink-0 rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
                 title={isDark ? 'Mudar para Claro' : 'Mudar para Escuro'}
               >

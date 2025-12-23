@@ -29,8 +29,9 @@ const MINDS_DIR = path.resolve(__dirname, '../../outputs/minds');
 const DRY_RUN = process.argv.includes('--dry-run');
 const PARALLEL = process.argv.includes('--parallel');
 const CONCURRENCY = parseInt(process.argv[process.argv.indexOf('--parallel') + 1]) || 5;
-const PATTERN =
-  process.argv.slice(2).find((arg) => !arg.startsWith('--') && !arg.match(/^\d+$/)) || '*';
+const PATTERN = process.argv.slice(2).find(arg =>
+  !arg.startsWith('--') && !arg.match(/^\d+$/)
+) || '*';
 
 let stats = {
   total: 0,
@@ -38,7 +39,7 @@ let stats = {
   failed: 0,
   skipped: 0,
   errors: [],
-  start_time: new Date(),
+  start_time: new Date()
 };
 
 async function getMindBySlug(supabase, slug) {
@@ -64,7 +65,7 @@ async function importSingleMind(mindSlug) {
     const child = spawn('node', [script, mindSlug], {
       cwd: __dirname,
       stdio: 'pipe',
-      env: process.env,
+      env: process.env
     });
 
     let output = '';
@@ -84,7 +85,7 @@ async function importSingleMind(mindSlug) {
         success: code === 0,
         output,
         error: errorOutput,
-        code,
+        code
       });
     });
   });
@@ -157,25 +158,18 @@ async function processParallel(minds, concurrency) {
 
 async function main() {
   console.log(`\n🚀 BATCH IMPORT Mind Histories`);
-  console.log(
-    `Mode: ${DRY_RUN ? 'DRY-RUN (no changes)' : PARALLEL ? `PARALLEL (concurrency: ${CONCURRENCY})` : 'SEQUENTIAL'}`
-  );
+  console.log(`Mode: ${DRY_RUN ? 'DRY-RUN (no changes)' : PARALLEL ? `PARALLEL (concurrency: ${CONCURRENCY})` : 'SEQUENTIAL'}`);
   console.log(`Pattern: ${PATTERN}`);
   console.log(`---\n`);
 
   // Find minds with history.yaml
-  const mindDirs = fs
-    .readdirSync(MINDS_DIR)
-    .filter((dir) => {
-      const fullPath = path.join(MINDS_DIR, dir);
-      const historyPath = path.join(fullPath, 'history.yaml');
-      return (
-        fs.statSync(fullPath).isDirectory() &&
-        fs.existsSync(historyPath) &&
-        (PATTERN === '*' || dir.includes(PATTERN))
-      );
-    })
-    .sort();
+  const mindDirs = fs.readdirSync(MINDS_DIR).filter(dir => {
+    const fullPath = path.join(MINDS_DIR, dir);
+    const historyPath = path.join(fullPath, 'history.yaml');
+    return fs.statSync(fullPath).isDirectory() &&
+           fs.existsSync(historyPath) &&
+           (PATTERN === '*' || dir.includes(PATTERN));
+  }).sort();
 
   if (mindDirs.length === 0) {
     console.log(`❌ No minds found with history.yaml matching pattern: ${PATTERN}`);
@@ -207,16 +201,14 @@ async function main() {
   console.log(`\n---\n`);
   console.log(`📊 IMPORT SUMMARY`);
   console.log(`Total:    ${stats.total}`);
-  console.log(
-    `✅ Completed: ${stats.completed}/${stats.total} (${Math.round((stats.completed / stats.total) * 100)}%)`
-  );
+  console.log(`✅ Completed: ${stats.completed}/${stats.total} (${Math.round(stats.completed/stats.total*100)}%)`);
   console.log(`❌ Failed:    ${stats.failed}/${stats.total}`);
   console.log(`Duration: ${duration}s`);
 
   if (stats.errors.length > 0) {
     console.log(`\n❌ IMPORT FAILED\n`);
     console.log('Errors:');
-    stats.errors.forEach((err) => {
+    stats.errors.forEach(err => {
       console.log(`  - ${err.mind}: ${err.error}`);
     });
     process.exit(1);
@@ -226,7 +218,7 @@ async function main() {
   }
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('Error:', err);
   process.exit(1);
 });

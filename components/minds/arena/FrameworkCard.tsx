@@ -8,7 +8,7 @@ interface FrameworkCardProps {
   onViewDetails?: (framework: DebateFramework) => void;
 }
 
-export const FrameworkCard: React.FC<FrameworkCardProps> = ({
+const FrameworkCardComponent: React.FC<FrameworkCardProps> = ({
   framework,
   onSelect,
   onViewDetails,
@@ -94,3 +94,9 @@ export const FrameworkCard: React.FC<FrameworkCardProps> = ({
     </div>
   );
 };
+
+/**
+ * FrameworkCard with memoization to prevent unnecessary re-renders in lists
+ * Memoized to prevent re-render when parent list updates other items
+ */
+export const FrameworkCard = React.memo(FrameworkCardComponent);

@@ -18,7 +18,7 @@ interface MindCardSelectProps {
   onClick: () => void;
 }
 
-export const MindCardSelect: React.FC<MindCardSelectProps> = ({
+const MindCardSelectComponent: React.FC<MindCardSelectProps> = ({
   name,
   shortBio,
   avatar,
@@ -65,3 +65,9 @@ export const MindCardSelect: React.FC<MindCardSelectProps> = ({
     </div>
   );
 };
+
+/**
+ * MindCardSelect with memoization
+ * Prevents unnecessary re-renders in selection lists
+ */
+export const MindCardSelect = React.memo(MindCardSelectComponent);

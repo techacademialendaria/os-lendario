@@ -43,7 +43,7 @@ function normalizeDisc(disc) {
     natural_profile: disc.natural_profile ?? null,
     adapted_profile: disc.adapted_profile ?? null,
     stress_profile: disc.stress_profile ?? null,
-    specific_behaviors: ensureArray(disc.specific_behaviors),
+    specific_behaviors: ensureArray(disc.specific_behaviors)
   };
 }
 
@@ -54,7 +54,7 @@ function normalizeEnneagram(enneagram) {
   // Merge behavioral_evidence and repetitive_patterns
   const behaviors = [
     ...ensureArray(enneagram.behavioral_evidence),
-    ...ensureArray(enneagram.repetitive_patterns),
+    ...ensureArray(enneagram.repetitive_patterns)
   ];
 
   return {
@@ -72,7 +72,7 @@ function normalizeEnneagram(enneagram) {
     behavioral_evidence: behaviors.length > 0 ? behaviors : null,
     // Preserve extras if present
     ...(enneagram.childhood_message && { childhood_message: enneagram.childhood_message }),
-    ...(enneagram.levels_timeline && { levels_timeline: enneagram.levels_timeline }),
+    ...(enneagram.levels_timeline && { levels_timeline: enneagram.levels_timeline })
   };
 }
 
@@ -87,7 +87,7 @@ function normalizeMbti(mbti) {
       dominant: { function: mbti.dominant_function },
       auxiliary: { function: mbti.auxiliary_function },
       tertiary: { function: mbti.tertiary_function },
-      inferior: { function: mbti.inferior_function },
+      inferior: { function: mbti.inferior_function }
     };
   }
 
@@ -98,7 +98,7 @@ function normalizeMbti(mbti) {
     N_percentage: mbti.N_percentage ?? null,
     T_percentage: mbti.T_percentage ?? null,
     J_percentage: mbti.J_percentage ?? null,
-    cognitive_stack: cognitiveStack ?? null,
+    cognitive_stack: cognitiveStack ?? null
   };
 }
 
@@ -114,7 +114,7 @@ function normalizeCognitiveStratum(cs) {
     transitioning_to: cs.transitioning_to ?? null,
     evidence: ensureArray(cs.evidence),
     temporal_horizons: cs.temporal_horizons ?? null,
-    cognitive_capabilities: cs.cognitive_capabilities ?? null,
+    cognitive_capabilities: cs.cognitive_capabilities ?? null
   };
 }
 
@@ -130,7 +130,7 @@ function normalizeBigFive(bf) {
       return {
         total: trait,
         percentile: null,
-        facets: null,
+        facets: null
       };
     }
 
@@ -138,7 +138,7 @@ function normalizeBigFive(bf) {
     return {
       total: trait.total ?? null,
       percentile: trait.percentile ?? null,
-      facets: trait.facets ?? null,
+      facets: trait.facets ?? null
     };
   };
 
@@ -147,7 +147,7 @@ function normalizeBigFive(bf) {
     conscientiousness: normalizeTraitWithFacets(bf.conscientiousness, 'conscientiousness'),
     extraversion: normalizeTraitWithFacets(bf.extraversion, 'extraversion'),
     agreeableness: normalizeTraitWithFacets(bf.agreeableness, 'agreeableness'),
-    neuroticism: normalizeTraitWithFacets(bf.neuroticism, 'neuroticism'),
+    neuroticism: normalizeTraitWithFacets(bf.neuroticism, 'neuroticism')
   };
 }
 
@@ -162,7 +162,7 @@ function normalizeDarkTriad(dt) {
         score: flatValue,
         max_scale: dt.scale_max ?? 7,
         percentile: null,
-        evidence: [],
+        evidence: []
       };
     }
 
@@ -173,7 +173,7 @@ function normalizeDarkTriad(dt) {
       score: trait.score ?? null,
       max_scale: trait.max_scale ?? dt.scale_max ?? 7,
       percentile: trait.percentile ?? null,
-      evidence: ensureArray(trait.evidence),
+      evidence: ensureArray(trait.evidence)
     };
   };
 
@@ -183,7 +183,7 @@ function normalizeDarkTriad(dt) {
   return {
     narcissism: normalizeTrait(dt.narcissism, isFlat ? dt.narcissism : null),
     machiavellianism: normalizeTrait(dt.machiavellianism, isFlat ? dt.machiavellianism : null),
-    psychopathy: normalizeTrait(dt.psychopathy, isFlat ? dt.psychopathy : null),
+    psychopathy: normalizeTrait(dt.psychopathy, isFlat ? dt.psychopathy : null)
   };
 }
 
@@ -197,13 +197,13 @@ function normalizeIntelligence(intel) {
     iqEstimated = {
       range: intel.iq_estimated,
       methodologies: [],
-      evidence: [],
+      evidence: []
     };
   } else if (intel.iq_estimated && typeof intel.iq_estimated === 'object') {
     iqEstimated = {
       range: intel.iq_estimated.range ?? null,
       methodologies: ensureArray(intel.iq_estimated.methodologies),
-      evidence: ensureArray(intel.iq_estimated.evidence),
+      evidence: ensureArray(intel.iq_estimated.evidence)
     };
   }
 
@@ -212,7 +212,7 @@ function normalizeIntelligence(intel) {
   if (typeof eqEstimated === 'number') {
     eqEstimated = {
       total: eqEstimated,
-      components: null,
+      components: null
     };
   }
 
@@ -228,7 +228,7 @@ function normalizeIntelligence(intel) {
     iq_estimated: iqEstimated,
     eq_estimated: eqEstimated,
     gardner_intelligences: intel.gardner_intelligences ?? intel.gardner_types ?? null,
-    ...extras,
+    ...extras
   };
 }
 
@@ -246,20 +246,13 @@ function normalizeUniqueCharacteristics(uc) {
     main_focus: uc.main_focus ?? null,
     statistical_rarity: uc.statistical_rarity ?? null,
     key_relationships: uc.key_relationships ?? null,
-    philosophy: uc.philosophy ?? null,
+    philosophy: uc.philosophy ?? null
   };
 
   // Preserve ALL extra fields (platforms_dominated, companies, daily_output, etc.)
   const coreFields = [
-    'superpower',
-    'kryptonite',
-    'work_hours_per_day',
-    'companies_founded',
-    'daily_routine',
-    'main_focus',
-    'statistical_rarity',
-    'key_relationships',
-    'philosophy',
+    'superpower', 'kryptonite', 'work_hours_per_day', 'companies_founded',
+    'daily_routine', 'main_focus', 'statistical_rarity', 'key_relationships', 'philosophy'
   ];
 
   for (const [key, value] of Object.entries(uc)) {
@@ -290,14 +283,14 @@ function normalizeProfile(data, filename) {
       intelligence: normalizeIntelligence(profile.intelligence),
       additional_assessments: profile.additional_assessments ?? null,
       unique_characteristics: normalizeUniqueCharacteristics(profile.unique_characteristics),
-      behavioral_patterns: ensureArray(profile.behavioral_patterns), // Standalone (peter-thiel style)
+      behavioral_patterns: ensureArray(profile.behavioral_patterns),  // Standalone (peter-thiel style)
       crisis_patterns: profile.crisis_patterns ?? null,
       convergence_analysis: profile.convergence_analysis ?? null,
       predictions: profile.predictions ?? null,
       comparative_analysis: profile.comparative_analysis ?? null,
       interaction_guide: profile.interaction_guide ?? null,
       development_roadmap: profile.development_roadmap ?? null,
-      data_sources: profile.data_sources ?? null,
+      data_sources: profile.data_sources ?? null
     },
     metadata: {
       schema_version: SCHEMA_VERSION,
@@ -311,8 +304,8 @@ function normalizeProfile(data, filename) {
       disclaimer: metadata.disclaimer ?? null,
       assessment_scales: metadata.assessment_scales ?? null,
       data_sources: ensureArray(metadata.data_sources),
-      limitations: ensureArray(metadata.limitations),
-    },
+      limitations: ensureArray(metadata.limitations)
+    }
   };
 
   return normalized;
@@ -321,14 +314,8 @@ function normalizeProfile(data, filename) {
 // Calculate completeness score
 function calculateCompleteness(profile) {
   const coreFields = [
-    'disc',
-    'enneagram',
-    'mbti',
-    'cognitive_stratum',
-    'big_five',
-    'dark_triad',
-    'intelligence',
-    'unique_characteristics',
+    'disc', 'enneagram', 'mbti', 'cognitive_stratum',
+    'big_five', 'dark_triad', 'intelligence', 'unique_characteristics'
   ];
 
   let filled = 0;
@@ -349,7 +336,7 @@ async function main() {
   await mkdir(OUTPUT_DIR, { recursive: true });
 
   const files = await readdir(INPUT_DIR);
-  const jsonFiles = files.filter((f) => f.endsWith('.json') && !f.startsWith('_'));
+  const jsonFiles = files.filter(f => f.endsWith('.json') && !f.startsWith('_'));
 
   const results = [];
 
@@ -363,17 +350,22 @@ async function main() {
 
       // Generate output filename
       const outputFile = `${normalized.profile.id}.json`;
-      await writeFile(join(OUTPUT_DIR, outputFile), JSON.stringify(normalized, null, 2), 'utf-8');
+      await writeFile(
+        join(OUTPUT_DIR, outputFile),
+        JSON.stringify(normalized, null, 2),
+        'utf-8'
+      );
 
       results.push({
         original: file,
         normalized: outputFile,
         id: normalized.profile.id,
         name: normalized.profile.name,
-        completeness,
+        completeness
       });
 
       console.log(`✓ ${file} → ${outputFile} (${completeness}% completo)`);
+
     } catch (e) {
       console.log(`✗ ${file}: ${e.message}`);
     }
@@ -397,15 +389,19 @@ async function main() {
   const index = {
     schema_version: SCHEMA_VERSION,
     generated_at: new Date().toISOString(),
-    profiles: results.map((r) => ({
+    profiles: results.map(r => ({
       id: r.id,
       name: r.name,
       file: r.normalized,
-      completeness: r.completeness,
-    })),
+      completeness: r.completeness
+    }))
   };
 
-  await writeFile(join(OUTPUT_DIR, '_index.json'), JSON.stringify(index, null, 2), 'utf-8');
+  await writeFile(
+    join(OUTPUT_DIR, '_index.json'),
+    JSON.stringify(index, null, 2),
+    'utf-8'
+  );
 
   console.log();
   console.log(`Índice gerado: ${OUTPUT_DIR}/_index.json`);

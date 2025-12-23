@@ -25,11 +25,7 @@ dotenv.config({ path: path.join(rootDir, '.env.local') });
 dotenv.config({ path: path.join(rootDir, '.env') });
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey =
-  process.env.VITE_SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  process.env.SUPABASE_Publishable_key ||
-  process.env.SUPABASE_ANON_KEY;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_Publishable_key || process.env.SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing Supabase credentials.');
@@ -108,21 +104,21 @@ async function auditCourse(courseSlug) {
       },
       // Output docs
       output: {
-        compiled: 0, // CURSO-COMPLETO.md, CURSO-PRONTO-PARA-USAR.md
-        summary: 0, // FINAL-SUMMARY.md, SUMARIO-EXECUTIVO.md
+        compiled: 0,    // CURSO-COMPLETO.md, CURSO-PRONTO-PARA-USAR.md
+        summary: 0,     // FINAL-SUMMARY.md, SUMARIO-EXECUTIVO.md
         readme: false,
       },
       // Report docs
       report: {
-        progress: 0, // GENERATION-STATUS.md, PROGRESS-REPORT.md, RELATORIO_*.md
-        context: 0, // CONTEXTO_*.md
-        prompt: 0, // PROMPT_*.md
-        session: 0, // SESSAO_*.md
+        progress: 0,    // GENERATION-STATUS.md, PROGRESS-REPORT.md, RELATORIO_*.md
+        context: 0,     // CONTEXTO_*.md
+        prompt: 0,      // PROMPT_*.md
+        session: 0,     // SESSAO_*.md
       },
       // QA docs
       qa: {
-        validation: 0, // VALIDACAO-*.md, VALIDATION-REPORT.md
-        review: 0, // avaliacao-*.md
+        validation: 0,  // VALIDACAO-*.md, VALIDATION-REPORT.md
+        review: 0,      // avaliacao-*.md
       },
       hasInstructor: false,
       hasMarketIntelligence: false,
@@ -148,8 +144,7 @@ async function auditCourse(courseSlug) {
   // Analyze curriculum YAML
   if (curriculum) {
     result.local.modules = curriculum.modules?.length || 0;
-    result.local.lessons =
-      curriculum.modules?.reduce((sum, m) => sum + (m.lessons?.length || 0), 0) || 0;
+    result.local.lessons = curriculum.modules?.reduce((sum, m) => sum + (m.lessons?.length || 0), 0) || 0;
     result.local.assessments = curriculum.assessments?.length || 0;
     result.local.resources =
       (curriculum.resources?.templates?.length || 0) +
@@ -168,31 +163,18 @@ async function auditCourse(courseSlug) {
   result.local.planning.outline = fs.existsSync(path.join(coursePath, 'course-outline.md'));
 
   // Check local files - Output
-  result.local.output.compiled = countFilesMatching(coursePath, [
-    /^CURSO-COMPLETO.*\.md$/i,
-    /^CURSO-PRONTO.*\.md$/i,
-  ]);
-  result.local.output.summary = countFilesMatching(coursePath, [
-    /^FINAL-SUMMARY.*\.md$/i,
-    /^SUMARIO-EXECUTIVO.*\.md$/i,
-  ]);
+  result.local.output.compiled = countFilesMatching(coursePath, [/^CURSO-COMPLETO.*\.md$/i, /^CURSO-PRONTO.*\.md$/i]);
+  result.local.output.summary = countFilesMatching(coursePath, [/^FINAL-SUMMARY.*\.md$/i, /^SUMARIO-EXECUTIVO.*\.md$/i]);
   result.local.output.readme = fs.existsSync(path.join(coursePath, 'README.md'));
 
   // Check local files - Reports (including reports/ subdirectory)
-  result.local.report.progress = countFilesMatching(coursePath, [
-    /^GENERATION-STATUS.*\.md$/i,
-    /^PROGRESS-REPORT.*\.md$/i,
-    /^RELATORIO_.*\.md$/i,
-  ]);
+  result.local.report.progress = countFilesMatching(coursePath, [/^GENERATION-STATUS.*\.md$/i, /^PROGRESS-REPORT.*\.md$/i, /^RELATORIO_.*\.md$/i]);
   result.local.report.context = countFilesMatching(coursePath, [/^CONTEXTO_.*\.md$/i]);
   result.local.report.prompt = countFilesMatching(coursePath, [/^PROMPT_.*\.md$/i]);
   result.local.report.session = countFilesMatching(coursePath, [/^SESSAO_.*\.md$/i]);
 
   // Check local files - QA
-  result.local.qa.validation = countFilesMatching(coursePath, [
-    /^VALIDACAO.*\.md$/i,
-    /^VALIDATION-REPORT.*\.md$/i,
-  ]);
+  result.local.qa.validation = countFilesMatching(coursePath, [/^VALIDACAO.*\.md$/i, /^VALIDATION-REPORT.*\.md$/i]);
   result.local.qa.review = countFilesMatching(coursePath, [/^avaliacao-.*\.md$/i]);
 
   // Query Supabase
@@ -221,7 +203,7 @@ async function auditCourse(courseSlug) {
     .is('deleted_at', null);
 
   if (contents) {
-    contents.forEach((c) => {
+    contents.forEach(c => {
       // Core content types
       if (c.content_type === 'course_module') result.supabase.modules++;
       else if (c.content_type === 'course_lesson') result.supabase.lessons++;
@@ -233,10 +215,8 @@ async function auditCourse(courseSlug) {
       else if (c.content_type === 'course_report') result.supabase.report++;
       else if (c.content_type === 'course_qa') result.supabase.qa++;
       // Legacy types (map to new)
-      else if (c.content_type === 'course_brief' || c.content_type === 'course_curriculum')
-        result.supabase.planning++;
-      else if (c.content_type === 'market_intelligence' || c.content_type === 'learning_objectives')
-        result.supabase.planning++;
+      else if (c.content_type === 'course_brief' || c.content_type === 'course_curriculum') result.supabase.planning++;
+      else if (c.content_type === 'market_intelligence' || c.content_type === 'learning_objectives') result.supabase.planning++;
     });
   }
 
@@ -250,20 +230,17 @@ async function auditCourse(courseSlug) {
   result.supabase.hasInstructorLinked = (projectMinds?.length || 0) > 0;
 
   // Calculate local totals
-  const localPlanningCount =
-    (result.local.planning.brief ? 1 : 0) +
+  const localPlanningCount = (result.local.planning.brief ? 1 : 0) +
     (result.local.planning.curriculum ? 1 : 0) +
     (result.local.planning.outline ? 1 : 0) +
     (result.local.hasMarketIntelligence ? 1 : 0) +
     (result.local.learningObjectives > 0 ? 1 : 0);
 
-  const localOutputCount =
-    result.local.output.compiled +
+  const localOutputCount = result.local.output.compiled +
     result.local.output.summary +
     (result.local.output.readme ? 1 : 0);
 
-  const localReportCount =
-    result.local.report.progress +
+  const localReportCount = result.local.report.progress +
     result.local.report.context +
     result.local.report.prompt +
     result.local.report.session;
@@ -278,9 +255,7 @@ async function auditCourse(courseSlug) {
     result.gaps.push(`Missing lessons: ${result.local.lessons - result.supabase.lessons}`);
   }
   if (result.local.assessments > result.supabase.assessments) {
-    result.gaps.push(
-      `Missing assessments: ${result.local.assessments - result.supabase.assessments}`
-    );
+    result.gaps.push(`Missing assessments: ${result.local.assessments - result.supabase.assessments}`);
   }
   if (result.local.resources > result.supabase.resources) {
     result.gaps.push(`Missing resources: ${result.local.resources - result.supabase.resources}`);
@@ -306,63 +281,48 @@ async function auditCourse(courseSlug) {
   let passedChecks = 0;
 
   // Project exists
-  totalChecks++;
-  if (result.supabase.projectExists) passedChecks++;
+  totalChecks++; if (result.supabase.projectExists) passedChecks++;
 
   // Core content
-  totalChecks++;
-  if (result.supabase.modules >= result.local.modules) passedChecks++;
-  totalChecks++;
-  if (result.supabase.lessons >= result.local.lessons) passedChecks++;
+  totalChecks++; if (result.supabase.modules >= result.local.modules) passedChecks++;
+  totalChecks++; if (result.supabase.lessons >= result.local.lessons) passedChecks++;
 
   if (result.local.assessments > 0) {
-    totalChecks++;
-    if (result.supabase.assessments >= result.local.assessments) passedChecks++;
+    totalChecks++; if (result.supabase.assessments >= result.local.assessments) passedChecks++;
   }
   if (result.local.resources > 0) {
-    totalChecks++;
-    if (result.supabase.resources >= result.local.resources) passedChecks++;
+    totalChecks++; if (result.supabase.resources >= result.local.resources) passedChecks++;
   }
 
   // Instructor
   if (result.local.hasInstructor) {
-    totalChecks++;
-    if (result.supabase.hasInstructorLinked) passedChecks++;
+    totalChecks++; if (result.supabase.hasInstructorLinked) passedChecks++;
   }
 
   // Planning docs
   if (localPlanningCount > 0) {
-    totalChecks++;
-    if (result.supabase.planning >= localPlanningCount) passedChecks++;
+    totalChecks++; if (result.supabase.planning >= localPlanningCount) passedChecks++;
   }
 
   // Output docs
   if (localOutputCount > 0) {
-    totalChecks++;
-    if (result.supabase.output >= localOutputCount) passedChecks++;
+    totalChecks++; if (result.supabase.output >= localOutputCount) passedChecks++;
   }
 
   // Report docs
   if (localReportCount > 0) {
-    totalChecks++;
-    if (result.supabase.report >= localReportCount) passedChecks++;
+    totalChecks++; if (result.supabase.report >= localReportCount) passedChecks++;
   }
 
   // QA docs
   if (localQaCount > 0) {
-    totalChecks++;
-    if (result.supabase.qa >= localQaCount) passedChecks++;
+    totalChecks++; if (result.supabase.qa >= localQaCount) passedChecks++;
   }
 
   result.score = totalChecks > 0 ? Math.round((passedChecks / totalChecks) * 100) : 0;
 
   // Add summary counts for display
-  result.localTotals = {
-    planning: localPlanningCount,
-    output: localOutputCount,
-    report: localReportCount,
-    qa: localQaCount,
-  };
+  result.localTotals = { planning: localPlanningCount, output: localOutputCount, report: localReportCount, qa: localQaCount };
 
   return result;
 }
@@ -379,11 +339,9 @@ async function main() {
   // Folders to skip (not real courses)
   const SKIP_FOLDERS = ['no-migration', '.DS_Store'];
 
-  const courseSlugs = fs
-    .readdirSync(coursesDir)
-    .filter(
-      (f) => fs.statSync(path.join(coursesDir, f)).isDirectory() && !SKIP_FOLDERS.includes(f)
-    );
+  const courseSlugs = fs.readdirSync(coursesDir).filter(f =>
+    fs.statSync(path.join(coursesDir, f)).isDirectory() && !SKIP_FOLDERS.includes(f)
+  );
 
   console.log(`Found ${courseSlugs.length} courses to audit\n`);
   console.log('='.repeat(80));
@@ -399,16 +357,12 @@ async function main() {
     const icon = result.score === 100 ? '✅' : result.score >= 70 ? '⚠️' : '❌';
     console.log(`\n${icon} ${result.courseTitle} (${result.courseSlug})`);
     console.log(`   Score: ${result.score}%`);
-    console.log(
-      `   Core:     Local ${result.local.modules}M/${result.local.lessons}L/${result.local.assessments}A/${result.local.resources}R → Supabase ${result.supabase.modules}M/${result.supabase.lessons}L/${result.supabase.assessments}A/${result.supabase.resources}R`
-    );
-    console.log(
-      `   Docs:     Local P:${result.localTotals.planning} O:${result.localTotals.output} R:${result.localTotals.report} Q:${result.localTotals.qa} → Supabase P:${result.supabase.planning} O:${result.supabase.output} R:${result.supabase.report} Q:${result.supabase.qa}`
-    );
+    console.log(`   Core:     Local ${result.local.modules}M/${result.local.lessons}L/${result.local.assessments}A/${result.local.resources}R → Supabase ${result.supabase.modules}M/${result.supabase.lessons}L/${result.supabase.assessments}A/${result.supabase.resources}R`);
+    console.log(`   Docs:     Local P:${result.localTotals.planning} O:${result.localTotals.output} R:${result.localTotals.report} Q:${result.localTotals.qa} → Supabase P:${result.supabase.planning} O:${result.supabase.output} R:${result.supabase.report} Q:${result.supabase.qa}`);
 
     if (result.gaps.length > 0) {
       console.log(`   Gaps:`);
-      result.gaps.forEach((gap) => console.log(`     - ${gap}`));
+      result.gaps.forEach(gap => console.log(`     - ${gap}`));
     }
   }
 
@@ -416,9 +370,9 @@ async function main() {
   console.log('\n📊 Summary\n');
 
   const avgScore = Math.round(totalScore / results.length);
-  const perfect = results.filter((r) => r.score === 100).length;
-  const partial = results.filter((r) => r.score >= 70 && r.score < 100).length;
-  const failing = results.filter((r) => r.score < 70).length;
+  const perfect = results.filter(r => r.score === 100).length;
+  const partial = results.filter(r => r.score >= 70 && r.score < 100).length;
+  const failing = results.filter(r => r.score < 70).length;
 
   console.log(`Average Score: ${avgScore}%`);
   console.log(`✅ Complete (100%): ${perfect}`);
@@ -427,8 +381,8 @@ async function main() {
 
   // Aggregate gaps
   const allGaps = {};
-  results.forEach((r) => {
-    r.gaps.forEach((gap) => {
+  results.forEach(r => {
+    r.gaps.forEach(gap => {
       const key = gap.replace(/\d+/g, 'N');
       allGaps[key] = (allGaps[key] || 0) + 1;
     });
@@ -446,19 +400,12 @@ async function main() {
   // Write detailed report
   const reportPath = path.join(rootDir, 'docs/reports/migration-audit.json');
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
-  fs.writeFileSync(
-    reportPath,
-    JSON.stringify(
-      {
-        timestamp: new Date().toISOString(),
-        summary: { avgScore, perfect, partial, failing, total: results.length },
-        commonGaps: allGaps,
-        results,
-      },
-      null,
-      2
-    )
-  );
+  fs.writeFileSync(reportPath, JSON.stringify({
+    timestamp: new Date().toISOString(),
+    summary: { avgScore, perfect, partial, failing, total: results.length },
+    commonGaps: allGaps,
+    results,
+  }, null, 2));
 
   console.log(`\n📄 Detailed report saved to: ${reportPath}`);
 }

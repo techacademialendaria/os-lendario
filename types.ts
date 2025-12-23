@@ -1,10 +1,11 @@
+
 export enum Page {
   DASHBOARD = 'Dashboard',
   CALLS = 'Calls',
   OBJECTIONS = 'Objeções',
   MARKETING = 'Marketing',
   PRODUCT = 'Produto',
-  SETTINGS = 'Configurações',
+  SETTINGS = 'Configurações'
 }
 
 export type Language = 'pt' | 'en' | 'es';
@@ -98,7 +99,7 @@ export enum Section {
   STUDIO_PRD_DASHBOARD = 'studio_prd_dashboard',
   STUDIO_PRD_NEW = 'studio_prd_new',
   STUDIO_PRD_EDITOR = 'studio_prd_editor',
-  STUDIO_PRD_EXPORT = 'studio_prd_export',
+  STUDIO_PRD_EXPORT = 'studio_prd_export'
 }
 
 export interface TypeScale {

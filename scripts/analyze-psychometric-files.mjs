@@ -16,7 +16,7 @@ async function analyzeFile(filename) {
       file: filename,
       type: 'jsonl',
       records: lines.length,
-      sample: JSON.parse(lines[0]),
+      sample: JSON.parse(lines[0])
     };
   }
 
@@ -24,7 +24,7 @@ async function analyzeFile(filename) {
     return {
       file: filename,
       type: 'yaml',
-      size: content.length,
+      size: content.length
     };
   }
 
@@ -48,15 +48,13 @@ async function analyzeFile(filename) {
     hasMetadata: !!data.metadata,
     discKeys: profile.disc ? Object.keys(profile.disc) : [],
     enneagramKeys: profile.enneagram ? Object.keys(profile.enneagram) : [],
-    mbtiKeys: profile.mbti ? Object.keys(profile.mbti) : [],
+    mbtiKeys: profile.mbti ? Object.keys(profile.mbti) : []
   };
 }
 
 async function main() {
   const files = await readdir(DIR);
-  const dataFiles = files.filter(
-    (f) => f.endsWith('.json') || f.endsWith('.yaml') || f.endsWith('.jsonl')
-  );
+  const dataFiles = files.filter(f => f.endsWith('.json') || f.endsWith('.yaml') || f.endsWith('.jsonl'));
 
   console.log('='.repeat(80));
   console.log('ANÁLISE DE ESTRUTURA - mapeamento-cognitivo');
@@ -77,17 +75,7 @@ async function main() {
 
   // Summary table
   console.log('=== COBERTURA DE FRAMEWORKS ===\n');
-  console.log(
-    'Arquivo'.padEnd(35),
-    'DISC',
-    'ENEA',
-    'MBTI',
-    'STRAT',
-    'BIG5',
-    'DARK',
-    'INTL',
-    'HEXA'
-  );
+  console.log('Arquivo'.padEnd(35), 'DISC', 'ENEA', 'MBTI', 'STRAT', 'BIG5', 'DARK', 'INTL', 'HEXA');
   console.log('-'.repeat(95));
 
   for (const r of results) {
@@ -138,14 +126,14 @@ async function main() {
   const allKeys = new Set();
   for (const r of results) {
     if (r.type !== 'json') continue;
-    r.topKeys.forEach((k) => allKeys.add(k));
+    r.topKeys.forEach(k => allKeys.add(k));
   }
 
   console.log('Campo'.padEnd(30), 'Presente em');
   console.log('-'.repeat(80));
   for (const key of [...allKeys].sort()) {
-    const count = results.filter((r) => r.type === 'json' && r.topKeys.includes(key)).length;
-    const total = results.filter((r) => r.type === 'json').length;
+    const count = results.filter(r => r.type === 'json' && r.topKeys.includes(key)).length;
+    const total = results.filter(r => r.type === 'json').length;
     console.log(key.padEnd(30), `${count}/${total} arquivos`);
   }
 }

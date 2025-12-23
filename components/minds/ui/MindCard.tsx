@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '../../ui/card';
+import { Badge } from '../../ui/badge';
 import { Icon } from '../../ui/icon';
 import { cn } from '../../../lib/utils';
+import { STUDIO_MIND_CARD_CLASSES } from '../studio-tokens';
 
 // DiceBear fallback for missing images
 const getDiceBearUrl = (slug: string): string => {
@@ -43,14 +45,6 @@ const MindCard: React.FC<MindCardProps> = ({ mind, onClick }) => {
   const isDraft = mind.status === 'draft';
   const isProgress = mind.status === 'progress';
 
-  // Keyboard handlers for accessibility
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.key === 'Enter' || e.key === ' ') && onClick) {
-      e.preventDefault();
-      onClick();
-    }
-  };
-
   // Use avatar, fallback to DiceBear if image fails to load
   const avatarSrc = imgError ? getDiceBearUrl(mind.slug) : mind.avatar;
 
@@ -69,15 +63,11 @@ const MindCard: React.FC<MindCardProps> = ({ mind, onClick }) => {
 
   return (
     <Card
-      role="button"
-      tabIndex={0}
       className={cn(
-        'bg-studio-card group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-xl border border-white/5 transition-all duration-500 hover:border-studio-primary/30 hover:bg-black/40 hover:shadow-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-studio-primary',
+        'bg-studio-card group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-xl border border-white/5 transition-all duration-500 hover:border-studio-primary/30 hover:bg-black/40 hover:shadow-2xl',
         isDraft && 'opacity-60 grayscale-[0.8]'
       )}
       onClick={onClick}
-      onKeyDown={handleKeyDown}
-      aria-label={`${mind.name}, ${mind.signatureSkill || 'Synthetic Mind'}`}
     >
       {/* Background Gradient Hover Effect */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-studio-primary/5 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
@@ -114,7 +104,6 @@ const MindCard: React.FC<MindCardProps> = ({ mind, onClick }) => {
                     ? 'animate-pulse bg-amber-500'
                     : 'bg-zinc-600'
               )}
-              aria-label={`Status: ${mind.status}`}
             />
           </div>
 
@@ -187,16 +176,9 @@ const MindCard: React.FC<MindCardProps> = ({ mind, onClick }) => {
                 </span>
               </div>
             ) : (
-              <button
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-white/5 text-zinc-500 transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-studio-primary group-hover:bg-studio-primary/20 group-hover:text-white"
-                aria-label={`View details for ${mind.name}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClick?.();
-                }}
-              >
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/5 text-zinc-500 transition-all group-hover:bg-studio-primary/20 group-hover:text-white">
                 <Icon name="arrow-right" size="size-3" />
-              </button>
+              </div>
             )}
           </div>
         </div>
@@ -205,4 +187,4 @@ const MindCard: React.FC<MindCardProps> = ({ mind, onClick }) => {
   );
 };
 
-export default MindCard;
+export default React.memo(MindCard);

@@ -10,7 +10,10 @@ const rootDir = path.resolve(__dirname, '../..');
 
 dotenv.config({ path: path.join(rootDir, '.env') });
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_Secret_key);
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_Secret_key
+);
 
 async function check() {
   // 1. Buscar o projeto
@@ -32,7 +35,7 @@ async function check() {
     .order('sequence_order');
 
   console.log('\nMódulos:', modules?.length);
-  modules?.forEach((m) => console.log('  -', m.sequence_order, m.title, '(id:', m.id, ')'));
+  modules?.forEach(m => console.log('  -', m.sequence_order, m.title, '(id:', m.id, ')'));
 
   // 3. Buscar lições
   const { data: lessons } = await supabase
@@ -44,9 +47,7 @@ async function check() {
     .order('sequence_order');
 
   console.log('\nLições:', lessons?.length);
-  lessons
-    ?.slice(0, 10)
-    .forEach((l) => console.log('  -', l.title, '| parent:', l.parent_content_id));
+  lessons?.slice(0, 10).forEach(l => console.log('  -', l.title, '| parent:', l.parent_content_id));
 
   // 4. Buscar TODOS os conteúdos do projeto
   const { data: allContents } = await supabase
@@ -57,7 +58,7 @@ async function check() {
 
   console.log('\nTodos os content_types do projeto:');
   const types = {};
-  allContents?.forEach((c) => {
+  allContents?.forEach(c => {
     types[c.content_type] = (types[c.content_type] || 0) + 1;
   });
   Object.entries(types).forEach(([k, v]) => console.log('  -', k, ':', v));

@@ -11,7 +11,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_ANON_KEY
+);
 
 async function registerMind(slug, displayName, description = null) {
   try {
@@ -36,7 +39,7 @@ async function registerMind(slug, displayName, description = null) {
       .from('minds')
       .insert({
         slug,
-        display_name: displayName,
+        display_name: displayName
       })
       .select()
       .single();
@@ -65,9 +68,7 @@ async function main() {
 
   if (!slug || !displayName) {
     console.error('Usage: node app/scripts/register-mind.mjs <slug> <display_name> [description]');
-    console.error(
-      'Example: node app/scripts/register-mind.mjs academia_lendaria "Academia Lendária"'
-    );
+    console.error('Example: node app/scripts/register-mind.mjs academia_lendaria "Academia Lendária"');
     process.exit(1);
   }
 

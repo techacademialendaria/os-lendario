@@ -10,10 +10,17 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 async function getMindBySlug(slug) {
-  const { data, error } = await supabase.from('minds').select('*').eq('slug', slug).single();
+  const { data, error } = await supabase
+    .from('minds')
+    .select('*')
+    .eq('slug', slug)
+    .single();
 
   if (error && error.code !== 'PGRST116') throw error;
   return data;
@@ -24,14 +31,14 @@ async function getRelatedData(mindId) {
     supabase.from('mind_profiles').select('*').eq('mind_id', mindId),
     supabase.from('mind_values').select('*').eq('mind_id', mindId),
     supabase.from('mind_obsessions').select('*').eq('mind_id', mindId),
-    supabase.from('mind_proficiencies').select('*').eq('mind_id', mindId),
+    supabase.from('mind_proficiencies').select('*').eq('mind_id', mindId)
   ]);
 
   return {
     profiles: profiles.data || [],
     values: values.data || [],
     obsessions: obsessions.data || [],
-    proficiencies: proficiencies.data || [],
+    proficiencies: proficiencies.data || []
   };
 }
 
@@ -70,11 +77,9 @@ async function mergeMinds(sourceSlug, targetSlug) {
   console.log(`    Proficiencies: ${targetData.proficiencies.length}`);
 
   // Migrate profiles that don't exist in target
-  const existingProfileTypes = new Set(
-    targetData.profiles.map((p) => `${p.profile_type}:${p.storage_format}`)
-  );
-  const profilesToMigrate = sourceData.profiles.filter(
-    (p) => !existingProfileTypes.has(`${p.profile_type}:${p.storage_format}`)
+  const existingProfileTypes = new Set(targetData.profiles.map(p => `${p.profile_type}:${p.storage_format}`));
+  const profilesToMigrate = sourceData.profiles.filter(p =>
+    !existingProfileTypes.has(`${p.profile_type}:${p.storage_format}`)
   );
 
   if (profilesToMigrate.length > 0) {
@@ -108,9 +113,9 @@ async function mergeMinds(sourceSlug, targetSlug) {
   }
 
   // Migrate proficiencies that don't exist
-  const existingSkills = new Set(targetData.proficiencies.map((p) => p.skill_id));
-  const proficienciesToMigrate = sourceData.proficiencies.filter(
-    (p) => !existingSkills.has(p.skill_id)
+  const existingSkills = new Set(targetData.proficiencies.map(p => p.skill_id));
+  const proficienciesToMigrate = sourceData.proficiencies.filter(p =>
+    !existingSkills.has(p.skill_id)
   );
 
   if (proficienciesToMigrate.length > 0) {
@@ -133,7 +138,10 @@ async function mergeMinds(sourceSlug, targetSlug) {
 
   // Delete source mind (cascades to related data)
   console.log(`\n  Deleting source mind ${sourceSlug}...`);
-  const { error: deleteError } = await supabase.from('minds').delete().eq('id', source.id);
+  const { error: deleteError } = await supabase
+    .from('minds')
+    .delete()
+    .eq('id', source.id);
 
   if (deleteError) {
     console.log(`  ERROR deleting: ${deleteError.message}`);

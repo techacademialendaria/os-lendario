@@ -43,17 +43,16 @@ git add . && git commit -m "feat: tokenize {STUDIO_NAME} Studio"
 
 **Paleta de cores:**
 
-| Studio             | Primary  | Secondary  | Accent | Hex Primary | Hex Secondary |
-| ------------------ | -------- | ---------- | ------ | ----------- | ------------- |
-| Course Creator     | Indigo   | Purple     | Gold   | #5856D6     | #9D4EDD       |
-| Synthetic Minds    | Teal     | Mint       | Gold   | #30B0C7     | #00D084       |
-| Sales Intelligence | Red      | Coral      | Gold   | #FF3B30     | #FF6B6B       |
-| PRD Studio         | Petróleo | Light Blue | Gold   | #538096     | #6FA3C1       |
-| Marketing          | Orange   | Amber      | Gold   | #FF9500     | #FFB84D       |
-| Design System      | Gold     | Cream      | Gold   | #C9B298     | #F2EBE4       |
+| Studio | Primary | Secondary | Accent | Hex Primary | Hex Secondary |
+|--------|---------|-----------|--------|-------------|---------------|
+| Course Creator | Indigo | Purple | Gold | #5856D6 | #9D4EDD |
+| Synthetic Minds | Teal | Mint | Gold | #30B0C7 | #00D084 |
+| Sales Intelligence | Red | Coral | Gold | #FF3B30 | #FF6B6B |
+| PRD Studio | Petróleo | Light Blue | Gold | #538096 | #6FA3C1 |
+| Marketing | Orange | Amber | Gold | #FF9500 | #FFB84D |
+| Design System | Gold | Cream | Gold | #C9B298 | #F2EBE4 |
 
 **Para novo Studio:**
-
 1. Escolha 2 cores primárias
 2. Converta para HSL (use https://htmlcolorcodes.com)
 3. Copie para studio-tokens.ts
@@ -156,11 +155,11 @@ import { StudioHome } from './components/{studio-name}/views/StudioHome';
 // App.tsx - Testar que cores mudam
 
 // Teste 1: Mudar Studio
-setCurrentStudio('app_minds'); // Deve ver Teal
-setCurrentStudio('{studio-name}'); // Deve ver sua cor
+setCurrentStudio('app_minds');  // Deve ver Teal
+setCurrentStudio('{studio-name}');  // Deve ver sua cor
 
 // Teste 2: Verificar CSS
-document.documentElement.getAttribute('data-studio');
+document.documentElement.getAttribute('data-studio')
 // Deve retornar: {studio-name}
 ```
 
@@ -222,34 +221,32 @@ app/components/sales/
 ### studio-tokens.ts (Adaptado)
 
 ```typescript
-export const STUDIO_PRIMARY = '#FF3B30'; // Sales Red
-export const STUDIO_SECONDARY = '#FF6B6B'; // Coral
-export const STUDIO_ACCENT = '#C9B298'; // Gold (cross-studio)
+export const STUDIO_PRIMARY = "#FF3B30";      // Sales Red
+export const STUDIO_SECONDARY = "#FF6B6B";    // Coral
+export const STUDIO_ACCENT = "#C9B298";       // Gold (cross-studio)
 
 export const STUDIO_STATUS = {
-  hot: {
-    // Em vez de "active"
-    bg: 'bg-red-500/20',
-    text: 'text-red-400',
-    border: 'border-red-500/30',
-    dot: 'bg-red-500',
+  hot: {        // Em vez de "active"
+    bg: "bg-red-500/20",
+    text: "text-red-400",
+    border: "border-red-500/30",
+    dot: "bg-red-500",
   },
-  cold: {
-    // Em vez de "inactive"
-    bg: 'bg-zinc-500/20',
-    text: 'text-zinc-400',
-    border: 'border-zinc-500/30',
-    dot: 'bg-zinc-500',
+  cold: {       // Em vez de "inactive"
+    bg: "bg-zinc-500/20",
+    text: "text-zinc-400",
+    border: "border-zinc-500/30",
+    dot: "bg-zinc-500",
   },
   // ... others
 };
 
 export const SALES_STAGE_COLORS = {
-  discovery: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  qualification: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
-  proposal: { bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
-  negotiation: { bg: 'bg-orange-500/20', text: 'text-orange-400' },
-  closed_won: { bg: 'bg-green-500/20', text: 'text-green-400' },
+  discovery: { bg: "bg-blue-500/20", text: "text-blue-400" },
+  qualification: { bg: "bg-purple-500/20", text: "text-purple-400" },
+  proposal: { bg: "bg-yellow-500/20", text: "text-yellow-400" },
+  negotiation: { bg: "bg-orange-500/20", text: "text-orange-400" },
+  closed_won: { bg: "bg-green-500/20", text: "text-green-400" },
 };
 ```
 
@@ -285,15 +282,15 @@ export const SalesCard: React.FC<SalesCardProps> = ({ opportunity, onClick }) =>
 
 ## ⏱️ Tempo por Tarefa
 
-| Tarefa                          | Tempo  | Dependências         |
-| ------------------------------- | ------ | -------------------- |
-| Copiar studio-tokens.ts         | 5 min  | Ter colors prontas   |
-| Atualizar colors                | 10 min | Paleta definida      |
-| Criar primeira view             | 15 min | studio-tokens pronto |
-| Testar CSS variables            | 10 min | View pronta          |
-| Copiar componentes genéricas    | 10 min | Necessário?          |
-| Criar domain-specific templates | 30 min | Design definido      |
-| Testar tudo                     | 10 min | Tudo acima           |
+| Tarefa | Tempo | Dependências |
+|--------|-------|--------------|
+| Copiar studio-tokens.ts | 5 min | Ter colors prontas |
+| Atualizar colors | 10 min | Paleta definida |
+| Criar primeira view | 15 min | studio-tokens pronto |
+| Testar CSS variables | 10 min | View pronta |
+| Copiar componentes genéricas | 10 min | Necessário? |
+| Criar domain-specific templates | 30 min | Design definido |
+| Testar tudo | 10 min | Tudo acima |
 
 **TOTAL: 45-90 minutos** (dependendo de complexidade)
 
@@ -302,7 +299,6 @@ export const SalesCard: React.FC<SalesCardProps> = ({ opportunity, onClick }) =>
 ## 🐛 Troubleshooting
 
 ### CSS Variables não aplicam
-
 ```bash
 # Verificar se App.tsx tem:
 <div data-studio={currentStudio} className="...">
@@ -317,7 +313,6 @@ export const SalesCard: React.FC<SalesCardProps> = ({ opportunity, onClick }) =>
 ```
 
 ### Cores não mudam ao trocar Studio
-
 ```bash
 # Verificar se:
 1. App.tsx atualiza data-studio
@@ -326,7 +321,6 @@ export const SalesCard: React.FC<SalesCardProps> = ({ opportunity, onClick }) =>
 ```
 
 ### Classes não encontradas
-
 ```bash
 # Verificar imports
 import { STUDIO_CARD_CLASSES } from '../studio-tokens';
@@ -381,3 +375,4 @@ Para novo Studio, criar:
 ## 🤝 Questions?
 
 Ref: `/Users/alan/Code/mmos/app/components/minds/REUSABILITY_ANALYSIS.md`
+

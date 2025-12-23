@@ -22,10 +22,7 @@ const supabaseKey = process.env.SUPABASE_Secret_key || process.env.SUPABASE_SERV
 if (!supabaseUrl || !supabaseKey || supabaseKey === 'your-service-role-key') {
   console.error('❌ Need SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_Secret_key) for DDL operations');
   console.error('   Found URL:', supabaseUrl ? 'yes' : 'no');
-  console.error(
-    '   Found Service Key:',
-    supabaseKey && supabaseKey !== 'your-service-role-key' ? 'yes' : 'no'
-  );
+  console.error('   Found Service Key:', supabaseKey && supabaseKey !== 'your-service-role-key' ? 'yes' : 'no');
   process.exit(1);
 }
 

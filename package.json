@@ -6,11 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -38,21 +34,17 @@
     "recharts": "^3.5.1",
     "tailwind-merge": "^2.2.1",
     "turndown": "^7.2.2",
+    "web-vitals": "^5.1.0",
     "yaml": "^2.8.2"
   },
   "devDependencies": {
     "@types/file-saver": "^2.0.7",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
-    "@typescript-eslint/eslint-plugin": "^8.50.1",
-    "@typescript-eslint/parser": "^8.50.1",
     "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^9.39.2",
-    "eslint-plugin-tailwindcss": "^3.18.2",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.2.7",
-    "prettier": "^3.7.4",
-    "prettier-plugin-tailwindcss": "^0.7.2",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
     "typescript": "^5.2.2",
     "vite": "^5.1.6"
   }

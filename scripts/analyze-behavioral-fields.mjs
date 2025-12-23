@@ -10,7 +10,7 @@ const DIR = '../outputs/minds/mapeamento-cognitivo';
 
 async function main() {
   const files = await readdir(DIR);
-  const jsonFiles = files.filter((f) => f.endsWith('.json') && !f.startsWith('_'));
+  const jsonFiles = files.filter(f => f.endsWith('.json') && !f.startsWith('_'));
 
   console.log('='.repeat(80));
   console.log('ANÁLISE DE DADOS COMPORTAMENTAIS - Replicabilidade');
@@ -34,16 +34,15 @@ async function main() {
       enneagram_repetitive_patterns: p.enneagram?.repetitive_patterns?.length || 0,
       enneagram_stress_behaviors: Array.isArray(p.enneagram?.stress_behaviors)
         ? p.enneagram.stress_behaviors.length
-        : p.enneagram?.stress_behaviors
-          ? 1
-          : 0,
+        : (p.enneagram?.stress_behaviors ? 1 : 0),
       enneagram_growth_behaviors: p.enneagram?.growth_behaviors ? 1 : 0,
       // MBTI cognitive manifestations
-      mbti_manifestations:
+      mbti_manifestations: (
         (p.mbti?.cognitive_stack?.dominant?.manifestations?.length || 0) +
         (p.mbti?.cognitive_stack?.auxiliary?.manifestations?.length || 0) +
         (p.mbti?.cognitive_stack?.tertiary?.manifestations?.length || 0) +
-        (p.mbti?.cognitive_stack?.inferior?.manifestations?.length || 0),
+        (p.mbti?.cognitive_stack?.inferior?.manifestations?.length || 0)
+      ),
       // Crisis patterns
       crisis_patterns: p.crisis_patterns ? Object.keys(p.crisis_patterns).length : 0,
       // Standalone behavioral_patterns (peter-thiel style)
@@ -55,20 +54,16 @@ async function main() {
       // Unique characteristics
       superpower: Array.isArray(p.unique_characteristics?.superpower)
         ? p.unique_characteristics.superpower.length
-        : p.unique_characteristics?.superpower
-          ? 1
-          : 0,
+        : (p.unique_characteristics?.superpower ? 1 : 0),
       kryptonite: Array.isArray(p.unique_characteristics?.kryptonite)
         ? p.unique_characteristics.kryptonite.length
-        : p.unique_characteristics?.kryptonite
-          ? 1
-          : 0,
+        : (p.unique_characteristics?.kryptonite ? 1 : 0),
       // Predictions
       predictions: p.predictions?.high_probability?.length || 0,
       // Interaction guide
       interaction_guide: p.interaction_guide ? 1 : 0,
       // Development roadmap
-      development_roadmap: p.development_roadmap ? 1 : 0,
+      development_roadmap: p.development_roadmap ? 1 : 0
     };
 
     results.push(behavioral);
@@ -87,7 +82,7 @@ async function main() {
   console.log();
 
   const headers = ['Arquivo', 'DISC', 'ENEA', 'MBTI', 'Crisis', 'Conv', 'Super', 'Krypt', 'Pred'];
-  console.log(headers.map((h, i) => (i === 0 ? h.padEnd(25) : h.padStart(6))).join(''));
+  console.log(headers.map((h, i) => i === 0 ? h.padEnd(25) : h.padStart(6)).join(''));
   console.log('-'.repeat(80));
 
   for (const r of results) {
@@ -100,7 +95,7 @@ async function main() {
       String(r.convergence_alignments).padStart(6),
       String(r.superpower).padStart(6),
       String(r.kryptonite).padStart(6),
-      String(r.predictions).padStart(6),
+      String(r.predictions).padStart(6)
     ];
     console.log(row.join(''));
   }
@@ -119,9 +114,7 @@ async function main() {
   for (const [field, stats] of sorted) {
     const coverage = `${stats.count}/${results.length}`;
     const status = stats.count === results.length ? '✅' : stats.count >= 8 ? '⚠️' : '❌';
-    console.log(
-      `${status} ${field.padEnd(33)} ${coverage.padStart(8)} ${String(stats.total).padStart(10)}`
-    );
+    console.log(`${status} ${field.padEnd(33)} ${coverage.padStart(8)} ${String(stats.total).padStart(10)}`);
   }
 
   console.log();

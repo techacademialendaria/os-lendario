@@ -35,17 +35,11 @@ const getContentType = (relativePath, filename) => {
   // Cursos - map to specific course subtypes
   if (lowerPath.includes('cursos/')) {
     if (lowerName.includes('q&a') || lowerName.includes('qa')) return 'course_qa';
-    if (
-      lowerName.includes('módulos') ||
-      lowerName.includes('modulos') ||
-      lowerName.includes('aulas')
-    )
-      return 'course_lesson';
+    if (lowerName.includes('módulos') || lowerName.includes('modulos') || lowerName.includes('aulas')) return 'course_lesson';
     if (lowerName.includes('glossário') || lowerName.includes('glossario')) return 'resource_guide';
     if (lowerName.includes('resumo')) return 'course_outline';
     if (lowerName.includes('material')) return 'resource_reading';
-    if (lowerName.includes('documentação') || lowerName.includes('documentacao'))
-      return 'resource_guide';
+    if (lowerName.includes('documentação') || lowerName.includes('documentacao')) return 'resource_guide';
     return 'course_module';
   }
 
@@ -229,17 +223,15 @@ async function importMindSources(mindSlug, dryRun = false) {
 
   // 4. Group by content type for summary
   const byType = {};
-  allFiles.forEach((f) => {
+  allFiles.forEach(f => {
     const type = getContentType(f.relativePath, f.filename);
     byType[type] = (byType[type] || 0) + 1;
   });
 
   console.log('📂 By content_type:');
-  Object.entries(byType)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([type, count]) => {
-      console.log(`  - ${type}: ${count}`);
-    });
+  Object.entries(byType).sort((a, b) => b[1] - a[1]).forEach(([type, count]) => {
+    console.log(`  - ${type}: ${count}`);
+  });
   console.log('');
 
   // 5. Import each file
@@ -280,22 +272,24 @@ async function importMindSources(mindSlug, dryRun = false) {
     }
 
     // Insert content
-    const { error: insertError } = await supabase.from('contents').insert({
-      project_id: project.id,
-      slug,
-      title,
-      content,
-      content_type: contentType,
-      ai_generated: false,
-      status: 'published',
-      metadata: {
-        category,
-        source_file: file.relativePath,
-        source_type: 'original',
-        imported_at: new Date().toISOString(),
-        file_extension: path.extname(file.filename),
-      },
-    });
+    const { error: insertError } = await supabase
+      .from('contents')
+      .insert({
+        project_id: project.id,
+        slug,
+        title,
+        content,
+        content_type: contentType,
+        ai_generated: false,
+        status: 'published',
+        metadata: {
+          category,
+          source_file: file.relativePath,
+          source_type: 'original',
+          imported_at: new Date().toISOString(),
+          file_extension: path.extname(file.filename),
+        },
+      });
 
     if (insertError) {
       console.error(`❌ Error: ${file.relativePath}:`, insertError.message);

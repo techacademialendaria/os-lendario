@@ -74,7 +74,7 @@ async function getOrCreateProject(mindId, mindSlug) {
       project_type: 'mind_artifacts',
       slug: projectSlug,
       name: `${mindSlug} Mind Artifacts`,
-      status: 'in_progress',
+      status: 'in_progress'
     })
     .select()
     .single();
@@ -113,8 +113,8 @@ async function upsertHistoryContent(projectId, mindSlug, yamlContent, sourceFile
     metadata: {
       source_file: sourceFile,
       imported_at: new Date().toISOString(),
-      format: 'yaml',
-    },
+      format: 'yaml'
+    }
   };
 
   if (existing) {
@@ -131,7 +131,9 @@ async function upsertHistoryContent(projectId, mindSlug, yamlContent, sourceFile
     console.log(`  Updated existing history content`);
   } else {
     // Insert new
-    const { error: insertError } = await supabase.from('contents').insert(contentData);
+    const { error: insertError } = await supabase
+      .from('contents')
+      .insert(contentData);
 
     if (insertError) {
       throw insertError;
@@ -187,7 +189,7 @@ async function main() {
   console.log(`\nDone! History imported successfully.`);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('Error:', err);
   process.exit(1);
 });

@@ -1,4 +1,5 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="pt-BR" class="dark">
   <head>
     <meta charset="utf-8" />
@@ -8,197 +9,42 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
     <!-- Icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css"
-    />
-
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          container: {
-            center: true,
-            padding: '2rem',
-            screens: {
-              '2xl': '1400px',
-            },
-          },
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              serif: ['"Source Serif 4"', 'serif'],
-              display: ['Rajdhani', 'sans-serif'],
-              mono: ['"JetBrains Mono"', 'monospace'],
-            },
-            borderRadius: {
-              lg: 'var(--radius)',
-              md: 'calc(var(--radius) - 2px)',
-              sm: 'calc(var(--radius) - 4px)',
-            },
-            colors: {
-              border: 'hsl(var(--border))',
-              input: 'hsl(var(--input))',
-              ring: 'hsl(var(--ring))',
-              background: 'hsl(var(--background))',
-              foreground: 'hsl(var(--foreground))',
-              primary: {
-                DEFAULT: 'hsl(var(--primary))',
-                foreground: 'hsl(var(--primary-foreground))',
-                light: 'hsl(var(--primary-light))',
-              },
-              secondary: {
-                DEFAULT: 'hsl(var(--secondary))',
-                foreground: 'hsl(var(--secondary-foreground))',
-              },
-              destructive: {
-                DEFAULT: 'hsl(var(--destructive))',
-                foreground: 'hsl(var(--destructive-foreground))',
-              },
-              muted: {
-                DEFAULT: 'hsl(var(--muted))',
-                foreground: 'hsl(var(--muted-foreground))',
-              },
-              accent: {
-                DEFAULT: 'hsl(var(--accent))',
-                foreground: 'hsl(var(--accent-foreground))',
-              },
-              popover: {
-                DEFAULT: 'hsl(var(--popover))',
-                foreground: 'hsl(var(--popover-foreground))',
-              },
-              card: {
-                DEFAULT: 'hsl(var(--card))',
-                foreground: 'hsl(var(--card-foreground))',
-              },
-              // Brand Palette - Guide
-              'brand-gold': {
-                DEFAULT: '#C9B298',
-                dark: '#C9B298',
-              },
-              'brand-red': { DEFAULT: '#FF3B30', dark: '#FF453A' },
-              'brand-orange': { DEFAULT: '#FF9500', dark: '#FF9F0A' },
-              'brand-yellow': { DEFAULT: '#FFCC00', dark: '#FFD60A' },
-              'brand-green': { DEFAULT: '#34C759', dark: '#30D158' },
-              'brand-mint': { DEFAULT: '#00C7BE', dark: '#63E6E2' },
-              'brand-teal': { DEFAULT: '#30B0C7', dark: '#40C8E0' },
-              'brand-cyan': { DEFAULT: '#32ADE6', dark: '#64D2FF' },
-              'brand-blue': { DEFAULT: '#007AFF', dark: '#0A84FF' },
-              'brand-indigo': { DEFAULT: '#5856D6', dark: '#5E5CE6' },
-              'brand-pink': { DEFAULT: '#FF2D55', dark: '#FF375F' },
-              'brand-brown': { DEFAULT: '#A2845E', dark: '#AC8E68' },
-            },
-            backgroundImage: {
-              'gold-gradient': 'linear-gradient(135deg, #E4D8CA 0%, #C9B298 50%, #8D7556 100%)',
-              'gold-shimmer':
-                'linear-gradient(45deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 60%)',
-            },
-            keyframes: {
-              'accordion-down': {
-                from: { height: '0' },
-                to: { height: 'var(--radix-accordion-content-height)' },
-              },
-              'accordion-up': {
-                from: { height: 'var(--radix-accordion-content-height)' },
-                to: { height: '0' },
-              },
-              'fade-in': {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              'fade-out': {
-                '0%': { opacity: '1' },
-                '100%': { opacity: '0' },
-              },
-              'scale-in': {
-                '0%': { transform: 'scale(0.95)', opacity: '0' },
-                '100%': { transform: 'scale(1)', opacity: '1' },
-              },
-              'slide-in-right': {
-                '0%': { transform: 'translateX(100%)' },
-                '100%': { transform: 'translateX(0)' },
-              },
-              'pulse-slow': {
-                '0%, 100%': { opacity: '1' },
-                '50%': { opacity: '0.5' },
-              },
-              shimmer: {
-                '100%': { transform: 'translateX(100%)' },
-              },
-              float: {
-                '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-10px)' },
-              },
-              'button-shimmer': {
-                '0%': { backgroundPosition: '200% 0' },
-                '100%': { backgroundPosition: '-200% 0' },
-              },
-              'spin-slow': {
-                from: { transform: 'rotate(0deg)' },
-                to: { transform: 'rotate(360deg)' },
-              },
-            },
-            animation: {
-              'accordion-down': 'accordion-down 0.2s ease-out',
-              'accordion-up': 'accordion-up 0.2s ease-out',
-              'fade-in': 'fade-in 0.5s ease-out forwards',
-              'scale-in': 'scale-in 0.2s ease-out',
-              'slide-in-right': 'slide-in-right 0.3s ease-out',
-              'pulse-slow': 'pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-              shimmer: 'shimmer 2s infinite',
-              float: 'float 3s ease-in-out infinite',
-              'spin-slow': 'spin-slow 8s linear infinite',
-              'button-shimmer': 'button-shimmer 4s linear infinite',
-            },
-          },
-        },
-      };
-    </script>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-brands/css/uicons-brands.css'>
+    
     <style>
       /* CSS Variables for Runtime Theming */
-      @layer base {
-        :root {
+      :root {
           /* Default Theme (Gold) - LIGHT MODE */
           --primary: 32 27% 69%;
           --primary-light: 32 27% 85%;
           --primary-foreground: 30 20% 11%;
-
+          
           --background: 0 0% 100%; /* Pure White Background */
           --foreground: 0 0% 9%;
-
+          
           /* Cards/Surfaces: Slight Off-White/Cool Gray for Contrast */
-          --card: 210 20% 98%; /* #F8F9FA */
+          --card: 210 20% 98%;     /* #F8F9FA */
           --card-foreground: 0 0% 9%;
-
-          --popover: 0 0% 100%; /* Popovers stay pure white to pop against cards */
+          
+          --popover: 0 0% 100%;    /* Popovers stay pure white to pop against cards */
           --popover-foreground: 0 0% 9%;
-
+          
           /* Secondary/Muted: Slightly darker than card for differentiation */
-          --secondary: 210 10% 94%;
+          --secondary: 210 10% 94%; 
           --secondary-foreground: 0 0% 9%;
           --muted: 210 10% 94%;
           --muted-foreground: 0 0% 45%;
-
+          
           --accent: 32 27% 69%;
           --accent-foreground: 30 20% 11%;
-
+          
           --destructive: 4 100% 59%;
           --destructive-foreground: 0 0% 100%;
           --success: 142 69% 49%;
@@ -207,13 +53,13 @@
           --warning-foreground: 30 20% 11%;
           --info: 211 100% 50%;
           --info-foreground: 0 0% 100%;
-
+          
           --border: 0 0% 91%; /* #E8E8E8 */
           --input: 0 0% 91%;
           --ring: 32 27% 69%;
           --radius: 0.75rem;
         }
-
+  
         .dark {
           --background: 240 5% 4%;
           --foreground: 0 0% 98%;
@@ -239,7 +85,6 @@
           --input: 0 0% 20%;
           --ring: 32 27% 69%;
         }
-      }
 
       /* Scrollbar */
       .custom-scrollbar::-webkit-scrollbar {
@@ -256,36 +101,36 @@
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: hsl(var(--muted-foreground) / 0.5);
       }
-
+      
       .mask-linear-fade {
         mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
         -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
       }
-
+      
       body {
         font-family: 'Inter', sans-serif;
       }
     </style>
-    <script type="importmap">
-      {
-        "imports": {
-          "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.2",
-          "vite": "https://aistudiocdn.com/vite@^7.2.7",
-          "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-          "react/": "https://aistudiocdn.com/react@^19.2.1/",
-          "react": "https://aistudiocdn.com/react@^19.2.1",
-          "tailwind-merge": "https://aistudiocdn.com/tailwind-merge@^3.4.0",
-          "clsx": "https://aistudiocdn.com/clsx@^2.1.1",
-          "class-variance-authority": "https://aistudiocdn.com/class-variance-authority@^0.7.1",
-          "date-fns": "https://aistudiocdn.com/date-fns@^4.1.0",
-          "react-dom": "https://aistudiocdn.com/react-dom@^19.2.1",
-          "@google/genai": "https://aistudiocdn.com/@google/genai@^1.32.0"
-        }
-      }
-    </script>
-    <link rel="stylesheet" href="/index.css" />
-  </head>
-  <body class="overflow-hidden bg-background font-medium text-foreground antialiased">
+<script type="importmap">
+{
+  "imports": {
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.2",
+    "vite": "https://aistudiocdn.com/vite@^7.2.7",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "tailwind-merge": "https://aistudiocdn.com/tailwind-merge@^3.4.0",
+    "clsx": "https://aistudiocdn.com/clsx@^2.1.1",
+    "class-variance-authority": "https://aistudiocdn.com/class-variance-authority@^0.7.1",
+    "date-fns": "https://aistudiocdn.com/date-fns@^4.1.0",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.1",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.32.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-background text-foreground antialiased overflow-hidden font-medium">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>
