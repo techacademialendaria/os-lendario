@@ -1,292 +1,347 @@
-import { useState, useCallback } from 'react';
-import { useToast } from './use-toast';
+// @ts-nocheck
+import { useState, useEffect, useCallback } from 'react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import type { ContentProjectWithRelations, CourseMetadata } from '../types/database';
 
-export interface Lesson {
-  id: string;
-  title: string;
-  description: string;
-  order: number;
-  duration?: number;
-  content?: string;
+// Course UI type that maps to CoursesTemplate expectations
+export interface CourseContentCounts {
+  modules: number;
+  lessons: number;
+  research: number;
+  assessments: number;
+  resources: number;
+  reports: number;
+  total: number;
+  avgFidelityScore: number | null;
 }
 
 export interface Course {
   id: string;
+  slug: string;
   title: string;
   description: string;
-  slug: string;
-  curriculum: Lesson[];
-  status: 'draft' | 'published';
-  createdAt: string;
+  status:
+    | 'planning'
+    | 'brief'
+    | 'research'
+    | 'curriculum'
+    | 'generation'
+    | 'validation'
+    | 'published';
+  progress: number;
+  modules: number;
+  lessons: number;
+  lessonsGenerated: number;
+  duration: string;
+  instructor: string;
+  instructorAvatar: string;
   updatedAt: string;
+  createdAt: string;
+  thumbnail?: string;
+  metadata?: CourseMetadata;
+  contentCounts?: CourseContentCounts;
 }
 
-export interface CoursesState {
+// Map database status to UI status
+const mapStatus = (dbStatus: string | null): Course['status'] => {
+  const statusMap: Record<string, Course['status']> = {
+    planning: 'planning',
+    brief: 'brief',
+    market_research: 'research',
+    research: 'research',
+    curriculum: 'curriculum',
+    generation: 'generation',
+    generating: 'generation',
+    validation: 'validation',
+    published: 'published',
+    ready: 'published',
+  };
+  return statusMap[dbStatus || 'planning'] || 'planning';
+};
+
+// Calculate progress based on workflow stage
+const calculateProgress = (metadata: CourseMetadata | null, status: string | null): number => {
+  if (!metadata) {
+    const stageProgress: Record<string, number> = {
+      planning: 10,
+      brief: 25,
+      market_research: 40,
+      research: 40,
+      curriculum: 60,
+      generation: 75,
+      generating: 75,
+      validation: 90,
+      published: 100,
+      ready: 100,
+    };
+    return stageProgress[status || 'planning'] || 10;
+  }
+
+  // Calculate based on actual completion
+  let progress = 0;
+  if (metadata.brief_complete) progress += 25;
+  if (metadata.research_complete) progress += 15;
+  if (metadata.curriculum_complete) progress += 20;
+  if (metadata.lessons_generated && metadata.lessons_total) {
+    progress += Math.round((metadata.lessons_generated / metadata.lessons_total) * 40);
+  }
+  return Math.min(progress, 100);
+};
+
+// Transform database record to UI course
+const transformToCourse = (project: ContentProjectWithRelations): Course => {
+  const metadata = project.project_metadata as CourseMetadata | null;
+  const contentCounts = (project as any).content_counts as CourseContentCounts | undefined;
+  const instructorFromJunction = (project as any).instructor_from_junction as
+    | { name: string; slug: string }
+    | undefined;
+
+  // Prioritize instructor from project_minds junction, fallback to persona_mind
+  const instructorName =
+    instructorFromJunction?.name || project.persona_mind?.name || 'Sem instrutor';
+  const instructorSlug = instructorFromJunction?.slug || project.persona_mind?.slug || '';
+
+  return {
+    id: project.id,
+    slug: project.slug,
+    title: project.name,
+    description: project.description || '',
+    status: mapStatus(project.status),
+    progress: calculateProgress(metadata, project.status),
+    modules: metadata?.num_modules || project.modules_count || 0,
+    lessons: metadata?.num_lessons || project.lessons_count || 0,
+    lessonsGenerated: metadata?.lessons_generated || 0,
+    duration: metadata?.duration_hours ? `${metadata.duration_hours}h` : '--',
+    instructor: instructorName,
+    instructorAvatar: instructorSlug ? `https://i.pravatar.cc/150?u=${instructorSlug}` : '',
+    updatedAt: project.updated_at,
+    createdAt: project.created_at,
+    metadata,
+    contentCounts,
+  };
+};
+
+interface UseCoursesResult {
   courses: Course[];
-  selectedCourse: Course | null;
-  isLoading: boolean;
-  isEditing: boolean;
+  loading: boolean;
   error: Error | null;
+  refetch: () => Promise<void>;
+  isUsingMockData: boolean;
+  totalContents: number;
+  aggregatedCounts: CourseContentCounts;
 }
 
-export interface UseCousesHook {
-  // State
-  courses: Course[];
-  selectedCourse: Course | null;
-  isLoading: boolean;
-  isEditing: boolean;
-  error: Error | null;
+const EMPTY_COUNTS: CourseContentCounts = {
+  modules: 0,
+  lessons: 0,
+  research: 0,
+  assessments: 0,
+  resources: 0,
+  reports: 0,
+  total: 0,
+  avgFidelityScore: null,
+};
 
-  // Setters
-  setSelectedCourse: (course: Course | null) => void;
-  setIsEditing: (editing: boolean) => void;
-  setError: (error: Error | null) => void;
-
-  // Actions
-  createCourse: (course: Omit<Course, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
-  updateCourse: (id: string, updates: Partial<Course>) => Promise<void>;
-  deleteCourse: (id: string) => Promise<void>;
-  publishCourse: (id: string) => Promise<void>;
-  addLesson: (courseId: string, lesson: Omit<Lesson, 'id'>) => Promise<void>;
-  updateLesson: (courseId: string, lessonId: string, updates: Partial<Lesson>) => Promise<void>;
-  removeLesson: (courseId: string, lessonId: string) => Promise<void>;
-  reorderLessons: (courseId: string, lessons: Lesson[]) => Promise<void>;
-}
-
-export const useCourses = (): UseCousesHook => {
-  const { toast } = useToast();
-
-  // State
+export function useCourses(): UseCoursesResult {
   const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isUsingMockData, setIsUsingMockData] = useState(false);
+  const [aggregatedCounts, setAggregatedCounts] = useState<CourseContentCounts>(EMPTY_COUNTS);
 
-  // Actions
-  const createCourse = useCallback(
-    async (courseData: Omit<Course, 'id' | 'createdAt' | 'updatedAt'>) => {
-      setIsLoading(true);
-      try {
-        const newCourse: Course = {
-          ...courseData,
-          id: `course_${Date.now()}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+  const fetchCourses = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    // Check if Supabase is configured
+    if (!isSupabaseConfigured()) {
+      console.warn('Supabase not configured - no courses available');
+      setCourses([]);
+      setIsUsingMockData(false);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Fetch courses (content_projects with type 'course')
+      const { data: projects, error: projectsError } = await supabase
+        .from('content_projects')
+        .select(
+          `
+          *,
+          persona_mind:minds!content_projects_persona_mind_id_fkey(id, name, slug),
+          creator_mind:minds!content_projects_creator_mind_id_fkey(id, name, slug),
+          target_audience:audience_profiles(id, name, slug)
+        `
+        )
+        .eq('project_type', 'course')
+        .order('updated_at', { ascending: false });
+
+      if (projectsError) {
+        throw projectsError;
+      }
+
+      // Fetch content counts for each project
+      const projectIds = projects?.map((p) => p.id) || [];
+
+      if (projectIds.length > 0) {
+        // Fetch instructors via project_minds junction table
+        const { data: projectMinds } = await supabase
+          .from('project_minds')
+          .select(
+            `
+            project_id,
+            role,
+            mind:minds(id, name, slug)
+          `
+          )
+          .in('project_id', projectIds)
+          .eq('role', 'instructor');
+
+        // Map instructors by project_id
+        const instructorMap: Record<string, { name: string; slug: string }> = {};
+        projectMinds?.forEach((pm) => {
+          if (pm.mind && pm.project_id) {
+            instructorMap[pm.project_id] = {
+              name: (pm.mind as any).name || 'Sem instrutor',
+              slug: (pm.mind as any).slug || '',
+            };
+          }
+        });
+
+        // Attach instructors to projects
+        projects?.forEach((p) => {
+          (p as any).instructor_from_junction = instructorMap[p.id];
+        });
+
+        // Get all content counts by type with fidelity scores
+        const { data: contentCounts } = await supabase
+          .from('contents')
+          .select('project_id, content_type, fidelity_score')
+          .in('project_id', projectIds)
+          .is('deleted_at', null);
+
+        // Aggregate counts per project with all content types
+        const countsMap: Record<string, CourseContentCounts & { fidelityScores: number[] }> = {};
+        contentCounts?.forEach((c) => {
+          if (!countsMap[c.project_id!]) {
+            countsMap[c.project_id!] = {
+              modules: 0,
+              lessons: 0,
+              research: 0,
+              assessments: 0,
+              resources: 0,
+              reports: 0,
+              total: 0,
+              avgFidelityScore: null,
+              fidelityScores: [],
+            };
+          }
+          const counts = countsMap[c.project_id!];
+          counts.total++;
+
+          // Match content_type patterns
+          if (c.content_type === 'course_module') {
+            counts.modules++;
+          } else if (c.content_type === 'course_lesson') {
+            counts.lessons++;
+            // Track fidelity scores for lessons
+            if (c.fidelity_score !== null && c.fidelity_score !== undefined) {
+              counts.fidelityScores.push(c.fidelity_score);
+            }
+          } else if (c.content_type?.startsWith('research_')) {
+            counts.research++;
+          } else if (c.content_type?.startsWith('assessment_')) {
+            counts.assessments++;
+          } else if (c.content_type?.startsWith('resource_')) {
+            counts.resources++;
+          } else if (c.content_type?.startsWith('report_')) {
+            counts.reports++;
+          }
+        });
+
+        // Calculate average fidelity scores
+        Object.values(countsMap).forEach((counts) => {
+          if (counts.fidelityScores.length > 0) {
+            const sum = counts.fidelityScores.reduce((a, b) => a + b, 0);
+            counts.avgFidelityScore = Math.round(sum / counts.fidelityScores.length);
+          }
+        });
+
+        // Attach counts to projects and aggregate totals
+        const aggregated: CourseContentCounts = {
+          modules: 0,
+          lessons: 0,
+          research: 0,
+          assessments: 0,
+          resources: 0,
+          reports: 0,
+          total: 0,
+          avgFidelityScore: null,
         };
-        setCourses((prev) => [...prev, newCourse]);
-        setSelectedCourse(newCourse);
-        toast({ title: 'Curso criado com sucesso!' });
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to create course');
-        setError(error);
-        toast({ title: 'Erro ao criar curso', variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [toast],
-  );
+        const allFidelityScores: number[] = [];
+        projects?.forEach((p) => {
+          const counts = countsMap[p.id] || {
+            modules: 0,
+            lessons: 0,
+            research: 0,
+            assessments: 0,
+            resources: 0,
+            reports: 0,
+            total: 0,
+            avgFidelityScore: null,
+            fidelityScores: [],
+          };
+          if (counts.avgFidelityScore !== null) {
+            allFidelityScores.push(counts.avgFidelityScore);
+          }
+          (p as ContentProjectWithRelations).modules_count = counts.modules;
+          (p as ContentProjectWithRelations).lessons_count = counts.lessons;
+          (p as any).content_counts = counts;
 
-  const updateCourse = useCallback(
-    async (id: string, updates: Partial<Course>) => {
-      setIsLoading(true);
-      try {
-        setCourses((prev) =>
-          prev.map((course) =>
-            course.id === id ? { ...course, ...updates, updatedAt: new Date().toISOString() } : course,
-          ),
-        );
-        if (selectedCourse?.id === id) {
-          setSelectedCourse({ ...selectedCourse, ...updates, updatedAt: new Date().toISOString() });
+          // Aggregate across all courses
+          aggregated.modules += counts.modules;
+          aggregated.lessons += counts.lessons;
+          aggregated.research += counts.research;
+          aggregated.assessments += counts.assessments;
+          aggregated.resources += counts.resources;
+          aggregated.reports += counts.reports;
+          aggregated.total += counts.total;
+        });
+        // Calculate global average fidelity
+        if (allFidelityScores.length > 0) {
+          aggregated.avgFidelityScore = Math.round(
+            allFidelityScores.reduce((a, b) => a + b, 0) / allFidelityScores.length
+          );
         }
-        toast({ title: 'Curso atualizado com sucesso!' });
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to update course');
-        setError(error);
-        toast({ title: 'Erro ao atualizar curso', variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
+        setAggregatedCounts(aggregated);
       }
-    },
-    [selectedCourse, toast],
-  );
 
-  const deleteCourse = useCallback(
-    async (id: string) => {
-      setIsLoading(true);
-      try {
-        setCourses((prev) => prev.filter((course) => course.id !== id));
-        if (selectedCourse?.id === id) {
-          setSelectedCourse(null);
-        }
-        toast({ title: 'Curso deletado com sucesso!' });
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to delete course');
-        setError(error);
-        toast({ title: 'Erro ao deletar curso', variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedCourse, toast],
-  );
+      const transformedCourses = (projects || []).map(transformToCourse);
+      setCourses(transformedCourses);
+      setIsUsingMockData(false);
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+      setError(err as Error);
+      setCourses([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  const publishCourse = useCallback(
-    async (id: string) => {
-      setIsLoading(true);
-      try {
-        setCourses((prev) =>
-          prev.map((course) =>
-            course.id === id ? { ...course, status: 'published', updatedAt: new Date().toISOString() } : course,
-          ),
-        );
-        if (selectedCourse?.id === id) {
-          setSelectedCourse({ ...selectedCourse, status: 'published', updatedAt: new Date().toISOString() });
-        }
-        toast({ title: 'Curso publicado com sucesso!' });
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to publish course');
-        setError(error);
-        toast({ title: 'Erro ao publicar curso', variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedCourse, toast],
-  );
-
-  const addLesson = useCallback(
-    async (courseId: string, lessonData: Omit<Lesson, 'id'>) => {
-      setIsLoading(true);
-      try {
-        const newLesson: Lesson = {
-          ...lessonData,
-          id: `lesson_${Date.now()}`,
-        };
-        setCourses((prev) =>
-          prev.map((course) =>
-            course.id === courseId ? { ...course, curriculum: [...course.curriculum, newLesson] } : course,
-          ),
-        );
-        if (selectedCourse?.id === courseId) {
-          setSelectedCourse({ ...selectedCourse, curriculum: [...selectedCourse.curriculum, newLesson] });
-        }
-        toast({ title: 'Aula adicionada com sucesso!' });
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to add lesson');
-        setError(error);
-        toast({ title: 'Erro ao adicionar aula', variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedCourse, toast],
-  );
-
-  const updateLesson = useCallback(
-    async (courseId: string, lessonId: string, updates: Partial<Lesson>) => {
-      setIsLoading(true);
-      try {
-        setCourses((prev) =>
-          prev.map((course) =>
-            course.id === courseId
-              ? {
-                  ...course,
-                  curriculum: course.curriculum.map((lesson) =>
-                    lesson.id === lessonId ? { ...lesson, ...updates } : lesson,
-                  ),
-                }
-              : course,
-          ),
-        );
-        if (selectedCourse?.id === courseId) {
-          setSelectedCourse({
-            ...selectedCourse,
-            curriculum: selectedCourse.curriculum.map((lesson) =>
-              lesson.id === lessonId ? { ...lesson, ...updates } : lesson,
-            ),
-          });
-        }
-        toast({ title: 'Aula atualizada com sucesso!' });
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to update lesson');
-        setError(error);
-        toast({ title: 'Erro ao atualizar aula', variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedCourse, toast],
-  );
-
-  const removeLesson = useCallback(
-    async (courseId: string, lessonId: string) => {
-      setIsLoading(true);
-      try {
-        setCourses((prev) =>
-          prev.map((course) =>
-            course.id === courseId
-              ? { ...course, curriculum: course.curriculum.filter((lesson) => lesson.id !== lessonId) }
-              : course,
-          ),
-        );
-        if (selectedCourse?.id === courseId) {
-          setSelectedCourse({
-            ...selectedCourse,
-            curriculum: selectedCourse.curriculum.filter((lesson) => lesson.id !== lessonId),
-          });
-        }
-        toast({ title: 'Aula removida com sucesso!' });
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to remove lesson');
-        setError(error);
-        toast({ title: 'Erro ao remover aula', variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedCourse, toast],
-  );
-
-  const reorderLessons = useCallback(
-    async (courseId: string, lessons: Lesson[]) => {
-      setIsLoading(true);
-      try {
-        setCourses((prev) =>
-          prev.map((course) => (course.id === courseId ? { ...course, curriculum: lessons } : course)),
-        );
-        if (selectedCourse?.id === courseId) {
-          setSelectedCourse({ ...selectedCourse, curriculum: lessons });
-        }
-        toast({ title: 'Aulas reordenadas com sucesso!' });
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to reorder lessons');
-        setError(error);
-        toast({ title: 'Erro ao reordenar aulas', variant: 'destructive' });
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedCourse, toast],
-  );
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
 
   return {
     courses,
-    selectedCourse,
-    isLoading,
-    isEditing,
+    loading,
     error,
-    setSelectedCourse,
-    setIsEditing,
-    setError,
-    createCourse,
-    updateCourse,
-    deleteCourse,
-    publishCourse,
-    addLesson,
-    updateLesson,
-    removeLesson,
-    reorderLessons,
+    refetch: fetchCourses,
+    isUsingMockData,
+    totalContents: aggregatedCounts.total,
+    aggregatedCounts,
   };
-};
+}
+
+export default useCourses;
