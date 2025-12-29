@@ -1,5 +1,5 @@
-// @ts-nocheck
 import React, { useState, useCallback, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   DndContext,
   closestCenter,
@@ -18,286 +18,236 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { PRDProject, EpicData } from '../../../types/prd';
-import { usePRDAI } from '../../../hooks/prd/usePRDAI';
-import { PRD_PRIMARY, PRD_STATUS } from '../prd-tokens';
-import PRDEffortIndicator from '../PRDEffortIndicator';
+import { Section } from '../../../types';
+import { PRDStatus, EpicData } from '../../../types/prd';
+import { usePRDProject } from '../../../hooks/prd/usePRDProject';
+import PRDTopbar from '../PRDTopbar';
+
 import { Card } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
 import { Input } from '../../ui/input';
-import { Textarea } from '../../ui/textarea';
+import { AutosizeTextarea } from '../../ui/autosize-textarea';
+import { Progress } from '../../ui/progress';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../../ui/accordion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog';
 import { cn } from '../../../lib/utils';
 
 // Re-export EpicData for convenience
 export type { EpicData } from '../../../types/prd';
 
-interface PRDEpicsTemplateProps {
-  project: PRDProject;
-  initialEpics?: EpicData[]; // Épicos carregados do banco
-  onUpdateEpics: (epics: EpicData[]) => Promise<void>;
-  onGenerateStories: (epicId: string) => void;
-  onGenerateAllStories: () => void;
-  onNext: () => void;
-}
-
 // =============================================================================
 // CONSTANTS
 // =============================================================================
 
-const STATUS_CONFIG: Record<EpicData['status'], { label: string; color: string; icon: string }> = {
-  pending: { label: 'Pendente', color: 'text-muted-foreground', icon: 'circle' },
-  stories_generated: { label: 'Stories Geradas', color: 'text-cyan-500', icon: 'check-circle' },
-  complete: { label: 'Completo', color: 'text-emerald-500', icon: 'check-circle-2' },
-};
+const STUDIO_TEAL = '#00C7BE';
+
+const PIPELINE_STEPS = [
+  { id: 'upload', label: 'Upload', status: 'done' as const },
+  { id: 'brief', label: 'Brief', status: 'done' as const },
+  { id: 'prd', label: 'PRD', status: 'done' as const },
+  { id: 'epics', label: 'Épicos', status: 'active' as const },
+  { id: 'stories', label: 'Stories', status: 'pending' as const },
+  { id: 'export', label: 'Export', status: 'pending' as const },
+];
 
 // =============================================================================
-// PROMPTS
+// TYPES
 // =============================================================================
 
-const EPICS_SYSTEM = `Você é um product manager experiente que quebra PRDs em épicos bem definidos.
-Cada épico deve ser um bloco lógico de trabalho que pode ser desenvolvido de forma independente.
-Seja claro e objetivo nas descrições.`;
-
-const EPICS_PROMPT = `Analise o seguinte PRD e gere 3-6 épicos bem estruturados:
-
-## Objetivos
-{objectives}
-
-## Escopo
-{scope}
-
-## User Stories
-{userStories}
-
-## Requisitos
-{requirements}
-
----
-
-Gere épicos no formato JSON:
-[
-  {
-    "title": "Nome curto do épico",
-    "description": "Descrição em 2-3 frases do que este épico abrange"
-  }
-]
-
-Regras:
-- Cada épico deve ser um bloco lógico de funcionalidade
-- Ordene do mais fundamental ao mais avançado
-- O primeiro épico geralmente é setup/infraestrutura
-- Os épicos devem cobrir todo o escopo do PRD`;
-
-// =============================================================================
-// SORTABLE EPIC CARD
-// =============================================================================
-
-interface SortableEpicCardProps {
-  epic: EpicData;
-  isEditing: boolean;
-  onEdit: () => void;
-  onSave: (title: string, description: string) => void;
-  onCancel: () => void;
-  onDelete: () => void;
-  onGenerateStories: () => void;
+interface PRDEpicsTemplateProps {
+  setSection: (section: Section) => void;
 }
 
-const SortableEpicCard: React.FC<SortableEpicCardProps> = ({
-  epic,
-  isEditing,
-  onEdit,
-  onSave,
-  onCancel,
-  onDelete,
-  onGenerateStories,
-}) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: epic.id,
-  });
+// =============================================================================
+// SUB-COMPONENTS
+// =============================================================================
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1000 : 'auto',
-  };
+const LoadingState: React.FC<{ setSection: (s: Section) => void }> = ({ setSection }) => (
+  <div className="flex min-h-screen flex-col bg-background">
+    <PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />
+    <div className="flex flex-1 items-center justify-center">
+      <div className="space-y-4 text-center">
+        <Icon name="refresh" className="mx-auto size-8 animate-spin text-muted-foreground" />
+        <p className="text-muted-foreground">Carregando projeto...</p>
+      </div>
+    </div>
+  </div>
+);
 
+// Pipeline Stepper Component
+const PipelineStepper: React.FC = () => (
+  <div className="relative mx-auto flex max-w-3xl items-center justify-between">
+    <div className="absolute left-0 top-1/2 -z-10 h-0.5 w-full bg-muted" />
+    {PIPELINE_STEPS.map((step, i) => (
+      <div
+        key={step.id}
+        className="z-10 flex flex-col items-center gap-2 rounded-full bg-background px-2"
+      >
+        <div
+          className={cn(
+            'flex size-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors',
+            step.status === 'active'
+              ? 'border-[var(--studio-teal)] bg-[var(--studio-teal)] text-white shadow-lg'
+              : step.status === 'done'
+                ? 'border-[var(--studio-teal)] bg-card text-[var(--studio-teal)]'
+                : 'border-border bg-card text-muted-foreground'
+          )}
+          style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
+        >
+          {step.status === 'done' ? <Icon name="check" size="size-3" /> : i + 1}
+        </div>
+        <span
+          className={cn(
+            'hidden text-[10px] font-bold uppercase tracking-wider sm:block',
+            step.status === 'active' ? 'text-[var(--studio-teal)]' : 'text-muted-foreground'
+          )}
+          style={step.status === 'active' ? { color: STUDIO_TEAL } : {}}
+        >
+          {step.label}
+        </span>
+      </div>
+    ))}
+  </div>
+);
+
+// Epic Accordion Item
+interface EpicItemProps {
+  epic: EpicData;
+  index: number;
+  onEdit: (id: string, title: string, description: string) => void;
+  onDelete: (id: string) => void;
+  onAddStory: (epicId: string, title: string) => void;
+}
+
+const EpicItem: React.FC<EpicItemProps> = ({ epic, index, onEdit, onDelete, onAddStory }) => {
+  const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(epic.title);
   const [editDescription, setEditDescription] = useState(epic.description);
-  const statusConfig = STATUS_CONFIG[epic.status];
+  const [newStory, setNewStory] = useState('');
 
   const handleSave = () => {
-    if (editTitle.trim()) {
-      onSave(editTitle.trim(), editDescription.trim());
+    onEdit(epic.id, editTitle, editDescription);
+    setIsEditing(false);
+  };
+
+  const handleAddStory = () => {
+    if (newStory.trim()) {
+      onAddStory(epic.id, newStory.trim());
+      setNewStory('');
     }
   };
 
-  if (isEditing) {
-    return (
-      <div ref={setNodeRef} style={style}>
-        <Card className="border-primary/50 p-4">
-          <div className="space-y-3">
+  const progress = epic.storiesCount > 0 ? Math.min(100, (epic.storiesCount / 5) * 100) : 0;
+
+  return (
+    <AccordionItem value={epic.id} className="overflow-hidden rounded-xl border">
+      <AccordionTrigger className="px-6 py-4 hover:no-underline [&[data-state=open]]:bg-muted/30">
+        <div className="flex flex-1 items-center gap-4">
+          <div
+            className="flex size-10 shrink-0 items-center justify-center rounded-lg text-lg font-bold text-white"
+            style={{ backgroundColor: STUDIO_TEAL }}
+          >
+            {index + 1}
+          </div>
+          <div className="flex-1 text-left">
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold">{epic.title}</h3>
+              <Badge variant="outline" className="text-xs">
+                {epic.storiesCount || 0} stories
+              </Badge>
+            </div>
+            <p className="line-clamp-1 text-sm text-muted-foreground">{epic.description}</p>
+          </div>
+        </div>
+      </AccordionTrigger>
+
+      <AccordionContent className="px-6 pb-6">
+        {isEditing ? (
+          <div className="space-y-4">
             <Input
               value={editTitle}
               onChange={(e) => setEditTitle(e.target.value)}
               placeholder="Título do épico"
-              className="font-semibold"
-              autoFocus
+              className="font-bold"
             />
-            <Textarea
+            <AutosizeTextarea
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              placeholder="Descrição do épico..."
-              className="min-h-[80px] resize-none"
+              placeholder="Descrição..."
             />
             <div className="flex justify-end gap-2">
-              <Button variant="ghost" size="sm" onClick={onCancel}>
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>
                 Cancelar
               </Button>
-              <Button size="sm" onClick={handleSave} disabled={!editTitle.trim()}>
-                <Icon name="check" className="mr-1.5 size-3" />
+              <Button size="sm" onClick={handleSave}>
                 Salvar
               </Button>
             </div>
           </div>
-        </Card>
-      </div>
-    );
-  }
-
-  return (
-    <div ref={setNodeRef} style={style}>
-      <Card
-        className={cn(
-          'group p-4 transition-colors hover:border-primary/30',
-          isDragging && 'border-primary/50 shadow-lg'
-        )}
-      >
-        <div className="flex items-start gap-4">
-          {/* Drag Handle */}
-          <button
-            {...attributes}
-            {...listeners}
-            className="mt-1 cursor-grab touch-none rounded p-1.5 hover:bg-muted active:cursor-grabbing"
-            aria-label="Arrastar para reordenar"
-          >
-            <Icon name="grip-vertical" className="size-4 text-muted-foreground" />
-          </button>
-
-          {/* Epic Number */}
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-lg font-bold"
-            style={{ backgroundColor: `${PRD_PRIMARY}20`, color: PRD_PRIMARY }}
-          >
-            {epic.sequence_order}
-          </div>
-
-          {/* Content */}
-          <div className="min-w-0 flex-1">
-            <div className="mb-1 flex items-center gap-2">
-              <h3 className="truncate text-base font-semibold">{epic.title}</h3>
-              <Badge variant="outline" className={cn('text-xs', statusConfig.color)}>
-                <Icon name={statusConfig.icon} className="mr-1 size-3" />
-                {statusConfig.label}
-              </Badge>
+        ) : (
+          <div className="space-y-4">
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Progresso estimado</span>
+                <span className="font-bold" style={{ color: STUDIO_TEAL }}>
+                  {Math.round(progress)}%
+                </span>
+              </div>
+              <Progress value={progress} className="h-2" />
             </div>
-            <p className="line-clamp-2 text-sm text-muted-foreground">{epic.description}</p>
-            {epic.storiesCount > 0 && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                <Icon name="list-checks" className="mr-1 inline size-3" />
-                {epic.storiesCount} stories
-              </p>
-            )}
-          </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-            <Button variant="ghost" size="sm" onClick={onEdit} className="h-8 w-8 p-0">
-              <Icon name="edit" className="size-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onDelete}
-              className="h-8 w-8 p-0 text-destructive"
-            >
-              <Icon name="trash" className="size-4" />
-            </Button>
-            {epic.status === 'pending' && (
-              <Button variant="outline" size="sm" onClick={onGenerateStories} className="ml-2">
-                <Icon name="sparkles" className="mr-1.5 size-3" />
-                Gerar Stories
+            {/* Stories Preview */}
+            <div className="space-y-2">
+              {epic.stories?.map((story, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 rounded-md bg-muted/50 px-3 py-2 text-sm"
+                >
+                  <Icon name="check-circle" className="size-4 text-muted-foreground" />
+                  {story}
+                </div>
+              ))}
+            </div>
+
+            {/* Add Story Input */}
+            <div className="flex gap-2">
+              <Input
+                value={newStory}
+                onChange={(e) => setNewStory(e.target.value)}
+                placeholder="Adicionar story..."
+                onKeyDown={(e) => e.key === 'Enter' && handleAddStory()}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAddStory}
+                disabled={!newStory.trim()}
+              >
+                <Icon name="plus" className="size-4" />
               </Button>
-            )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 border-t pt-4">
+              <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
+                <Icon name="edit-pencil" className="mr-1 size-3" /> Editar
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-destructive"
+                onClick={() => onDelete(epic.id)}
+              >
+                <Icon name="trash" className="mr-1 size-3" /> Remover
+              </Button>
+            </div>
           </div>
-        </div>
-      </Card>
-    </div>
-  );
-};
-
-// =============================================================================
-// ADD EPIC CARD
-// =============================================================================
-
-const AddEpicCard: React.FC<{
-  onAdd: (title: string, description: string) => void;
-}> = ({ onAdd }) => {
-  const [isAdding, setIsAdding] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-
-  const handleAdd = () => {
-    if (title.trim()) {
-      onAdd(title.trim(), description.trim());
-      setTitle('');
-      setDescription('');
-      setIsAdding(false);
-    }
-  };
-
-  if (!isAdding) {
-    return (
-      <button
-        onClick={() => setIsAdding(true)}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/30 p-4 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
-      >
-        <Icon name="plus" className="size-5" />
-        Adicionar Épico
-      </button>
-    );
-  }
-
-  return (
-    <Card className="border-primary/50 p-4">
-      <div className="space-y-3">
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Título do novo épico"
-          className="font-semibold"
-          autoFocus
-        />
-        <Textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Descrição do épico..."
-          className="min-h-[80px] resize-none"
-        />
-        <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={() => setIsAdding(false)}>
-            Cancelar
-          </Button>
-          <Button size="sm" onClick={handleAdd} disabled={!title.trim()}>
-            <Icon name="plus" className="mr-1.5 size-3" />
-            Adicionar
-          </Button>
-        </div>
-      </div>
-    </Card>
+        )}
+      </AccordionContent>
+    </AccordionItem>
   );
 };
 
@@ -305,317 +255,325 @@ const AddEpicCard: React.FC<{
 // MAIN COMPONENT
 // =============================================================================
 
-export const PRDEpicsTemplate: React.FC<PRDEpicsTemplateProps> = ({
-  project,
-  initialEpics,
-  onUpdateEpics,
-  onGenerateStories,
-  onGenerateAllStories,
-  onNext,
-}) => {
-  const { generate, isGenerating, progress } = usePRDAI();
-  const [epics, setEpics] = useState<EpicData[]>(() => {
-    // Prioritize initialEpics (from database), fallback to metadata
-    if (initialEpics && initialEpics.length > 0) {
-      return initialEpics;
-    }
-    const existingEpics = project.project_metadata?.epics as EpicData[] | undefined;
-    return existingEpics || [];
-  });
+export const PRDEpicsTemplate: React.FC<PRDEpicsTemplateProps> = ({ setSection }) => {
+  const navigate = useNavigate();
+  const { slug } = useParams<{ slug: string }>();
+  const { project, loading, updateProject, advancePhase } = usePRDProject(slug || '');
 
-  // Update epics when initialEpics changes (e.g., after loadContents)
-  React.useEffect(() => {
-    if (initialEpics && initialEpics.length > 0) {
-      setEpics(initialEpics);
-    }
-  }, [initialEpics]);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  // Local state
+  const [epics, setEpics] = useState<EpicData[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isAdvancing, setIsAdvancing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [openEpics, setOpenEpics] = useState<string[]>([]);
 
-  const prdDocument = project.project_metadata?.prdDocument?.document;
-
-  // DnD sensors for pointer, touch, and keyboard
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  // Check if all epics have stories generated
-  const allStoriesGenerated = useMemo(() => {
-    return epics.length > 0 && epics.every((e) => e.status !== 'pending');
-  }, [epics]);
-
-  const hasEpics = epics.length > 0;
-  const pendingEpics = epics.filter((e) => e.status === 'pending').length;
-
-  // Handle drag end - reorder epics
-  const handleDragEnd = useCallback(
-    async (event: DragEndEvent) => {
-      const { active, over } = event;
-
-      if (over && active.id !== over.id) {
-        const oldIndex = epics.findIndex((e) => e.id === active.id);
-        const newIndex = epics.findIndex((e) => e.id === over.id);
-
-        const reordered = arrayMove(epics, oldIndex, newIndex).map((epic, index) => ({
-          ...epic,
-          sequence_order: index + 1,
-        }));
-
-        setEpics(reordered);
-        await onUpdateEpics(reordered);
+  // Initialize from project
+  React.useEffect(() => {
+    if (project?.project_metadata?.epics) {
+      setEpics(project.project_metadata.epics);
+      // Open first epic by default
+      if (project.project_metadata.epics.length > 0 && openEpics.length === 0) {
+        setOpenEpics([project.project_metadata.epics[0].id]);
       }
-    },
-    [epics, onUpdateEpics]
-  );
-
-  // Generate epics from PRD
-  const handleGenerateEpics = useCallback(async () => {
-    if (!prdDocument) return;
-
-    try {
-      const prompt = EPICS_PROMPT.replace('{objectives}', prdDocument.objectives?.content || '')
-        .replace('{scope}', prdDocument.scope?.content || '')
-        .replace('{userStories}', prdDocument.userStories?.content || '')
-        .replace('{requirements}', prdDocument.requirements?.content || '');
-
-      const result = await generate(prompt, {
-        systemPrompt: EPICS_SYSTEM,
-        temperature: 0.7,
-        maxTokens: 2048,
-      });
-
-      const jsonMatch = result.content.match(/\[[\s\S]*\]/);
-      if (!jsonMatch) {
-        console.error('[PRD-Epics] No JSON found in response');
-        return;
-      }
-
-      const parsed = JSON.parse(jsonMatch[0]) as Array<{ title: string; description: string }>;
-
-      const newEpics: EpicData[] = parsed.map((item, index) => ({
-        id: `epic-${Date.now()}-${index}`,
-        sequence_order: index + 1,
-        title: item.title,
-        description: item.description,
-        storiesCount: 0,
-        status: 'pending' as const,
-      }));
-
-      setEpics(newEpics);
-      await onUpdateEpics(newEpics);
-    } catch (err) {
-      console.error('[PRD-Epics] Failed to generate epics:', err);
     }
-  }, [prdDocument, generate, onUpdateEpics]);
+  }, [project]);
+
+  // Mock generate epics (would use AI in real implementation)
+  const handleGenerateEpics = useCallback(async () => {
+    setIsGenerating(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    const mockEpics: EpicData[] = [
+      {
+        id: 'epic-1',
+        sequence_order: 1,
+        title: 'Fundação e Autenticação',
+        description: 'Setup inicial do projeto, autenticação de usuários e estrutura base.',
+        storiesCount: 3,
+        status: 'pending',
+        stories: ['Configurar ambiente', 'Implementar login', 'Implementar registro'],
+      },
+      {
+        id: 'epic-2',
+        sequence_order: 2,
+        title: 'Dashboard Principal',
+        description: 'Tela principal com métricas, gráficos e visão geral do sistema.',
+        storiesCount: 4,
+        status: 'pending',
+        stories: ['Layout do dashboard', 'Componentes de métricas', 'Gráficos', 'Filtros'],
+      },
+      {
+        id: 'epic-3',
+        sequence_order: 3,
+        title: 'Gestão de Dados',
+        description: 'CRUD completo para as entidades principais do sistema.',
+        storiesCount: 5,
+        status: 'pending',
+        stories: ['Listagem', 'Criação', 'Edição', 'Exclusão', 'Busca'],
+      },
+    ];
+
+    setEpics(mockEpics);
+    setOpenEpics([mockEpics[0].id]);
+    await updateProject({ epics: mockEpics });
+    setIsGenerating(false);
+  }, [updateProject]);
 
   // Add new epic
-  const handleAddEpic = useCallback(
-    async (title: string, description: string) => {
-      const newEpic: EpicData = {
-        id: `epic-${Date.now()}`,
-        sequence_order: epics.length + 1,
-        title,
-        description,
-        storiesCount: 0,
-        status: 'pending',
-      };
-
-      const updated = [...epics, newEpic];
-      setEpics(updated);
-      await onUpdateEpics(updated);
-    },
-    [epics, onUpdateEpics]
-  );
+  const handleAddEpic = useCallback(() => {
+    const newEpic: EpicData = {
+      id: `epic-${Date.now()}`,
+      sequence_order: epics.length + 1,
+      title: 'Novo Épico',
+      description: 'Descrição do épico...',
+      storiesCount: 0,
+      status: 'pending',
+      stories: [],
+    };
+    const updated = [...epics, newEpic];
+    setEpics(updated);
+    setOpenEpics([newEpic.id]);
+    updateProject({ epics: updated });
+  }, [epics, updateProject]);
 
   // Edit epic
   const handleEditEpic = useCallback(
-    async (id: string, title: string, description: string) => {
+    (id: string, title: string, description: string) => {
       const updated = epics.map((e) => (e.id === id ? { ...e, title, description } : e));
       setEpics(updated);
-      setEditingId(null);
-      await onUpdateEpics(updated);
+      updateProject({ epics: updated });
     },
-    [epics, onUpdateEpics]
+    [epics, updateProject]
   );
 
   // Delete epic
   const handleDeleteEpic = useCallback(
-    async (id: string) => {
-      const filtered = epics.filter((e) => e.id !== id);
-      const reordered = filtered.map((e, i) => ({
-        ...e,
-        sequence_order: i + 1,
-      }));
-      setEpics(reordered);
+    (id: string) => {
+      const updated = epics.filter((e) => e.id !== id);
+      setEpics(updated);
       setShowDeleteConfirm(null);
-      await onUpdateEpics(reordered);
+      updateProject({ epics: updated });
     },
-    [epics, onUpdateEpics]
+    [epics, updateProject]
   );
 
+  // Add story to epic
+  const handleAddStory = useCallback(
+    (epicId: string, storyTitle: string) => {
+      const updated = epics.map((e) =>
+        e.id === epicId
+          ? {
+              ...e,
+              stories: [...(e.stories || []), storyTitle],
+              storiesCount: (e.storiesCount || 0) + 1,
+            }
+          : e
+      );
+      setEpics(updated);
+      updateProject({ epics: updated });
+    },
+    [epics, updateProject]
+  );
+
+  // Advance to stories
+  const handleAdvance = useCallback(async () => {
+    if (epics.length === 0) return;
+    setIsAdvancing(true);
+    const success = await advancePhase();
+    if (success) {
+      navigate(`/prd/${slug}/stories`);
+    }
+    setIsAdvancing(false);
+  }, [epics, advancePhase, navigate, slug]);
+
+  // Loading state
+  if (loading) {
+    return <LoadingState setSection={setSection} />;
+  }
+
+  // Wrong phase redirect
+  if (project && project.status !== 'epics') {
+    const status = project.status as PRDStatus;
+    const phaseRoutes: Record<string, string> = {
+      upload: `/prd/${slug}`,
+      brief: `/prd/${slug}/brief`,
+      prd: `/prd/${slug}/prd`,
+      epics: `/prd/${slug}/epicos`,
+      stories: `/prd/${slug}/stories`,
+      exported: `/prd/${slug}/exportar`,
+      completed: `/prd/${slug}/exportar`,
+    };
+    navigate(phaseRoutes[status] || `/prd/${slug}`, { replace: true });
+    return null;
+  }
+
+  const hasEpics = epics.length > 0;
+  const totalStories = epics.reduce((sum, e) => sum + (e.storiesCount || 0), 0);
+
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex min-h-screen animate-fade-in flex-col bg-background font-sans text-foreground">
       {/* Header */}
-      <header className="border-b bg-background p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Badge className={cn(PRD_STATUS.epics.bg, PRD_STATUS.epics.text)}>Épicos</Badge>
-            <PRDEffortIndicator human={30} ai={70} size="md" />
+      <header className="sticky top-0 z-40 border-b border-border bg-card/50 backdrop-blur-sm">
+        <div className="container py-4">
+          {/* Breadcrumbs + Effort Badge */}
+          <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span
+                className="cursor-pointer hover:text-foreground"
+                onClick={() => navigate('/prd')}
+              >
+                Projetos
+              </span>
+              <Icon name="nav-arrow-right" size="size-3" />
+              <span
+                className="cursor-pointer hover:text-foreground"
+                onClick={() => navigate(`/prd/${slug}/prd`)}
+              >
+                PRD
+              </span>
+              <Icon name="nav-arrow-right" size="size-3" />
+              <span className="font-medium text-foreground">Plano de Execução</span>
+            </div>
+            <Badge
+              variant="outline"
+              className="border-[var(--studio-teal)]/30 bg-[var(--studio-teal)]/5 w-fit text-[var(--studio-teal)]"
+              style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
+            >
+              30% Você · 70% IA
+            </Badge>
           </div>
-          <div className="flex items-center gap-2">
-            {hasEpics && pendingEpics > 0 && (
-              <Button variant="outline" size="sm" onClick={onGenerateAllStories}>
-                <Icon name="sparkles" className="mr-1.5 size-4" />
-                Gerar Todas Stories ({pendingEpics})
-              </Button>
-            )}
-          </div>
+
+          {/* Pipeline Stepper */}
+          <PipelineStepper />
         </div>
       </header>
 
-      {/* Content */}
-      <main className="flex-1 overflow-auto p-6">
+      {/* Main Content */}
+      <main className="container mx-auto max-w-4xl flex-1 py-8">
         {!hasEpics && !isGenerating ? (
+          /* Empty State - Generate */
           <Card className="mx-auto max-w-xl p-12 text-center">
             <div
-              className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: `${PRD_PRIMARY}20` }}
+              className="mx-auto mb-4 flex size-20 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: `${STUDIO_TEAL}20` }}
             >
-              <Icon name="milestone" size="size-8" style={{ color: PRD_PRIMARY }} />
+              <Icon name="sitemap" size="size-10" style={{ color: STUDIO_TEAL }} />
             </div>
-            <h3 className="mb-2 text-lg font-bold">Gerar Épicos</h3>
-            <p className="mb-6 text-muted-foreground">
-              A IA vai analisar o PRD e dividir o projeto em épicos lógicos
+            <h3 className="mb-2 text-xl font-bold">Quebrar PRD em Épicos</h3>
+            <p className="mb-6 font-serif text-muted-foreground">
+              A IA vai analisar seu PRD e dividir o projeto em blocos de entrega lógicos.
             </p>
             <Button
+              size="lg"
               onClick={handleGenerateEpics}
-              style={{ backgroundColor: PRD_PRIMARY }}
-              disabled={!prdDocument}
+              className="px-8 text-white"
+              style={{ backgroundColor: STUDIO_TEAL }}
             >
-              <Icon name="sparkles" className="mr-2 size-4" />
+              <Icon name="sparkles" className="mr-2 size-5" />
               Gerar Épicos
             </Button>
-            {!prdDocument && (
-              <p className="mt-4 text-xs text-destructive">Complete o PRD antes de gerar épicos</p>
-            )}
           </Card>
-        ) : isGenerating && !hasEpics ? (
+        ) : isGenerating ? (
+          /* Loading State */
           <Card className="mx-auto max-w-xl p-12 text-center">
-            <Icon
-              name="spinner"
-              className="mx-auto mb-4 size-12 animate-spin"
-              style={{ color: PRD_PRIMARY }}
-            />
-            <h3 className="mb-2 text-lg font-bold">Gerando Épicos...</h3>
-            <p className="text-muted-foreground">Analisando o PRD e criando blocos de trabalho</p>
-            {progress > 0 && (
-              <div className="mx-auto mt-4 h-1.5 w-48 overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%`, backgroundColor: PRD_PRIMARY }}
-                />
-              </div>
-            )}
+            <div className="mx-auto mb-4 flex size-20 items-center justify-center">
+              <Icon
+                name="brain"
+                size="size-12"
+                className="animate-pulse"
+                style={{ color: STUDIO_TEAL }}
+              />
+            </div>
+            <h3 className="mb-2 text-xl font-bold">Quebrando PRD em átomos...</h3>
+            <p className="text-muted-foreground">
+              Analisando requisitos e criando blocos de trabalho
+            </p>
+            <div className="mx-auto mt-6 h-2 w-48 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full animate-pulse rounded-full"
+                style={{ width: '60%', backgroundColor: STUDIO_TEAL }}
+              />
+            </div>
           </Card>
         ) : (
-          <div className="mx-auto max-w-3xl space-y-4">
-            <div className="mb-6 flex items-center justify-between">
+          /* Epics List */
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold">Épicos do Projeto</h2>
-                <p className="text-sm text-muted-foreground">
-                  {epics.length} épico{epics.length !== 1 ? 's' : ''} • {pendingEpics} pendente
-                  {pendingEpics !== 1 ? 's' : ''} • Arraste para reordenar
+                <h2 className="text-2xl font-bold">Plano de Execução</h2>
+                <p className="text-muted-foreground">
+                  {epics.length} épicos · {totalStories} stories previstas
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleGenerateEpics}
-                disabled={isGenerating}
-              >
-                <Icon
-                  name="refresh"
-                  className={cn('mr-1.5 size-4', isGenerating && 'animate-spin')}
-                />
+              <Button variant="outline" onClick={handleGenerateEpics} disabled={isGenerating}>
+                <Icon name="refresh" className="mr-2 size-4" />
                 Regenerar
               </Button>
             </div>
 
-            {/* Sortable Epic Cards */}
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
+            {/* Accordion List */}
+            <Accordion
+              type="multiple"
+              value={openEpics}
+              onValueChange={setOpenEpics}
+              className="space-y-4"
             >
-              <SortableContext
-                items={epics.map((e) => e.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-4">
-                  {epics.map((epic) => (
-                    <SortableEpicCard
-                      key={epic.id}
-                      epic={epic}
-                      isEditing={editingId === epic.id}
-                      onEdit={() => setEditingId(epic.id)}
-                      onSave={(title, description) => handleEditEpic(epic.id, title, description)}
-                      onCancel={() => setEditingId(null)}
-                      onDelete={() => setShowDeleteConfirm(epic.id)}
-                      onGenerateStories={() => onGenerateStories(epic.id)}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
+              {epics.map((epic, i) => (
+                <EpicItem
+                  key={epic.id}
+                  epic={epic}
+                  index={i}
+                  onEdit={handleEditEpic}
+                  onDelete={(id) => setShowDeleteConfirm(id)}
+                  onAddStory={handleAddStory}
+                />
+              ))}
+            </Accordion>
 
-            {/* Add Epic */}
-            <AddEpicCard onAdd={handleAddEpic} />
+            {/* Add Epic Button */}
+            <button
+              onClick={handleAddEpic}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted-foreground/30 p-6 text-muted-foreground transition-colors hover:border-[var(--studio-teal)] hover:text-foreground"
+              style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
+            >
+              <Icon name="plus" className="size-5" />
+              Adicionar Épico
+            </button>
+
+            {/* Navigation */}
+            <div className="flex items-center justify-between border-t border-border pt-8">
+              <Button variant="outline" onClick={() => navigate(`/prd/${slug}/prd`)}>
+                <Icon name="arrow-left" className="mr-2 size-4" />
+                Voltar ao PRD
+              </Button>
+
+              <Button
+                size="lg"
+                onClick={handleAdvance}
+                disabled={epics.length === 0 || isAdvancing}
+                className="px-8 text-white"
+                style={{ backgroundColor: epics.length > 0 ? STUDIO_TEAL : undefined }}
+              >
+                {isAdvancing ? (
+                  <>
+                    <Icon name="refresh" className="mr-2 size-4 animate-spin" />
+                    Processando...
+                  </>
+                ) : (
+                  <>
+                    Validar e Gerar Stories
+                    <Icon name="arrow-right" className="ml-2 size-4" />
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         )}
       </main>
 
-      {/* Footer Navigation */}
-      {hasEpics && (
-        <footer className="border-t bg-background p-4">
-          <div className="mx-auto flex max-w-3xl items-center justify-between">
-            <div className="text-sm text-muted-foreground">
-              {allStoriesGenerated ? (
-                <span className="text-emerald-500">
-                  <Icon name="check-circle" className="mr-1.5 inline size-4" />
-                  Todas as stories geradas
-                </span>
-              ) : (
-                <span>Gere as stories para cada épico antes de avançar</span>
-              )}
-            </div>
-            <Button
-              onClick={onNext}
-              disabled={!allStoriesGenerated}
-              style={{ backgroundColor: allStoriesGenerated ? PRD_PRIMARY : undefined }}
-            >
-              Avançar para Stories
-              <Icon name="arrow-right" className="ml-2 size-4" />
-            </Button>
-          </div>
-        </footer>
-      )}
-
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!showDeleteConfirm} onOpenChange={() => setShowDeleteConfirm(null)}>
-        <DialogContent onClose={() => setShowDeleteConfirm(null)}>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Deletar Épico?</DialogTitle>
           </DialogHeader>
