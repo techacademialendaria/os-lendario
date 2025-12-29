@@ -1,32 +1,35 @@
-// @ts-nocheck
 import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Section } from '../../../types';
-import { PRDStatus, PRDDocument, PRDSection, PRDSectionStatus } from '../../../types/prd';
+import { PRDStatus } from '../../../types/prd';
 import { usePRDProject } from '../../../hooks/prd/usePRDProject';
-import { usePRDAI } from '../../../hooks/prd/usePRDAI';
-import { PRD_PRIMARY, PRD_EFFORT, PRD_STATUS } from '../prd-tokens';
 import PRDTopbar from '../PRDTopbar';
 
-// Shared Studio Components
-import {
-  StudioLayout,
-  StudioHeader,
-  StudioContent,
-  StudioSidebar,
-  StudioSectionNav,
-  StudioTwoColumn,
-  type PipelineStep,
-  type SectionItem,
-} from '../../studio';
-
-import { Card } from '../../ui/card';
 import { Button } from '../../ui/button';
 import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
-import { Textarea } from '../../ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
+import { AutosizeTextarea } from '../../ui/autosize-textarea';
+import { Input } from '../../ui/input';
+import { ScrollArea } from '../../ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../ui/tabs';
+import { FileUpload } from '../../ui/file-upload';
 import { cn } from '../../../lib/utils';
+
+// =============================================================================
+// CONSTANTS
+// =============================================================================
+
+const STUDIO_TEAL = '#00C7BE';
+
+const PIPELINE_STEPS = [
+  { id: 'upload', label: 'Upload', status: 'done' as const },
+  { id: 'brief', label: 'Brief', status: 'done' as const },
+  { id: 'prd', label: 'PRD', status: 'active' as const },
+  { id: 'epics', label: 'Épicos', status: 'pending' as const },
+  { id: 'stories', label: 'Stories', status: 'pending' as const },
+  { id: 'export', label: 'Export', status: 'pending' as const },
+];
 
 // =============================================================================
 // TYPES
@@ -36,111 +39,39 @@ interface PRDDocumentTemplateProps {
   setSection: (section: Section) => void;
 }
 
-type SectionKey = keyof PRDDocument;
-
-// =============================================================================
-// CONSTANTS
-// =============================================================================
-
-const PRD_SECTIONS: SectionItem[] = [
-  { id: 'objectives', key: 'objectives', title: 'Objetivos', icon: 'bullseye' },
-  { id: 'scope', key: 'scope', title: 'Escopo', icon: 'box' },
-  { id: 'userStories', key: 'userStories', title: 'User Stories', icon: 'users' },
-  { id: 'designDecisions', key: 'designDecisions', title: 'Decisões de Design', icon: 'palette' },
-  { id: 'requirements', key: 'requirements', title: 'Requisitos', icon: 'list-check' },
-  { id: 'architecture', key: 'architecture', title: 'Arquitetura', icon: 'sitemap' },
-];
-
-const EMPTY_SECTION: PRDSection = {
-  content: '',
-  status: 'incomplete',
-  lineCount: 0,
-};
-
-const EMPTY_DOCUMENT: PRDDocument = {
-  objectives: { ...EMPTY_SECTION },
-  scope: { ...EMPTY_SECTION },
-  userStories: { ...EMPTY_SECTION },
-  designDecisions: { ...EMPTY_SECTION },
-  requirements: { ...EMPTY_SECTION },
-  architecture: { ...EMPTY_SECTION },
-};
-
-const STATUS_CONFIG: Record<PRDSectionStatus, { label: string; color: string; icon: string }> = {
-  incomplete: { label: 'Incompleto', color: 'text-muted-foreground', icon: 'circle' },
-  reviewing: { label: 'Em Revisão', color: 'text-amber-500', icon: 'clock' },
-  approved: { label: 'Aprovado', color: 'text-emerald-500', icon: 'check-circle' },
-};
-
-const PRD_PIPELINE: PipelineStep[] = [
-  { key: 'upload', label: 'Upload', icon: 'upload', status: 'complete' },
-  { key: 'brief', label: 'Brief', icon: 'file-text', status: 'complete' },
-  { key: 'prd', label: 'PRD', icon: 'clipboard-list', status: 'current' },
-  { key: 'epics', label: 'Épicos', icon: 'milestone', status: 'pending' },
-  { key: 'stories', label: 'Stories', icon: 'list-checks', status: 'pending' },
-  { key: 'export', label: 'Exportar', icon: 'download', status: 'pending' },
-];
-
-// =============================================================================
-// PROMPTS
-// =============================================================================
-
-const PRD_SYSTEM = `Você é um product manager experiente criando PRDs (Product Requirements Documents) detalhados.
-Escreva cada seção de forma clara, objetiva e acionável.
-Use listas e formatação quando apropriado.`;
-
-const PRD_PROMPT = `Gere um PRD completo baseado no seguinte brief:
-
-PROBLEMA:
-{problem}
-
-SOLUÇÃO:
-{solution}
-
-PÚBLICO-ALVO:
-{targetAudience}
-
-DIFERENCIAIS:
-{differentials}
-
-MÉTRICAS DE SUCESSO:
-{successMetrics}
-
----
-
-Gere o PRD completo com as seguintes seções (em JSON):
-{
-  "objectives": "Objetivos claros e mensuráveis do projeto...",
-  "scope": "Escopo do projeto incluindo o que está dentro e fora...",
-  "userStories": "User stories no formato 'Como [persona], quero [ação], para [benefício]'...",
-  "designDecisions": "Decisões de design, fluxos de usuário, padrões visuais...",
-  "requirements": "Requisitos funcionais e não-funcionais detalhados...",
-  "architecture": "Arquitetura técnica, stack, integrações..."
+interface Requirement {
+  id: string;
+  text: string;
+  status: 'pending' | 'approved' | 'rejected';
+  category: 'must' | 'should' | 'nice';
 }
 
-Cada seção deve ter 3-5 parágrafos detalhados.`;
+interface TechStack {
+  frontend: string;
+  backend: string;
+  ai: string;
+  hosting: string;
+}
 
 // =============================================================================
 // SUB-COMPONENTS
 // =============================================================================
 
 const LoadingState: React.FC<{ setSection: (s: Section) => void }> = ({ setSection }) => (
-  <StudioLayout
-    topbar={<PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />}
-  >
+  <div className="flex min-h-screen flex-col bg-background">
+    <PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />
     <div className="flex flex-1 items-center justify-center">
       <div className="space-y-4 text-center">
-        <Icon name="spinner" className="mx-auto size-8 animate-spin text-muted-foreground" />
+        <Icon name="refresh" className="mx-auto size-8 animate-spin text-muted-foreground" />
         <p className="text-muted-foreground">Carregando projeto...</p>
       </div>
     </div>
-  </StudioLayout>
+  </div>
 );
 
 const NotFoundState: React.FC<{ setSection: (s: Section) => void }> = ({ setSection }) => (
-  <StudioLayout
-    topbar={<PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />}
-  >
+  <div className="flex min-h-screen flex-col bg-background">
+    <PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />
     <div className="flex flex-1 items-center justify-center">
       <div className="space-y-4 text-center">
         <Icon name="folder-open" size="size-16" className="mx-auto text-muted-foreground/30" />
@@ -152,8 +83,141 @@ const NotFoundState: React.FC<{ setSection: (s: Section) => void }> = ({ setSect
         </Button>
       </div>
     </div>
-  </StudioLayout>
+  </div>
 );
+
+// Pipeline Stepper Component
+const PipelineStepper: React.FC = () => (
+  <div className="relative mx-auto flex max-w-3xl items-center justify-between">
+    <div className="absolute left-0 top-1/2 -z-10 h-0.5 w-full bg-muted" />
+    {PIPELINE_STEPS.map((step, i) => (
+      <div
+        key={step.id}
+        className="z-10 flex flex-col items-center gap-2 rounded-full bg-background px-2"
+      >
+        <div
+          className={cn(
+            'flex size-8 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors',
+            step.status === 'active'
+              ? 'border-[var(--studio-teal)] bg-[var(--studio-teal)] text-white shadow-lg'
+              : step.status === 'done'
+                ? 'border-[var(--studio-teal)] bg-card text-[var(--studio-teal)]'
+                : 'border-border bg-card text-muted-foreground'
+          )}
+          style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
+        >
+          {step.status === 'done' ? <Icon name="check" size="size-3" /> : i + 1}
+        </div>
+        <span
+          className={cn(
+            'hidden text-[10px] font-bold uppercase tracking-wider sm:block',
+            step.status === 'active' ? 'text-[var(--studio-teal)]' : 'text-muted-foreground'
+          )}
+          style={step.status === 'active' ? { color: STUDIO_TEAL } : {}}
+        >
+          {step.label}
+        </span>
+      </div>
+    ))}
+  </div>
+);
+
+// Requirement Card Component
+const RequirementCard: React.FC<{
+  req: Requirement;
+  onApprove: () => void;
+  onReject: () => void;
+  onUndo: () => void;
+}> = ({ req, onApprove, onReject, onUndo }) => {
+  const categoryConfig = {
+    must: { label: 'Must Have', color: 'bg-red-500/10 text-red-600 border-red-500/20' },
+    should: { label: 'Should Have', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
+    nice: { label: 'Nice to Have', color: 'bg-green-500/10 text-green-600 border-green-500/20' },
+  };
+
+  const cat = categoryConfig[req.category];
+
+  return (
+    <Card
+      className={cn(
+        'border-l-4 transition-all duration-300',
+        req.status === 'pending'
+          ? 'border-l-blue-500 shadow-sm'
+          : req.status === 'approved'
+            ? 'border-l-green-500 bg-muted/20 opacity-60'
+            : 'border-l-red-500 bg-muted/20 opacity-40'
+      )}
+    >
+      <CardContent className="flex items-start gap-4 p-4">
+        <div className="flex-1 space-y-1">
+          <div className="mb-1 flex items-center gap-2">
+            <Badge variant="secondary" className={cn('h-5 text-[10px]', cat.color)}>
+              {cat.label}
+            </Badge>
+            {req.status === 'approved' && (
+              <span className="flex items-center gap-1 text-xs font-bold text-green-600">
+                <Icon name="check" size="size-3" /> Aprovado
+              </span>
+            )}
+            {req.status === 'rejected' && (
+              <span className="flex items-center gap-1 text-xs font-bold text-red-600">
+                <Icon name="xmark" size="size-3" /> Rejeitado
+              </span>
+            )}
+          </div>
+          <p
+            className={cn(
+              'text-sm font-medium leading-snug',
+              req.status === 'rejected' && 'line-through'
+            )}
+          >
+            {req.text}
+          </p>
+        </div>
+
+        {req.status === 'pending' ? (
+          <div className="flex shrink-0 gap-2">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-8 text-green-600 hover:bg-green-100 hover:text-green-700"
+              onClick={onApprove}
+              title="Aprovar"
+            >
+              <Icon name="check" size="size-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-8 text-muted-foreground hover:text-foreground"
+              title="Editar"
+            >
+              <Icon name="edit-pencil" size="size-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-8 text-red-600 hover:bg-red-100 hover:text-red-700"
+              onClick={onReject}
+              title="Rejeitar"
+            >
+              <Icon name="xmark" size="size-4" />
+            </Button>
+          </div>
+        ) : (
+          <Button
+            size="icon"
+            variant="ghost"
+            className="size-8 text-muted-foreground"
+            onClick={onUndo}
+          >
+            <Icon name="undo" size="size-3" />
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
 
 // =============================================================================
 // MAIN COMPONENT
@@ -163,235 +227,167 @@ export const PRDDocumentTemplate: React.FC<PRDDocumentTemplateProps> = ({ setSec
   const navigate = useNavigate();
   const { slug } = useParams<{ slug: string }>();
   const { project, loading, updateProject, advancePhase } = usePRDProject(slug || '');
-  const { generate, isGenerating, progress } = usePRDAI();
 
   // Local state
-  const [document, setDocument] = useState<PRDDocument>(EMPTY_DOCUMENT);
-  const [activeSection, setActiveSection] = useState<SectionKey>('objectives');
-  const [regeneratingSection, setRegeneratingSection] = useState<SectionKey | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState('design');
   const [isAdvancing, setIsAdvancing] = useState(false);
 
-  // Initialize document from project
+  // Design tab state
+  const [screens, setScreens] = useState('');
+  const [vibe, setVibe] = useState('');
+
+  // Requirements state (mock - would be from project metadata)
+  const [requirements, setRequirements] = useState<Requirement[]>([
+    { id: 'req1', text: 'Login social com Google e Apple.', status: 'pending', category: 'must' },
+    {
+      id: 'req2',
+      text: 'Dashboard inicial com métricas de vendas e gráficos.',
+      status: 'pending',
+      category: 'must',
+    },
+    { id: 'req3', text: 'Sistema de gamificação com badges.', status: 'pending', category: 'nice' },
+    {
+      id: 'req4',
+      text: 'Exportação de relatórios em PDF e CSV.',
+      status: 'pending',
+      category: 'should',
+    },
+    { id: 'req5', text: 'Modo escuro automático.', status: 'pending', category: 'should' },
+  ]);
+
+  // Tech stack state
+  const [techStack, setTechStack] = useState<TechStack>({
+    frontend: 'React + Vite + Tailwind',
+    backend: 'Supabase (Postgres + Auth)',
+    ai: 'OpenAI API (GPT-4o)',
+    hosting: 'Vercel',
+  });
+
+  const [scopeLimits, setScopeLimits] = useState(
+    '- Não teremos app nativo (apenas PWA)\n- Sem suporte a múltiplos idiomas no MVP\n- Pagamentos apenas via Stripe inicialmente'
+  );
+
+  // Initialize from project
   React.useEffect(() => {
-    if (project?.project_metadata?.prdDocument?.document) {
-      setDocument(project.project_metadata.prdDocument.document);
+    if (project?.project_metadata?.prdDocument) {
+      // Load existing data if available
+      const prdDoc = project.project_metadata.prdDocument;
+      if (prdDoc.requirements) {
+        setRequirements(prdDoc.requirements);
+      }
+      if (prdDoc.techStack) {
+        setTechStack(prdDoc.techStack);
+      }
     }
   }, [project]);
 
-  const brief = project?.project_metadata?.brief?.structure;
+  // Computed
+  const brief = project?.project_metadata?.brief;
+  const pendingCount = requirements.filter((r) => r.status === 'pending').length;
+  const approvedCount = requirements.filter((r) => r.status === 'approved').length;
+  const allCriticalReviewed = requirements
+    .filter((r) => r.category === 'must')
+    .every((r) => r.status !== 'pending');
 
-  // Calculate progress
-  const sectionsWithStatus = useMemo((): SectionItem[] => {
-    return PRD_SECTIONS.map((section) => ({
-      ...section,
-      isComplete: document[section.key as SectionKey]?.status === 'approved',
-    }));
-  }, [document]);
+  // Generate live preview markdown
+  const generatePreview = useMemo(() => {
+    return `# Especificação Técnica: ${project?.name || 'Projeto'}
 
-  const totalLines = useMemo(() => {
-    return PRD_SECTIONS.reduce(
-      (sum, s) => sum + (document[s.key as SectionKey]?.lineCount || 0),
-      0
-    );
-  }, [document]);
+**Status:** Draft | **Autor:** Alan Nicolas
 
-  const allApproved = useMemo(() => {
-    return PRD_SECTIONS.every((s) => document[s.key as SectionKey]?.status === 'approved');
-  }, [document]);
+---
 
-  const hasContent = useMemo(() => {
-    return PRD_SECTIONS.some((s) => document[s.key as SectionKey]?.content?.trim());
-  }, [document]);
+## 1. Visão Geral
+${brief?.superProblem || brief?.structure?.problem || 'Não definido'}
 
-  const approvedCount = sectionsWithStatus.filter((s) => s.isComplete).length;
-  const progressPercent = Math.round((approvedCount / PRD_SECTIONS.length) * 100);
+## 2. Solução
+${brief?.solution || brief?.structure?.solution || 'Não definido'}
 
-  // Helper to create section
-  const createSection = useCallback(
-    (content: string): PRDSection => ({
-      content,
-      status: content.trim() ? 'reviewing' : 'incomplete',
-      lineCount: content.split('\n').length,
-      lastModified: new Date().toISOString(),
-    }),
+## 3. Requisitos Funcionais
+${
+  requirements
+    .filter((r) => r.status === 'approved')
+    .map((r) => `- [x] ${r.text} (${r.category.toUpperCase()})`)
+    .join('\n') || '- Nenhum aprovado ainda'
+}
+
+${requirements
+  .filter((r) => r.status === 'pending')
+  .map((r) => `- [ ] ${r.text}`)
+  .join('\n')}
+
+## 4. Stack Tecnológico
+- **Frontend:** ${techStack.frontend}
+- **Backend:** ${techStack.backend}
+- **AI:** ${techStack.ai}
+- **Hosting:** ${techStack.hosting}
+
+## 5. Limites de Escopo
+${scopeLimits}
+`;
+  }, [project, brief, requirements, techStack, scopeLimits]);
+
+  // Handlers
+  const handleRequirementAction = useCallback(
+    (id: string, action: 'approve' | 'reject' | 'undo') => {
+      setRequirements((prev) =>
+        prev.map((req) =>
+          req.id === id
+            ? {
+                ...req,
+                status:
+                  action === 'undo' ? 'pending' : action === 'approve' ? 'approved' : 'rejected',
+              }
+            : req
+        )
+      );
+    },
     []
   );
 
-  // Save document
-  const handleSaveDocument = useCallback(
-    async (doc: PRDDocument) => {
-      if (!project) return;
-      setIsSaving(true);
-      await updateProject({
-        prdDocument: {
-          ...project.project_metadata?.prdDocument,
-          document: doc,
-          lineCount: PRD_SECTIONS.reduce(
-            (sum, s) => sum + (doc[s.key as SectionKey]?.lineCount || 0),
-            0
-          ),
-        },
-      });
-      setIsSaving(false);
-      setLastSaved(new Date());
-    },
-    [project, updateProject]
-  );
-
-  // Generate full PRD
-  const handleGeneratePRD = useCallback(async () => {
-    if (!brief) return;
-
-    try {
-      const prompt = PRD_PROMPT.replace('{problem}', brief.problem)
-        .replace('{solution}', brief.solution)
-        .replace('{targetAudience}', brief.targetAudience)
-        .replace('{differentials}', brief.differentials.join('\n- '))
-        .replace('{successMetrics}', brief.successMetrics.join('\n- '));
-
-      const result = await generate(prompt, {
-        systemPrompt: PRD_SYSTEM,
-        temperature: 0.7,
-        maxTokens: 8192,
-      });
-
-      let parsed: Record<string, string>;
-      try {
-        const jsonMatch = result.content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          parsed = JSON.parse(jsonMatch[0]);
-        } else {
-          throw new Error('No JSON found');
-        }
-      } catch {
-        console.error('Failed to parse PRD response');
-        return;
-      }
-
-      const newDocument: PRDDocument = {
-        objectives: createSection(parsed.objectives || ''),
-        scope: createSection(parsed.scope || ''),
-        userStories: createSection(parsed.userStories || ''),
-        designDecisions: createSection(parsed.designDecisions || ''),
-        requirements: createSection(parsed.requirements || ''),
-        architecture: createSection(parsed.architecture || ''),
-      };
-
-      setDocument(newDocument);
-      await handleSaveDocument(newDocument);
-    } catch (err) {
-      console.error('Failed to generate PRD:', err);
-    }
-  }, [brief, generate, createSection, handleSaveDocument]);
-
-  // Update section content
-  const handleUpdateSection = useCallback(
-    async (content: string) => {
-      const updated = {
-        ...document,
-        [activeSection]: {
-          ...document[activeSection],
-          content,
-          lineCount: content.split('\n').length,
-          lastModified: new Date().toISOString(),
-        },
-      };
-      setDocument(updated);
-      await handleSaveDocument(updated);
-    },
-    [document, activeSection, handleSaveDocument]
-  );
-
-  // Update section status
-  const handleStatusChange = useCallback(
-    async (status: PRDSectionStatus) => {
-      const updated = {
-        ...document,
-        [activeSection]: {
-          ...document[activeSection],
-          status,
-          lastModified: new Date().toISOString(),
-        },
-      };
-      setDocument(updated);
-      await handleSaveDocument(updated);
-    },
-    [document, activeSection, handleSaveDocument]
-  );
-
-  // Regenerate section
-  const handleRegenerateSection = useCallback(async () => {
-    if (!brief) return;
-
-    setRegeneratingSection(activeSection);
-    try {
-      const sectionConfig = PRD_SECTIONS.find((s) => s.key === activeSection);
-      const prompt = `Reescreva a seção "${sectionConfig?.title}" do PRD de forma mais detalhada.
-
-Contexto do projeto:
-Problema: ${brief.problem}
-Solução: ${brief.solution}
-
-Conteúdo atual:
-${document[activeSection]?.content || 'Vazio'}
-
-Escreva uma versão melhorada e mais completa desta seção.`;
-
-      const result = await generate(prompt, {
-        systemPrompt: PRD_SYSTEM,
-        temperature: 0.8,
-        maxTokens: 2048,
-      });
-
-      const updated = {
-        ...document,
-        [activeSection]: createSection(result.content),
-      };
-      setDocument(updated);
-      await handleSaveDocument(updated);
-    } catch (err) {
-      console.error('Failed to regenerate section:', err);
-    } finally {
-      setRegeneratingSection(null);
-    }
-  }, [brief, document, activeSection, generate, createSection, handleSaveDocument]);
-
-  // Navigation
-  const handleSectionClick = useCallback((sectionId: string | number) => {
-    setActiveSection(sectionId as SectionKey);
-  }, []);
-
-  const handlePipelineClick = useCallback(
-    (stepKey: string) => {
-      const routes: Record<string, string> = {
-        upload: `/prd/${slug}`,
-        brief: `/prd/${slug}/brief`,
-        prd: `/prd/${slug}/prd`,
-        epics: `/prd/${slug}/epicos`,
-        stories: `/prd/${slug}/stories`,
-        export: `/prd/${slug}/exportar`,
-      };
-      if (routes[stepKey]) {
-        navigate(routes[stepKey]);
-      }
-    },
-    [navigate, slug]
-  );
-
-  const handleAdvanceToEpics = useCallback(async () => {
-    if (!project || !allApproved) return;
+  const handleFinish = useCallback(async () => {
+    if (pendingCount > 0) return;
 
     setIsAdvancing(true);
-    const success = await advancePhase();
-    setIsAdvancing(false);
 
+    // Save PRD document
+    await updateProject({
+      prdDocument: {
+        requirements,
+        techStack,
+        scopeLimits,
+        screens,
+        vibe,
+      },
+    });
+
+    const success = await advancePhase();
     if (success) {
       navigate(`/prd/${slug}/epicos`);
     }
-  }, [project, allApproved, advancePhase, navigate, slug]);
+    setIsAdvancing(false);
+  }, [
+    pendingCount,
+    updateProject,
+    requirements,
+    techStack,
+    scopeLimits,
+    screens,
+    vibe,
+    advancePhase,
+    navigate,
+    slug,
+  ]);
+
+  const handleDownload = useCallback(() => {
+    const element = document.createElement('a');
+    const file = new Blob([generatePreview], { type: 'text/markdown' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'prd.md';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }, [generatePreview]);
 
   // Loading state
   if (loading) {
@@ -406,313 +402,316 @@ Escreva uma versão melhorada e mais completa desta seção.`;
   // Wrong phase redirect
   if (project.status !== 'prd') {
     const status = project.status as PRDStatus;
+    const phaseRoutes: Record<string, string> = {
+      upload: `/prd/${slug}`,
+      brief: `/prd/${slug}/brief`,
+      prd: `/prd/${slug}/prd`,
+      epics: `/prd/${slug}/epicos`,
+      stories: `/prd/${slug}/stories`,
+      exported: `/prd/${slug}/exportar`,
+      completed: `/prd/${slug}/exportar`,
+    };
+
     return (
-      <StudioLayout
-        topbar={<PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />}
-      >
+      <div className="flex min-h-screen flex-col bg-background">
+        <PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-4 text-center">
-            <Badge className={cn(PRD_STATUS[status]?.bg, PRD_STATUS[status]?.text)}>{status}</Badge>
-            <h2 className="text-xl font-bold">
-              {['upload', 'brief'].includes(status)
-                ? 'Complete as fases anteriores'
-                : 'Fase PRD concluída'}
-            </h2>
-            <Button variant="outline" onClick={() => handlePipelineClick(status)}>
+            <Icon name="refresh" className="mx-auto size-8 animate-spin text-muted-foreground" />
+            <p className="text-muted-foreground">Redirecionando...</p>
+            <Button variant="outline" onClick={() => navigate(phaseRoutes[status] || '/prd')}>
               Ir para fase {status}
             </Button>
           </div>
         </div>
-      </StudioLayout>
+      </div>
     );
   }
 
-  const activeIndex = PRD_SECTIONS.findIndex((s) => s.key === activeSection);
-  const isFirstSection = activeIndex === 0;
-  const isLastSection = activeIndex === PRD_SECTIONS.length - 1;
-  const activeSectionData = document[activeSection] || EMPTY_SECTION;
-  const activeSectionConfig = PRD_SECTIONS.find((s) => s.key === activeSection)!;
-  const activeStatusConfig = STATUS_CONFIG[activeSectionData.status];
-
   return (
-    <StudioLayout
-      topbar={<PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />}
-      sidebar={
-        <StudioSidebar
-          title={project.name}
-          subtitle="PRD Document"
-          pipeline={PRD_PIPELINE}
-          currentStep="prd"
-          onStepClick={handlePipelineClick}
-          onBack={() => navigate('/prd')}
-          backLabel="Voltar aos Projetos"
-          showAutoSave={true}
-          lastSaved={lastSaved}
-          isSaving={isSaving}
-          primaryColor={PRD_PRIMARY}
-        />
-      }
-    >
+    <div className="flex min-h-screen animate-fade-in flex-col bg-background font-sans text-foreground">
       {/* Header */}
-      <StudioHeader
-        title="PRD Document"
-        description={`${totalLines} linhas geradas`}
-        progress={progressPercent}
-        showSave={false}
-        primaryColor={PRD_PRIMARY}
-        actions={
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPreview(true)}
-              disabled={!hasContent}
-            >
-              <Icon name="eye" className="mr-1.5 size-4" />
-              Preview
-            </Button>
+      <header className="sticky top-0 z-40 border-b border-border bg-card/50 backdrop-blur-sm">
+        <div className="container py-4">
+          {/* Breadcrumbs + Effort Badge */}
+          <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Icon name="user" size="size-3" />
-              <span>{PRD_EFFORT.prd.human}% humano</span>
-              <span className="text-muted-foreground/30">|</span>
-              <Icon name="sparkles" size="size-3" />
-              <span>{PRD_EFFORT.prd.ai}% IA</span>
+              <span
+                className="cursor-pointer hover:text-foreground"
+                onClick={() => navigate('/prd')}
+              >
+                Projetos
+              </span>
+              <Icon name="nav-arrow-right" size="size-3" />
+              <span
+                className="cursor-pointer hover:text-foreground"
+                onClick={() => navigate(`/prd/${slug}/brief`)}
+              >
+                Brief
+              </span>
+              <Icon name="nav-arrow-right" size="size-3" />
+              <span className="font-medium text-foreground">Especificação Técnica</span>
             </div>
-          </div>
-        }
-      />
-
-      {/* Content */}
-      <StudioContent maxWidth="max-w-5xl" padding="p-8">
-        {!hasContent && !isGenerating ? (
-          <Card className="p-12 text-center">
-            <div
-              className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: `${PRD_PRIMARY}20` }}
+            <Badge
+              variant="outline"
+              className="border-[var(--studio-teal)]/30 bg-[var(--studio-teal)]/5 w-fit text-[var(--studio-teal)]"
+              style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
             >
-              <Icon name="document-text" size="size-8" style={{ color: PRD_PRIMARY }} />
-            </div>
-            <h3 className="mb-2 text-lg font-bold">Gerar PRD Completo</h3>
-            <p className="mx-auto mb-6 max-w-md text-muted-foreground">
-              A IA vai gerar todas as seções do PRD baseado no brief estruturado
-            </p>
-            <Button onClick={handleGeneratePRD} style={{ backgroundColor: PRD_PRIMARY }}>
-              <Icon name="sparkles" className="mr-2 size-4" />
-              Gerar PRD
-            </Button>
-          </Card>
-        ) : isGenerating && !hasContent ? (
-          <Card className="p-12 text-center">
-            <Icon
-              name="spinner"
-              className="mx-auto mb-4 size-12 animate-spin"
-              style={{ color: PRD_PRIMARY }}
-            />
-            <h3 className="mb-2 text-lg font-bold">Gerando PRD...</h3>
-            <p className="text-muted-foreground">Criando todas as seções do documento</p>
-            {progress > 0 && (
-              <div className="mx-auto mt-4 h-1.5 w-48 overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${progress}%`, backgroundColor: PRD_PRIMARY }}
-                />
-              </div>
-            )}
-          </Card>
-        ) : (
-          <StudioTwoColumn
-            navigation={
-              <StudioSectionNav
-                title="Seções do PRD"
-                sections={sectionsWithStatus}
-                activeSection={activeSection}
-                onSectionClick={handleSectionClick}
-                showCompletedIcon={true}
-                primaryColor={PRD_PRIMARY}
-              />
-            }
-          >
-            <div className="space-y-6">
-              {/* Section Editor */}
-              <Card className="p-6">
+              70% Você · 30% IA
+            </Badge>
+          </div>
+
+          {/* Pipeline Stepper */}
+          <PipelineStepper />
+        </div>
+      </header>
+
+      {/* Main Content - Tabs + Live Preview */}
+      <main className="container mx-auto grid max-w-7xl flex-1 grid-cols-1 items-start gap-8 py-8 lg:grid-cols-12">
+        {/* LEFT: INTERACTIVE WIZARD (Tabs) */}
+        <div className="space-y-6 lg:col-span-7">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full justify-start gap-6 overflow-x-auto border-b border-border bg-transparent p-0">
+              <TabsTrigger
+                value="design"
+                className="rounded-none border-b-2 border-transparent px-0 pb-3 data-[state=active]:border-[var(--studio-teal)] data-[state=active]:text-[var(--studio-teal)]"
+                style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
+              >
+                1. Design & UX
+              </TabsTrigger>
+              <TabsTrigger
+                value="functional"
+                className="rounded-none border-b-2 border-transparent px-0 pb-3 data-[state=active]:border-[var(--studio-teal)] data-[state=active]:text-[var(--studio-teal)]"
+                style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
+              >
+                2. Funcionalidades
+              </TabsTrigger>
+              <TabsTrigger
+                value="tech"
+                className="rounded-none border-b-2 border-transparent px-0 pb-3 data-[state=active]:border-[var(--studio-teal)] data-[state=active]:text-[var(--studio-teal)]"
+                style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
+              >
+                3. Tecnologia
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="mt-6">
+              {/* TAB 1: DESIGN */}
+              <TabsContent value="design" className="animate-fade-in space-y-8">
                 <div className="space-y-4">
-                  {/* Section Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 items-center justify-center rounded-lg"
-                        style={{ backgroundColor: `${PRD_PRIMARY}20` }}
-                      >
-                        <Icon
-                          name={activeSectionConfig.icon}
-                          size="size-5"
-                          style={{ color: PRD_PRIMARY }}
-                        />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold">{activeSectionConfig.title}</h3>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Icon
-                            name={activeStatusConfig.icon}
-                            size="size-3"
-                            className={activeStatusConfig.color}
+                  <h3 className="text-xl font-bold">Identidade Visual & Fluxo</h3>
+                  <p className="font-serif text-muted-foreground">
+                    A IA tende a criar designs genéricos. Use esta seção para definir a
+                    personalidade visual do seu produto.
+                  </p>
+
+                  <div className="grid gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Referências Visuais</CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Faça upload de prints de apps que você gosta.
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <FileUpload className="h-32" />
+                      </CardContent>
+                    </Card>
+
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                        Perguntas Guiadas
+                      </h4>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="mb-1 block text-sm font-medium">
+                            Quantas telas principais você imagina?
+                          </label>
+                          <Input
+                            placeholder="Ex: Dashboard, Lista de Clientes, Perfil..."
+                            value={screens}
+                            onChange={(e) => setScreens(e.target.value)}
                           />
-                          <span className={activeStatusConfig.color}>
-                            {activeStatusConfig.label}
-                          </span>
-                          <span className="text-muted-foreground">
-                            • {activeSectionData.lineCount} linhas
-                          </span>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-sm font-medium">
+                            Qual a "vibe" do design?
+                          </label>
+                          <AutosizeTextarea
+                            placeholder="Ex: Minimalista, Clean, Dark Mode, Corporativo, Colorido..."
+                            value={vibe}
+                            onChange={(e) => setVibe(e.target.value)}
+                          />
                         </div>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleRegenerateSection}
-                      disabled={regeneratingSection === activeSection}
-                    >
-                      <Icon
-                        name={regeneratingSection === activeSection ? 'spinner' : 'refresh'}
-                        className={cn(
-                          'mr-1.5 size-3',
-                          regeneratingSection === activeSection && 'animate-spin'
-                        )}
-                      />
-                      Regenerar
+                  </div>
+
+                  <div className="flex justify-end pt-4">
+                    <Button onClick={() => setActiveTab('functional')}>
+                      Próximo: Funcionalidades <Icon name="arrow-right" className="ml-2" />
                     </Button>
                   </div>
+                </div>
+              </TabsContent>
 
-                  {/* Content Editor */}
-                  <Textarea
-                    value={activeSectionData.content}
-                    onChange={(e) => handleUpdateSection(e.target.value)}
-                    className="min-h-[350px] resize-none font-mono text-sm"
-                    placeholder={`Conteúdo da seção ${activeSectionConfig.title}...`}
-                  />
+              {/* TAB 2: FUNCTIONAL (1-2-3 SYSTEM) */}
+              <TabsContent value="functional" className="animate-fade-in space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-bold">Validação de Requisitos</h3>
+                      <p className="font-serif text-sm text-muted-foreground">
+                        O sistema "1-2-3": Aprove (✓), Edite (✎) ou Rejeite (✗) cada sugestão da IA.
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="h-fit">
+                      {pendingCount} pendentes
+                    </Badge>
+                  </div>
 
-                  {/* Status Actions */}
-                  <div className="flex items-center gap-2">
-                    <span className="mr-2 text-sm text-muted-foreground">Status:</span>
-                    {(['incomplete', 'reviewing', 'approved'] as PRDSectionStatus[]).map(
-                      (status) => {
-                        const config = STATUS_CONFIG[status];
-                        return (
-                          <Button
-                            key={status}
-                            variant={activeSectionData.status === status ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handleStatusChange(status)}
-                            className={cn(
-                              activeSectionData.status === status &&
-                                status === 'approved' &&
-                                'bg-emerald-600 hover:bg-emerald-700',
-                              activeSectionData.status === status &&
-                                status === 'reviewing' &&
-                                'bg-amber-600 hover:bg-amber-700'
-                            )}
-                          >
-                            <Icon name={config.icon} className="mr-1.5 size-3" />
-                            {config.label}
-                          </Button>
-                        );
-                      }
-                    )}
+                  <div className="space-y-3">
+                    {requirements.map((req) => (
+                      <RequirementCard
+                        key={req.id}
+                        req={req}
+                        onApprove={() => handleRequirementAction(req.id, 'approve')}
+                        onReject={() => handleRequirementAction(req.id, 'reject')}
+                        onUndo={() => handleRequirementAction(req.id, 'undo')}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-4">
+                    <Button variant="ghost" onClick={() => setActiveTab('design')}>
+                      Voltar
+                    </Button>
+                    <Button onClick={() => setActiveTab('tech')} disabled={!allCriticalReviewed}>
+                      Próximo: Tecnologia <Icon name="arrow-right" className="ml-2" />
+                    </Button>
                   </div>
                 </div>
-              </Card>
+              </TabsContent>
 
-              {/* Navigation */}
-              <div className="flex items-center justify-between border-t border-border pt-6">
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    isFirstSection
-                      ? navigate(`/prd/${slug}/brief`)
-                      : setActiveSection(PRD_SECTIONS[activeIndex - 1].key as SectionKey)
-                  }
-                >
-                  <Icon name="arrow-left" className="mr-2 size-4" />
-                  {isFirstSection ? 'Voltar ao Brief' : 'Anterior'}
-                </Button>
+              {/* TAB 3: TECH STACK */}
+              <TabsContent value="tech" className="animate-fade-in space-y-8">
+                <div className="space-y-6">
+                  <h3 className="text-xl font-bold">Arquitetura Técnica</h3>
 
-                <span className="text-sm text-muted-foreground">
-                  {activeIndex + 1} de {PRD_SECTIONS.length}
-                </span>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <Card className="border-primary/20 bg-primary/5">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-bold uppercase tracking-wider text-primary">
+                          Sugestão da IA
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground">Frontend</label>
+                          <Input
+                            value={techStack.frontend}
+                            onChange={(e) =>
+                              setTechStack({ ...techStack, frontend: e.target.value })
+                            }
+                            className="bg-background"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground">Backend / BaaS</label>
+                          <Input
+                            value={techStack.backend}
+                            onChange={(e) =>
+                              setTechStack({ ...techStack, backend: e.target.value })
+                            }
+                            className="bg-background"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground">AI Model</label>
+                          <Input
+                            value={techStack.ai}
+                            onChange={(e) => setTechStack({ ...techStack, ai: e.target.value })}
+                            className="bg-background"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
 
-                {isLastSection ? (
-                  <Button
-                    onClick={handleAdvanceToEpics}
-                    disabled={!allApproved || isAdvancing}
-                    style={{
-                      backgroundColor: allApproved && !isAdvancing ? PRD_PRIMARY : undefined,
-                    }}
-                  >
-                    {isAdvancing ? (
-                      <>
-                        <Icon name="spinner" className="mr-2 size-4 animate-spin" />
-                        Avançando...
-                      </>
-                    ) : (
-                      <>
-                        Gerar Épicos
-                        <Icon name="arrow-right" className="ml-2 size-4" />
-                      </>
-                    )}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() =>
-                      setActiveSection(PRD_SECTIONS[activeIndex + 1].key as SectionKey)
-                    }
-                    style={{ backgroundColor: PRD_PRIMARY }}
-                  >
-                    Próxima
-                    <Icon name="arrow-right" className="ml-2 size-4" />
-                  </Button>
-                )}
-              </div>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                          Limites de Escopo
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <AutosizeTextarea
+                          className="min-h-[150px] text-sm"
+                          value={scopeLimits}
+                          onChange={(e) => setScopeLimits(e.target.value)}
+                        />
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  <div className="flex justify-end gap-3 border-t border-border pt-8">
+                    <Button variant="ghost" onClick={() => setActiveTab('functional')}>
+                      Voltar
+                    </Button>
+                    <Button
+                      size="lg"
+                      className="px-8 font-bold text-white shadow-lg hover:opacity-90"
+                      style={{ backgroundColor: STUDIO_TEAL }}
+                      onClick={handleFinish}
+                      disabled={pendingCount > 0 || isAdvancing}
+                    >
+                      {isAdvancing ? (
+                        <>
+                          <Icon name="refresh" className="mr-2 animate-spin" />
+                          Gerando...
+                        </>
+                      ) : (
+                        <>
+                          Gerar Plano de Execução <Icon name="check-circle" className="ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </TabsContent>
             </div>
-          </StudioTwoColumn>
-        )}
-      </StudioContent>
+          </Tabs>
+        </div>
 
-      {/* Preview Dialog */}
-      <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent
-          onClose={() => setShowPreview(false)}
-          className="max-h-[80vh] max-w-3xl overflow-y-auto"
-        >
-          <DialogHeader>
-            <DialogTitle>Preview do PRD</DialogTitle>
-          </DialogHeader>
-          <div className="prose prose-sm dark:prose-invert max-w-none">
-            <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg bg-muted p-4 text-sm">
-              {PRD_SECTIONS.map((s) => {
-                const section = document[s.key as SectionKey];
-                return `## ${s.title}\n\n${section?.content || '_Não gerado_'}\n`;
-              }).join('\n---\n\n')}
-            </pre>
+        {/* RIGHT: LIVE PREVIEW (Sticky) */}
+        <aside className="h-fit space-y-6 lg:sticky lg:top-32 lg:col-span-5">
+          <div className="flex max-h-[80vh] flex-col overflow-hidden rounded-xl border border-border bg-muted/30 shadow-sm">
+            <div className="flex items-center justify-between border-b border-border bg-muted/50 p-3">
+              <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <Icon name="code" size="size-3" /> Live Preview (PRD.md)
+              </span>
+              <Badge variant="outline" className="bg-background text-[10px]">
+                Auto-Save
+              </Badge>
+            </div>
+            <ScrollArea className="flex-1 bg-card p-6">
+              <article className="prose prose-sm dark:prose-invert max-w-none font-mono text-xs leading-relaxed">
+                <pre className="whitespace-pre-wrap">{generatePreview}</pre>
+              </article>
+            </ScrollArea>
+            <div className="border-t border-border bg-muted/10 p-3 text-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-full text-xs text-muted-foreground"
+                onClick={handleDownload}
+              >
+                <Icon name="download" size="size-3" className="mr-2" /> Baixar Markdown
+              </Button>
+            </div>
           </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                const preview = PRD_SECTIONS.map((s) => {
-                  const section = document[s.key as SectionKey];
-                  return `## ${s.title}\n\n${section?.content || '_Não gerado_'}\n`;
-                }).join('\n---\n\n');
-                navigator.clipboard.writeText(preview);
-              }}
-            >
-              <Icon name="clipboard" className="mr-2 size-4" />
-              Copiar
-            </Button>
-            <Button onClick={() => setShowPreview(false)}>Fechar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </StudioLayout>
+        </aside>
+      </main>
+    </div>
   );
 };
 
