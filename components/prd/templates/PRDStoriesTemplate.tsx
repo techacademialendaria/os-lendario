@@ -355,21 +355,7 @@ export const PRDStoriesTemplate: React.FC<PRDStoriesTemplateProps> = ({ setSecti
     return <LoadingState setSection={setSection} />;
   }
 
-  // Wrong phase redirect
-  if (project && project.status !== 'stories') {
-    const status = project.status as PRDStatus;
-    const phaseRoutes: Record<string, string> = {
-      upload: `/prd/${slug}`,
-      brief: `/prd/${slug}/brief`,
-      prd: `/prd/${slug}/prd`,
-      epics: `/prd/${slug}/epicos`,
-      stories: `/prd/${slug}/stories`,
-      exported: `/prd/${slug}/exportar`,
-      completed: `/prd/${slug}/exportar`,
-    };
-    navigate(phaseRoutes[status] || `/prd/${slug}`, { replace: true });
-    return null;
-  }
+  // NOTE: Auto-redirect removed to allow free navigation between phases
 
   return (
     <div className="flex min-h-screen animate-fade-in flex-col bg-background font-sans text-foreground">

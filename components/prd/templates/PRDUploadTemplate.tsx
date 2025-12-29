@@ -102,25 +102,7 @@ export const PRDUploadTemplate: React.FC<PRDUploadTemplateProps> = ({ setSection
     }
   }, [content, inputState]);
 
-  // Auto-redirect if project is not in upload phase
-  useEffect(() => {
-    if (project && project.status !== 'upload') {
-      const rawStatus = project.status;
-      const status: PRDStatus = rawStatus === 'completed' ? 'exported' : (rawStatus as PRDStatus);
-
-      const phaseRoutes: Record<PRDStatus, string> = {
-        upload: `/prd/${slug}`,
-        brief: `/prd/${slug}/brief`,
-        prd: `/prd/${slug}/prd`,
-        epics: `/prd/${slug}/epicos`,
-        stories: `/prd/${slug}/stories`,
-        exported: `/prd/${slug}/exportar`,
-      };
-
-      const targetRoute = phaseRoutes[status] || `/prd/${slug}/brief`;
-      navigate(targetRoute, { replace: true });
-    }
-  }, [project, slug, navigate]);
+  // NOTE: Auto-redirect removed to allow free navigation between phases
 
   // Computed
   const isValid = content.trim().length >= MIN_CHARS || attachedFiles.length > 0;
@@ -189,20 +171,7 @@ export const PRDUploadTemplate: React.FC<PRDUploadTemplateProps> = ({ setSection
     return <NotFoundState setSection={setSection} />;
   }
 
-  // Redirecting state
-  if (project.status !== 'upload') {
-    return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />
-        <div className="flex flex-1 items-center justify-center">
-          <div className="space-y-4 text-center">
-            <Icon name="refresh" className="mx-auto size-8 animate-spin text-muted-foreground" />
-            <p className="text-muted-foreground">Redirecionando para a fase atual...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // NOTE: Status check removed to allow free navigation between phases
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

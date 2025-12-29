@@ -153,25 +153,7 @@ export const PRDBriefTemplate: React.FC<PRDBriefTemplateProps> = ({ setSection }
     }
   }, [project]);
 
-  // Auto-redirect if project is not in brief phase
-  useEffect(() => {
-    if (project && project.status !== 'brief') {
-      const rawStatus = project.status;
-      const status: PRDStatus = rawStatus === 'completed' ? 'exported' : (rawStatus as PRDStatus);
-
-      const phaseRoutes: Record<PRDStatus, string> = {
-        upload: `/prd/${slug}`,
-        brief: `/prd/${slug}/brief`,
-        prd: `/prd/${slug}/prd`,
-        epics: `/prd/${slug}/epicos`,
-        stories: `/prd/${slug}/stories`,
-        exported: `/prd/${slug}/exportar`,
-      };
-
-      const targetRoute = phaseRoutes[status] || `/prd/${slug}`;
-      navigate(targetRoute, { replace: true });
-    }
-  }, [project, slug, navigate]);
+  // NOTE: Auto-redirect removed to allow free navigation between phases
 
   // Computed
   const uploadContent = project?.project_metadata?.upload?.content || '';
@@ -322,20 +304,7 @@ ${metrics || '_Não definido_'}
     return <NotFoundState setSection={setSection} />;
   }
 
-  // Redirecting state
-  if (project.status !== 'brief') {
-    return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />
-        <div className="flex flex-1 items-center justify-center">
-          <div className="space-y-4 text-center">
-            <Icon name="refresh" className="mx-auto size-8 animate-spin text-muted-foreground" />
-            <p className="text-muted-foreground">Redirecionando para a fase atual...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // NOTE: Status check removed to allow free navigation between phases
 
   return (
     <div className="flex min-h-screen animate-fade-in flex-col bg-background font-sans text-foreground">

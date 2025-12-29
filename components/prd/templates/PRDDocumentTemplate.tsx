@@ -399,34 +399,7 @@ ${scopeLimits}
     return <NotFoundState setSection={setSection} />;
   }
 
-  // Wrong phase redirect
-  if (project.status !== 'prd') {
-    const status = project.status as PRDStatus;
-    const phaseRoutes: Record<string, string> = {
-      upload: `/prd/${slug}`,
-      brief: `/prd/${slug}/brief`,
-      prd: `/prd/${slug}/prd`,
-      epics: `/prd/${slug}/epicos`,
-      stories: `/prd/${slug}/stories`,
-      exported: `/prd/${slug}/exportar`,
-      completed: `/prd/${slug}/exportar`,
-    };
-
-    return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <PRDTopbar currentSection={Section.STUDIO_PRD_EDITOR} setSection={setSection} />
-        <div className="flex flex-1 items-center justify-center">
-          <div className="space-y-4 text-center">
-            <Icon name="refresh" className="mx-auto size-8 animate-spin text-muted-foreground" />
-            <p className="text-muted-foreground">Redirecionando...</p>
-            <Button variant="outline" onClick={() => navigate(phaseRoutes[status] || '/prd')}>
-              Ir para fase {status}
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // NOTE: Auto-redirect removed to allow free navigation between phases
 
   return (
     <div className="flex min-h-screen animate-fade-in flex-col bg-background font-sans text-foreground">
