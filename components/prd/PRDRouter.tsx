@@ -13,6 +13,7 @@ import PRDDocumentTemplate from './templates/PRDDocumentTemplate';
 import PRDEpicsTemplate from './templates/PRDEpicsTemplate';
 import PRDStoriesTemplate from './templates/PRDStoriesTemplate';
 import PRDExportTemplate from './templates/PRDExportTemplate';
+import PRDProjectDetailTemplate from './templates/PRDProjectDetailTemplate';
 import { getSectionFromPath } from '../../routes';
 
 // =============================================================================
@@ -256,8 +257,11 @@ const PRDRouter: React.FC<PRDRouterProps> = ({ setSection }) => {
       {/* Novo projeto (has its own layout) */}
       <Route path="/novo" element={<PRDNewTemplate setSection={setSection} />} />
 
+      {/* Project Detail - visão geral do projeto */}
+      <Route path="/:slug" element={<PRDProjectDetailTemplate setSection={setSection} />} />
+
       {/* Phase 1: Upload (has its own layout) */}
-      <Route path="/:slug" element={<PRDUploadTemplate setSection={setSection} />} />
+      <Route path="/:slug/upload" element={<PRDUploadTemplate setSection={setSection} />} />
 
       {/* Phase 2: Brief (has its own layout) */}
       <Route path="/:slug/brief" element={<PRDBriefTemplate setSection={setSection} />} />
