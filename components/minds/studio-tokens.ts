@@ -29,13 +29,13 @@
  */
 
 /** HEX Reference: #30B0C7 Teal - Use class: bg-studio-primary */
-export const STUDIO_PRIMARY = '#30B0C7';
+export const STUDIO_PRIMARY = 'hsl(var(--primary-color))';
 
 /** HEX Reference: #00D084 Mint Green - Use class: bg-studio-secondary */
-export const STUDIO_SECONDARY = '#00D084';
+export const STUDIO_SECONDARY = 'hsl(var(--accent-color))';
 
 /** HEX Reference: #C9B298 Gold - Use class: bg-studio-accent */
-export const STUDIO_ACCENT = '#C9B298';
+export const STUDIO_ACCENT = 'hsl(var(--accent-color))';
 
 // =============================================================================
 // BACKGROUNDS (Dinâmicas via CSS Variables)
@@ -45,19 +45,19 @@ export const STUDIO_ACCENT = '#C9B298';
  * Fundo principal escuro (#0A0A0C)
  * Use class: bg-studio-bg
  */
-export const STUDIO_BG = '#0A0A0C';
+export const STUDIO_BG = 'hsl(var(--studio-bg))';
 
 /**
  * Fundo de cards (#0F0F13)
  * Use class: bg-studio-card
  */
-export const STUDIO_CARD_BG = '#0F0F13';
+export const STUDIO_CARD_BG = 'hsl(var(--studio-card-bg))';
 
 /** Gradiente para cards com Teal - Use classes: bg-gradient-to-br + dinâmicas */
-export const STUDIO_CARD_GRADIENT = 'from-[#0a1f23] to-[#050a0c]';
+export const STUDIO_CARD_GRADIENT = 'from-studio-primary-dark/40 to-studio-bg';
 
 /** Gradiente para cards com destaque teal - Use classes: bg-gradient-to-br + dinâmicas */
-export const STUDIO_TEAL_GRADIENT = 'from-[#1a3540] to-[#0a1f23]';
+export const STUDIO_TEAL_GRADIENT = 'from-studio-secondary-dark/40 to-studio-bg';
 
 // =============================================================================
 // STATUS COLORS
@@ -73,17 +73,17 @@ export const STUDIO_STATUS = {
   },
   /** Teal - Processando/Em análise */
   processing: {
-    bg: 'bg-[#30B0C7]/20',
-    text: 'text-[#30B0C7]',
-    border: 'border-[#30B0C7]/30',
-    dot: 'bg-[#30B0C7]',
+    bg: 'bg-studio-primary/20',
+    text: 'text-studio-primary',
+    border: 'border-studio-primary/30',
+    dot: 'bg-studio-primary',
   },
   /** Verde menta - Completo/Resultados */
   complete: {
-    bg: 'bg-[#00D084]/20',
-    text: 'text-[#00D084]',
-    border: 'border-[#00D084]/30',
-    dot: 'bg-[#00D084]',
+    bg: 'bg-studio-secondary/20',
+    text: 'text-studio-secondary',
+    border: 'border-studio-secondary/30',
+    dot: 'bg-studio-secondary',
   },
   /** Amarelo - Atenção/Review */
   warning: {
@@ -138,8 +138,8 @@ export const ARTIFACT_TYPE_ICONS: Record<string, string> = {
 // =============================================================================
 
 export const OBSESSION_RING_COLORS = [
-  '#30B0C7', // Teal - Primary
-  '#00D084', // Mint - Secondary
+  'hsl(var(--primary-color))', // Teal - Primary
+  'hsl(var(--accent-color))', // Mint - Secondary
   '#FFD700', // Gold - Accent
   '#FF6B6B', // Red
   '#4ECDC4', // Turquoise

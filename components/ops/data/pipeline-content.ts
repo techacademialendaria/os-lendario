@@ -117,9 +117,7 @@ export const PHASE_DETAILS: PhaseDetail[] = [
       'Evolucao temporal: permite rastrear mudancas ao longo do tempo',
     ],
     tables: [
-      { name: 'minds', role: 'Entidade central com biografia, slug, metadados' },
-      { name: 'mind_obsessions', role: 'Temas recorrentes com frequencia e evidencias' },
-      { name: 'mind_values', role: 'Valores fundamentais derivados de padroes' },
+      { name: 'minds', role: 'Entidade central com biografia, slug, obsession, metadados' },
     ],
   },
   {
@@ -188,9 +186,9 @@ export const DATA_FLOW_EXAMPLE = {
       phase: 5,
       phaseName: 'PERFIL',
       input: 'Scores de componentes + drivers + MIUs agregados',
-      process: 'Consolida em minds: atualiza bio_generated, detecta obsessao "produtividade matinal"',
-      output: 'minds.bio_generated atualizado, mind_obsessions: "morning_routine" (freq=high)',
-      tables: ['minds', 'mind_obsessions'],
+      process: 'Consolida em minds: atualiza bio_generated, define obsession (texto consolidado)',
+      output: 'minds.bio_generated atualizado, minds.obsession: "morning_routine"',
+      tables: ['minds'],
     },
     {
       phase: 6,

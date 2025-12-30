@@ -155,7 +155,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="flex items-center gap-2 text-xl font-bold text-foreground">
-                <Icon name="pencil" size="size-5" style={{ color: STUDIO_PRIMARY }} />
+                <Icon name="pencil" size="size-5" className="text-studio-primary" />
                 Editor de Currículo
               </h1>
               <p className="mt-0.5 text-sm text-muted-foreground">
@@ -175,8 +175,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
                 <Button
                   size="sm"
                   onClick={handleSaveAll}
-                  className="font-semibold text-[#0A0A0F]"
-                  style={{ backgroundColor: STUDIO_GOLD }}
+                  className="font-semibold text-[#0A0A0F] bg-studio-gold hover:bg-studio-gold/90"
                 >
                   <Icon name="check" className="mr-2" size="size-4" /> Salvar Alterações
                 </Button>
@@ -220,8 +219,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
               </p>
               <Button
                 onClick={handleAddModule}
-                style={{ backgroundColor: STUDIO_PRIMARY }}
-                className="text-white"
+                className="text-white bg-studio-primary hover:bg-studio-primary/90"
               >
                 <Icon name="plus" className="mr-2" size="size-4" /> Criar Primeiro Módulo
               </Button>
@@ -243,8 +241,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
 
                   {/* Module Badge */}
                   <div
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold"
-                    style={{ backgroundColor: `${STUDIO_PRIMARY}20`, color: STUDIO_PRIMARY }}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold bg-studio-primary/20 text-studio-primary"
                   >
                     M{modIndex + 1}
                   </div>
@@ -453,8 +450,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
               <Button
                 size="sm"
                 onClick={handleSaveAll}
-                className="font-semibold text-[#0A0A0F]"
-                style={{ backgroundColor: STUDIO_GOLD }}
+                className="font-semibold text-[#0A0A0F] bg-studio-gold hover:bg-studio-gold/90"
               >
                 <Icon name="check" className="mr-2" size="size-4" /> Salvar Alterações
               </Button>

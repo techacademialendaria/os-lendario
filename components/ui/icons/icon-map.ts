@@ -376,6 +376,26 @@ iconMap['quote-right'] = Quote;
 iconMap['stats'] = StatsReport;
 iconMap['video'] = VideoCamera;
 
+// Social media
+iconMap['whatsapp'] = Whatsapp;
+iconMap['facebook'] = Facebook;
+iconMap['linkedin'] = Linkedin;
+iconMap['twitter'] = Twitter;
+iconMap['spotify'] = Spotify;
+iconMap['google'] = Google;
+
+// Groups Dashboard icons
+iconMap['graph-up'] = GraphUp;
+iconMap['graph-down'] = GraphDown;
+iconMap['stats-report'] = StatsReport;
+iconMap['activity'] = GraphUp;
+iconMap['pin-alt'] = MapPin;
+iconMap['chat-bubble'] = ChatBubble;
+iconMap['layout-grid'] = ViewGrid;
+iconMap['refresh-double'] = SystemRestart;
+iconMap['page'] = Page;
+iconMap['group'] = Group;
+
 // Fallback for missing icons
 export const DefaultIcon = HelpCircle;
 

@@ -299,14 +299,8 @@ export const JOB_ENTITY_RELATIONSHIPS = {
     {
       table: 'contents',
       field: 'generation_execution_id',
-      desc: 'Conteudos gerados por AI',
+      desc: 'Conteudos gerados por AI (includes system prompts migrated from mind_profiles)',
       example: 'Artigo foi escrito por qual modelo?',
-    },
-    {
-      table: 'mind_profiles',
-      field: 'generation_execution_id',
-      desc: 'System prompts gerados',
-      example: 'Prompt foi criado em qual job?',
     },
   ],
 
@@ -482,7 +476,6 @@ flowchart TB
     subgraph OUTPUT[SAIDA]
         MIU[(mius)]
         FRAG[(fragments)]
-        PROF[(mind_profiles)]
         CONT[(contents)]
     end
 
@@ -494,7 +487,6 @@ flowchart TB
     LLM --> JOB
     JOB -->|generation_execution_id| MIU
     JOB -->|generation_execution_id| FRAG
-    JOB -->|generation_execution_id| PROF
     JOB -->|generation_execution_id| CONT
 
     WORKER -->|success| DONE[Completo]
@@ -550,7 +542,6 @@ erDiagram
     job_executions ||--o{ fragments : generates
     job_executions ||--o{ mius : generates
     job_executions ||--o{ contents : generates
-    job_executions ||--o{ mind_profiles : generates
 
     ingestion_batches {
         uuid id PK

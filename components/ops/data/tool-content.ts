@@ -732,6 +732,134 @@ export const TOOL_STACKS = {
       ],
       synergy: 'Lean valida ideias, SCRUM estrutura sprints, Kanban visualiza fluxo, Pomodoro maximiza foco, Retrospectives melhoram processo.',
       warning: 'Risco de fazer rapido demais sem qualidade. Balance velocidade com reflexao.'
+    },
+    {
+      name: 'The Deep Work Specialist',
+      subtitle: 'Para quem precisa de concentracao profunda e output de qualidade',
+      icon: 'focus',
+      color: '#6366f1',
+      idealProfile: 'Alto conscientiousness, baixa impulsividade, introversao moderada',
+      tools: [
+        { name: 'Deep Work', role: 'Mentalidade de foco ininterrupto' },
+        { name: 'Time Blocking', role: 'Protecao de blocos de foco' },
+        { name: 'Pomodoro Technique', role: 'Ritmo de trabalho sustentavel' },
+        { name: 'Distraction Matrix', role: 'Eliminacao de interrupcoes' },
+        { name: 'Flow State Triggers', role: 'Entrada em fluxo' }
+      ],
+      synergy: 'Deep Work define a mentalidade, Time Blocking protege espaco, Pomodoro estrutura o ritmo, Distraction Matrix elimina ruido, Flow Triggers otimizam entrada.',
+      warning: 'Risco de isolamento social. Balance foco profundo com colaboracao.'
+    },
+    {
+      name: 'The Systems Optimizer',
+      subtitle: 'Para quem gerencia operacoes complexas e quer eficiencia',
+      icon: 'settings',
+      color: '#14b8a6',
+      idealProfile: 'Systemico, atencao a detalhes, orientacao a processos',
+      tools: [
+        { name: 'Lean Manufacturing', role: 'Eliminacao de desperdicio' },
+        { name: 'Six Sigma', role: 'Reducao de variancia' },
+        { name: 'Process Mapping', role: 'Visualizacao de fluxo' },
+        { name: 'PDCA Cycle', role: 'Melhoria continua' },
+        { name: 'Bottleneck Analysis', role: 'Identificacao de restricoes' }
+      ],
+      synergy: 'Process Mapping revela fluxo, Bottleneck Analysis identifica restricoes, Lean elimina desperdicio, Six Sigma reduz variancia, PDCA sustenta melhoria.',
+      warning: 'Risco de over-optimization e inflexibilidade. Deixe margem para inovacao.'
+    },
+    {
+      name: 'The Change Catalyst',
+      subtitle: 'Para quem lidera transformacao organizacional',
+      icon: 'trending-up',
+      color: '#f97316',
+      idealProfile: 'Alta Abertura, charisma, conforto com ambiguidade',
+      tools: [
+        { name: 'Transformational Leadership', role: 'Visao e inspiracao' },
+        { name: 'Stakeholder Mapping', role: 'Identificacao de influenciadores' },
+        { name: 'Change Management', role: 'Gestao de transicao' },
+        { name: 'Narrative Design', role: 'Criacao de story para buy-in' },
+        { name: 'Coalition Building', role: 'Formacao de aliancas' }
+      ],
+      synergy: 'Visao inspira, Stakeholder Mapping identifica aliados, Coalition Building gera momentum, Change Management estrutura transicao, Narrative Design sustenta engajamento.',
+      warning: 'Risco de resistencia organizacional. Comunique frequentemente e envolva cedo.'
+    },
+    {
+      name: 'The Holistic Growth Seeker',
+      subtitle: 'Para desenvolvimento pessoal integrado (corpo, mente, espirito)',
+      icon: 'heart',
+      color: '#e11d48',
+      idealProfile: 'Abertura elevada, introversao moderada, busca de significado',
+      tools: [
+        { name: 'Habit Stacking', role: 'Integracao de habitos' },
+        { name: 'Journaling Practice', role: 'Auto-reflexao profunda' },
+        { name: 'Meditation/Mindfulness', role: 'Presenca e clareza' },
+        { name: 'Zone of Genius Framework', role: 'Alinhamento com proposito' },
+        { name: 'Ikigai Method', role: 'Convergencia de passao, talento, proposito, mercado' }
+      ],
+      synergy: 'Ikigai define direcao, Zone of Genius mapeia talentos, Habit Stacking constroi rotinas, Meditacao conecta com proposito, Journaling integra aprendizados.',
+      warning: 'Risco de espiritualismo superficial. Mantenha rigor e validacao constante.'
+    },
+    {
+      name: 'The Risk Manager',
+      subtitle: 'Para quem precisa de contingencia e preparo para cenarios adversos',
+      icon: 'shield-alert',
+      color: '#0891b2',
+      idealProfile: 'Cauteloso, sistemico, baixa impulsividade, planejamento rigoroso',
+      tools: [
+        { name: 'Risk Register', role: 'Inventario de riscos' },
+        { name: 'Pre-mortem Analysis', role: 'Antecipacao de falhas' },
+        { name: 'Scenario Planning', role: 'Preparacao para futuros' },
+        { name: 'Decision Trees', role: 'Mapeamento de contingencias' },
+        { name: 'Simulation/Stress Testing', role: 'Validacao de robustez' }
+      ],
+      synergy: 'Risk Register mapeia exposicoes, Pre-mortem antecipa falhas, Scenario Planning testa futuros, Decision Trees estrutura contingencias, Simulation valida planos.',
+      warning: 'Risco de paralisia por fear. Defina "risco aceitavel" e execute.'
+    },
+    {
+      name: 'The Customer-Centric Designer',
+      subtitle: 'Para quem cria produtos centrados em necessidades reais do usuario',
+      icon: 'users',
+      color: '#d946ef',
+      idealProfile: 'Empatia elevada, curiosidade sobre comportamento, pensamento divergente',
+      tools: [
+        { name: 'Jobs To Be Done', role: 'Identificacao de necessidade real' },
+        { name: 'User Research', role: 'Entendimento profundo' },
+        { name: 'Design Thinking', role: 'Processo de solucao iterativo' },
+        { name: 'Prototyping & Testing', role: 'Validacao com usuarios' },
+        { name: 'Empathy Mapping', role: 'Humanizacao do usuario' }
+      ],
+      synergy: 'User Research e Empathy Mapping revelam necessidade, JTBD a contextualiza, Design Thinking ideiza solucoes, Prototyping valida, Iteracao refina.',
+      warning: 'Risco de design por comissao ao inves de dados. Confie em evidencia do usuario.'
+    },
+    {
+      name: 'The Knowledge Architect',
+      subtitle: 'Para quem constroi sistemas de conhecimento e aprendizado',
+      icon: 'book-open',
+      color: '#a855f7',
+      idealProfile: 'Alto Need for Cognition, meticuloso, docente/comunicador',
+      tools: [
+        { name: 'Mental Models Latticework', role: 'Integracao de conhecimento' },
+        { name: 'Spaced Repetition', role: 'Retencao de longo prazo' },
+        { name: 'Concept Mapping', role: 'Estruturacao de ideias' },
+        { name: 'Teaching Method (Feynman)', role: 'Simplificacao e validacao' },
+        { name: 'Knowledge Graph', role: 'Conexoes entre dominios' }
+      ],
+      synergy: 'Mental Models fornece framework, Concept Mapping organiza, Spaced Repetition fixa, Feynman valida compreensao, Knowledge Graph integra dominios.',
+      warning: 'Risco de knowledge sem aplicacao. Sempre teste pratica e aplicacao real.'
+    },
+    {
+      name: 'The Negotiator & Influencer',
+      subtitle: 'Para quem precisa ganhar acordos e influenciar decisoes',
+      icon: 'handshake',
+      color: '#fb923c',
+      idealProfile: 'Alto carisma, empatia, persuasion, leitura social',
+      tools: [
+        { name: 'Interest-Based Negotiation (Fisher)', role: 'Identificacao de interesses reais' },
+        { name: 'BATNA Analysis', role: 'Alternativa se falhar' },
+        { name: 'Anchoring & Framing', role: 'Posicionamento inicial' },
+        { name: 'Social Proof & Reciprocity', role: 'Influencia psicologica' },
+        { name: 'Principled Disagreement', role: 'Discordia sem prejuizo relacional' }
+      ],
+      synergy: 'BATNA define posicao, Framing posiciona oferta, Interest-Based busca ganha-ganha, Psicologia amplifica, Principled preserva relacao.',
+      warning: 'Risco de manipulacao. Use influencia para beneficio mutuo, nao predacao.'
     }
   ]
 };

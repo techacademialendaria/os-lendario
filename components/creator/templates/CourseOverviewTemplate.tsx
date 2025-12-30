@@ -130,11 +130,12 @@ const PipelineStep = ({
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
       onClick={onClick}
       disabled={!isClickable || status === 'pending'}
       className={cn(
-        'flex min-w-[100px] flex-col items-center gap-2 rounded-xl p-4 transition-all duration-200',
+        'flex h-auto min-w-[100px] flex-col items-center gap-2 rounded-xl p-4 transition-all duration-200',
         bgClass,
         isClickable && status !== 'pending' && 'cursor-pointer hover:scale-105',
         status === 'pending' && 'cursor-not-allowed opacity-50'
@@ -148,7 +149,7 @@ const PipelineStep = ({
       <span className={cn('text-xs font-medium uppercase tracking-wider', labelClass)}>
         {label}
       </span>
-    </button>
+    </Button>
   );
 };
 
@@ -165,7 +166,7 @@ const StatCard = ({
 }) => (
   <Card className="bg-muted/10">
     <CardContent className="flex items-center gap-4 p-4">
-      <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ color: STUDIO_PRIMARY, backgroundColor: `${STUDIO_PRIMARY}10` }}>
+      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-studio-primary/10 text-studio-primary">
         <Icon name={icon} size="size-5" />
       </div>
       <div className="flex-1">
@@ -259,7 +260,7 @@ const CourseOverviewTemplate: React.FC<CourseOverviewTemplateProps> = ({
             </Button>
 
             {/* Course Icon */}
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-gradient-to-br from-primary/20 to-primary/5" style={{ color: STUDIO_PRIMARY }}>
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl border border-studio-primary/20 bg-gradient-to-br from-studio-primary/20 to-studio-primary/5 text-studio-primary">
               <Icon name={course.icon} size="size-10" />
             </div>
 
@@ -308,7 +309,7 @@ const CourseOverviewTemplate: React.FC<CourseOverviewTemplateProps> = ({
             </Button>
             <Button
               onClick={() => onNavigate(getNextStep())}
-              className="bg-primary text-white shadow-lg shadow-primary/20" style={{ backgroundColor: STUDIO_PRIMARY }}
+              className="shadow-lg shadow-studio-primary/20"
             >
               Continuar Edição <Icon name="arrow-right" className="ml-2 size-4" />
             </Button>
@@ -334,7 +335,7 @@ const CourseOverviewTemplate: React.FC<CourseOverviewTemplateProps> = ({
                 </div>
                 {course.score && (
                   <div className="border-l border-border pl-4 text-right">
-                    <p className="font-mono text-2xl font-bold" style={{ color: STUDIO_PRIMARY }}>{course.score}</p>
+                    <p className="font-mono text-2xl font-bold text-studio-primary">{course.score}</p>
                     <p className="text-xs text-muted-foreground">Score</p>
                   </div>
                 )}
@@ -412,49 +413,49 @@ const CourseOverviewTemplate: React.FC<CourseOverviewTemplateProps> = ({
                 <CardContent className="grid grid-cols-2 gap-3 md:grid-cols-3">
                   <Button
                     variant="outline"
-                    className="h-auto flex-col gap-2 py-4 hover:bg-primary/5 hover:border-primary/30" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}
+                    className="h-auto flex-col gap-2 py-4 shadow-sm transition-all hover:border-studio-primary/30 hover:bg-studio-primary/5"
                     onClick={() => onNavigate('brief')}
                   >
-                    <Icon name="file-edit" size="size-5" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                    <Icon name="file-edit" size="size-5" className="text-studio-primary" />
                     <span className="text-xs">Editar Brief</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-auto flex-col gap-2 py-4 hover:bg-primary/5 hover:border-primary/30" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}
+                    className="h-auto flex-col gap-2 py-4 shadow-sm transition-all hover:border-studio-primary/30 hover:bg-studio-primary/5"
                     onClick={() => onNavigate('research')}
                   >
-                    <Icon name="search-alt" size="size-5" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                    <Icon name="search-alt" size="size-5" className="text-studio-primary" />
                     <span className="text-xs">Ver Research</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-auto flex-col gap-2 py-4 hover:bg-primary/5 hover:border-primary/30" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}
+                    className="h-auto flex-col gap-2 py-4 shadow-sm transition-all hover:border-studio-primary/30 hover:bg-studio-primary/5"
                     onClick={() => onNavigate('curriculum')}
                   >
-                    <Icon name="sitemap" size="size-5" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                    <Icon name="sitemap" size="size-5" className="text-studio-primary" />
                     <span className="text-xs">Editar Currículo</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-auto flex-col gap-2 py-4 hover:bg-primary/5 hover:border-primary/30" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}
+                    className="h-auto flex-col gap-2 py-4 shadow-sm transition-all hover:border-studio-primary/30 hover:bg-studio-primary/5"
                     onClick={() => onNavigate('lessons')}
                   >
-                    <Icon name="list" size="size-5" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                    <Icon name="list" size="size-5" className="text-studio-primary" />
                     <span className="text-xs">Ver Lições</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-auto flex-col gap-2 py-4 hover:bg-primary/5 hover:border-primary/30" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}
+                    className="h-auto flex-col gap-2 py-4 shadow-sm transition-all hover:border-studio-primary/30 hover:bg-studio-primary/5"
                     onClick={() => onNavigate('validation')}
                   >
-                    <Icon name="check-double" size="size-5" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                    <Icon name="check-double" size="size-5" className="text-studio-primary" />
                     <span className="text-xs">Validação</span>
                   </Button>
                   <Button
                     variant="outline"
-                    className="h-auto flex-col gap-2 py-4 hover:bg-primary/5 hover:border-primary/30" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}
+                    className="h-auto flex-col gap-2 py-4 shadow-sm transition-all hover:border-studio-primary/30 hover:bg-studio-primary/5"
                   >
-                    <Icon name="download" size="size-5" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                    <Icon name="download" size="size-5" className="text-studio-primary" />
                     <span className="text-xs">Exportar</span>
                   </Button>
                 </CardContent>

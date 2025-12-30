@@ -25,13 +25,13 @@
  */
 
 /** HEX Reference: #538096 Azul - Use class: bg-studio-primary */
-export const STUDIO_PRIMARY = '#538096';
+export const STUDIO_PRIMARY = 'hsl(var(--primary-color))';
 
 /** HEX Reference: #F2EBE4 Bege/Cream - Use class: bg-studio-accent */
-export const STUDIO_GOLD = '#F2EBE4';
+export const STUDIO_GOLD = 'hsl(var(--accent-color))';
 
 /** HEX Reference: #F2EBE4 Bege/Cream - Use class: bg-studio-secondary-light */
-export const STUDIO_ACCENT = '#F2EBE4';
+export const STUDIO_ACCENT = 'hsl(var(--accent-color))';
 
 // =============================================================================
 // BACKGROUNDS (Dinâmicas via CSS Variables)
@@ -41,19 +41,19 @@ export const STUDIO_ACCENT = '#F2EBE4';
  * Fundo principal escuro (#0A0A0F)
  * Use class: bg-studio-bg
  */
-export const STUDIO_BG = '#0A0A0F';
+export const STUDIO_BG = 'hsl(var(--studio-bg))';
 
 /**
  * Fundo de cards (#111116)
  * Use class: bg-studio-card
  */
-export const STUDIO_CARD_BG = '#111116';
+export const STUDIO_CARD_BG = 'hsl(var(--studio-card-bg))';
 
 /** Gradiente para KPI cards - Use classes: bg-gradient-to-br + dinâmicas */
-export const STUDIO_CARD_GRADIENT = 'from-[#1a2e35] to-[#0f1a1d]';
+export const STUDIO_CARD_GRADIENT = 'from-studio-primary-dark/40 to-studio-bg';
 
 /** Gradiente para cards com destaque gold - Use classes: bg-gradient-to-br + dinâmicas */
-export const STUDIO_GOLD_GRADIENT = 'from-[#2a2520] to-[#1a1815]';
+export const STUDIO_GOLD_GRADIENT = 'from-studio-accent-dark/40 to-studio-bg';
 
 // =============================================================================
 // STATUS COLORS
@@ -164,3 +164,15 @@ export const STUDIO_BUTTON_PRIMARY = 'bg-studio-primary hover:bg-studio-primary-
  * Dinâmicas: cor de acento muda com o Studio
  */
 export const STUDIO_BUTTON_GOLD = 'bg-studio-accent hover:opacity-90 text-[#0A0A0F] font-medium';
+
+/**
+ * Classes padrão para Inputs
+ * Fundo escuro, borda sutil, foco com cor do Studio
+ */
+export const INPUT_CLASSES = 'bg-studio-bg border-studio-primary/20 focus-visible:ring-studio-primary/30 focus-visible:border-studio-primary/40';
+
+/**
+ * Classes padrão para Textareas
+ * Fundo escuro, borda sutil, foco com cor do Studio
+ */
+export const TEXTAREA_CLASSES = 'bg-studio-bg border-studio-primary/20 focus-visible:ring-studio-primary/30 focus-visible:border-studio-primary/40 min-h-[120px]';

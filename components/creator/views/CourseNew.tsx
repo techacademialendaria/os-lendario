@@ -64,8 +64,7 @@ const CourseNew: React.FC<CourseNewProps> = ({ setSection }) => {
                 <CardContent className="space-y-6 p-8">
                   <div className="flex items-center justify-between">
                     <div
-                      className="flex h-12 w-12 items-center justify-center rounded-xl transition-colors"
-                      style={{ backgroundColor: STUDIO_ACCENT, color: STUDIO_PRIMARY }}
+                      className="flex h-12 w-12 items-center justify-center rounded-xl transition-colors bg-studio-accent text-studio-primary"
                     >
                       <Icon name="seedling" size="size-6" />
                     </div>
@@ -74,15 +73,14 @@ const CourseNew: React.FC<CourseNewProps> = ({ setSection }) => {
                         name="check-circle"
                         size="size-6"
                         type="solid"
-                        style={{ color: STUDIO_PRIMARY }}
+                        className="text-studio-primary"
                       />
                     )}
                   </div>
                   <div>
                     <h4 className="text-lg font-bold">Greenfield (Do Zero)</h4>
                     <p
-                      className="font-mono text-xs uppercase tracking-wider"
-                      style={{ color: STUDIO_PRIMARY }}
+                      className="font-mono text-xs uppercase tracking-wider text-studio-primary"
                     >
                       Recomendado
                     </p>
@@ -108,8 +106,7 @@ const CourseNew: React.FC<CourseNewProps> = ({ setSection }) => {
                 <CardContent className="space-y-6 p-8">
                   <div className="flex items-center justify-between">
                     <div
-                      className="flex h-12 w-12 items-center justify-center rounded-xl transition-colors"
-                      style={{ backgroundColor: STUDIO_ACCENT, color: STUDIO_GOLD }}
+                      className="flex h-12 w-12 items-center justify-center rounded-xl transition-colors bg-studio-accent text-studio-gold"
                     >
                       <Icon name="file-import" size="size-6" />
                     </div>
@@ -118,7 +115,7 @@ const CourseNew: React.FC<CourseNewProps> = ({ setSection }) => {
                         name="check-circle"
                         size="size-6"
                         type="solid"
-                        style={{ color: STUDIO_PRIMARY }}
+                        className="text-studio-primary"
                       />
                     )}
                   </div>
@@ -173,8 +170,7 @@ const CourseNew: React.FC<CourseNewProps> = ({ setSection }) => {
             <Button
               onClick={handleCreateCourse}
               disabled={!mode || !slug}
-              className="min-w-[140px] text-white"
-              style={{ backgroundColor: STUDIO_PRIMARY }}
+              className="min-w-[140px] text-white bg-studio-primary hover:bg-studio-primary/90"
             >
               {isCreating ? (
                 <Icon name="spinner" className="mr-2 animate-spin" />

@@ -73,10 +73,10 @@ export const MindHeroSection: React.FC<MindHeroSectionProps> = ({
 
   // Calculate specific metrics
   const topProficiency = mind.proficiencies?.sort((a, b) => b.level - a.level)[0];
-  const totalObsessions = mind.obsessions?.length || 0;
+  const hasObsession = !!mind.obsession;
 
   return (
-    <div className="relative overflow-hidden border-b border-white/10 bg-studio-bg">
+    <div className="relative overflow-hidden border-b border-studio-border bg-studio-bg">
       {/* Neural Data Stream Background */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(15,15,19,0.95),rgba(15,15,19,0.8)),url('https://www.transparenttextures.com/patterns/circuit-board.png')] opacity-20"></div>
       <div className="pointer-events-none absolute right-0 top-0 h-[600px] w-[600px] -translate-y-1/2 translate-x-1/2 animate-pulse-slow rounded-full bg-primary/10 blur-[120px]"></div>
@@ -128,7 +128,7 @@ export const MindHeroSection: React.FC<MindHeroSectionProps> = ({
               <div className="absolute -inset-1 h-[136px] w-[136px] animate-[spin_10s_linear_infinite] rounded-full border border-studio-primary/30 opacity-0 transition-opacity group-hover:opacity-100"></div>
               <div className="absolute -inset-2 h-[144px] w-[144px] animate-[spin_15s_linear_infinite_reverse] rounded-full border border-primary/20 opacity-0 transition-opacity group-hover:opacity-100"></div>
 
-              <div className="relative h-32 w-32 overflow-hidden rounded-xl border border-white/10 bg-zinc-900 shadow-2xl transition-colors duration-500 group-hover:border-studio-primary/50">
+              <div className="relative h-32 w-32 overflow-hidden rounded-xl border border-studio-border bg-zinc-900 shadow-2xl transition-colors duration-500 group-hover:border-studio-primary/50">
                 <img
                   src={avatarSrc}
                   alt={mind.name}
@@ -162,22 +162,14 @@ export const MindHeroSection: React.FC<MindHeroSectionProps> = ({
                 </p>
               </div>
 
-              {/* Active Obsessions Ticker */}
-              {mind.obsessions && mind.obsessions.length > 0 && (
+              {/* Active Obsession */}
+              {mind.obsession && (
                 <div className="flex max-w-[400px] items-center gap-2 overflow-hidden">
                   <Icon name="zap" size="size-3" className="shrink-0 text-studio-primary" />
                   <div className="flex gap-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                    {mind.obsessions.slice(0, 3).map((obs, i) => (
-                      <span
-                        key={i}
-                        className="cursor-default whitespace-nowrap transition-colors hover:text-white"
-                      >
-                        [{obs.name}]
-                        {i < Math.min(mind.obsessions.length, 3) - 1 && (
-                          <span className="mx-1 text-zinc-700">/</span>
-                        )}
-                      </span>
-                    ))}
+                    <span className="cursor-default whitespace-nowrap transition-colors hover:text-white">
+                      [{mind.obsession}]
+                    </span>
                   </div>
                 </div>
               )}
@@ -187,7 +179,7 @@ export const MindHeroSection: React.FC<MindHeroSectionProps> = ({
           {/* RIGHT: Vital Signs (Metrics) */}
           <div className="flex w-full gap-4 overflow-x-auto pb-2 lg:w-auto lg:pb-0">
             {/* APEX Score Module */}
-            <div className="bg-studio-card group relative w-[160px] shrink-0 overflow-hidden rounded-lg border border-white/10 p-4 transition-colors hover:border-studio-primary/30">
+            <div className="bg-studio-card group relative w-[160px] shrink-0 overflow-hidden rounded-lg border border-studio-border p-4 transition-colors hover:border-studio-primary/30">
               <div className="absolute right-0 top-0 p-1.5 opacity-50">
                 <Icon
                   name="brain"
@@ -216,7 +208,7 @@ export const MindHeroSection: React.FC<MindHeroSectionProps> = ({
             </div>
 
             {/* Knowledge Module */}
-            <div className="bg-studio-card group relative w-[160px] shrink-0 overflow-hidden rounded-lg border border-white/10 p-4 transition-colors hover:border-studio-primary/30">
+            <div className="bg-studio-card group relative w-[160px] shrink-0 overflow-hidden rounded-lg border border-studio-border p-4 transition-colors hover:border-studio-primary/30">
               <div className="absolute right-0 top-0 p-1.5 opacity-50">
                 <Icon
                   name="database"
@@ -242,7 +234,7 @@ export const MindHeroSection: React.FC<MindHeroSectionProps> = ({
             </div>
 
             {/* Top Skill Module */}
-            <div className="bg-studio-card group relative w-[180px] shrink-0 overflow-hidden rounded-lg border border-white/10 p-4 transition-colors hover:border-studio-primary/30">
+            <div className="bg-studio-card group relative w-[180px] shrink-0 overflow-hidden rounded-lg border border-studio-border p-4 transition-colors hover:border-studio-primary/30">
               <div className="absolute right-0 top-0 p-1.5 opacity-50">
                 <Icon
                   name="trophy"
@@ -283,12 +275,12 @@ export const MindHeroSection: React.FC<MindHeroSectionProps> = ({
                   <Button
                     variant="outline"
                     size="icon"
-                    className="h-8 w-8 border-white/10 bg-zinc-900/50 text-zinc-400 hover:border-white/20 hover:text-white"
+                    className="h-8 w-8 border-studio-border bg-zinc-900/50 text-zinc-400 hover:border-studio-primary/30 hover:text-white"
                   >
                     <Icon name="settings" size="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[180px] border-white/10 bg-black">
+                <DropdownMenuContent align="end" className="w-[180px] border-studio-border bg-black">
                   <DropdownMenuItem onClick={onEditSettingsClick} className="text-xs">
                     <Icon name="edit" className="mr-2 size-3" />
                     Editar Informações
@@ -297,7 +289,7 @@ export const MindHeroSection: React.FC<MindHeroSectionProps> = ({
                     <Icon name="image" className="mr-2 size-3" />
                     Alterar Avatar
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-white/10" />
+                  <DropdownMenuSeparator className="bg-studio-border" />
                   <DropdownMenuItem
                     onClick={onDeleteClick}
                     className="text-xs text-red-500 focus:text-red-500"

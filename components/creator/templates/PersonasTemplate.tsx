@@ -14,7 +14,7 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { useToast } from '../../../hooks/use-toast';
 import { ScrollArea } from '../../ui/scroll-area';
 import { Skeleton } from '../../ui/skeleton';
-import { STUDIO_PRIMARY, STUDIO_GOLD, STUDIO_ACCENT } from '../studio-tokens';
+import { STUDIO_KPI_CLASSES, STUDIO_CARD_CLASSES, STUDIO_GOLD_GRADIENT } from '../studio-tokens';
 import { useAudienceProfiles, Persona } from '../../../hooks/useAudienceProfiles';
 
 // PersonaData type for AI-generated personas (before saving to DB)
@@ -233,11 +233,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               setInputText('');
               setView('input');
             }}
-            className="gap-2 text-white shadow-lg transition-all hover:scale-105"
-            style={{
-              backgroundColor: STUDIO_PRIMARY,
-              boxShadow: `0 10px 15px -3px ${STUDIO_PRIMARY}30`,
-            }}
+            className="gap-2 bg-studio-primary text-white shadow-lg shadow-studio-primary/20 transition-all hover:scale-105"
           >
             <Icon name="sparkles" size="size-4" /> Gerar com IA
           </Button>
@@ -245,11 +241,11 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          <Card className="border-[#538096]/20 bg-gradient-to-br from-[#1a2e35] to-[#0f1a1d]">
+          <Card className={STUDIO_KPI_CLASSES}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#538096]/20">
-                  <Icon name="users-alt" size="size-5" style={{ color: STUDIO_PRIMARY }} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-studio-primary/10">
+                  <Icon name="users-alt" size="size-5" className="text-studio-primary" />
                 </div>
                 <div>
                   {loading ? (
@@ -262,11 +258,11 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               </div>
             </CardContent>
           </Card>
-          <Card className="border-[#C9B298]/20 bg-gradient-to-br from-[#2a2520] to-[#1a1815]">
+          <Card className={cn("bg-gradient-to-br", STUDIO_GOLD_GRADIENT, "border-studio-accent/20 rounded-xl")}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#C9B298]/20">
-                  <Icon name="target" size="size-5" style={{ color: STUDIO_GOLD }} />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-studio-accent/10">
+                  <Icon name="target" size="size-5" className="text-studio-accent" />
                 </div>
                 <div>
                   {loading ? (
@@ -279,7 +275,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               </div>
             </CardContent>
           </Card>
-          <Card className="border-border/30 bg-card">
+          <Card className={STUDIO_CARD_CLASSES}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/20">
@@ -298,7 +294,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               </div>
             </CardContent>
           </Card>
-          <Card className="border-border/30 bg-card">
+          <Card className={STUDIO_CARD_CLASSES}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/20">
@@ -369,7 +365,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
             {personas.map((persona, index) => (
               <Card
                 key={persona.id}
-                className="group cursor-pointer overflow-hidden transition-all hover:border-[#538096]/50"
+                className={cn(STUDIO_CARD_CLASSES, "group cursor-pointer overflow-hidden transition-all hover:border-studio-primary/50")}
                 onClick={() => {
                   setCurrentPersona(persona);
                   setView('result');
@@ -377,20 +373,19 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               >
                 {/* Color Bar - first is gold (ICP), rest are primary */}
                 <div
-                  className="h-1 w-full"
-                  style={{
-                    backgroundColor: persona.isIcp || index === 0 ? STUDIO_GOLD : STUDIO_PRIMARY,
-                  }}
+                  className={cn(
+                    'h-1 w-full',
+                    (persona.isIcp || index === 0) ? 'bg-studio-accent' : 'bg-studio-primary'
+                  )}
                 />
                 <CardHeader className="flex flex-row items-center gap-4 pb-2">
                   <div
-                    className="flex h-12 w-12 items-center justify-center rounded-xl border shadow-inner"
-                    style={{ backgroundColor: STUDIO_ACCENT, borderColor: `${STUDIO_PRIMARY}20` }}
+                    className="flex h-12 w-12 items-center justify-center rounded-xl border border-studio-primary/20 bg-studio-accent/5 shadow-inner"
                   >
                     <Icon
                       name={persona.icon as any}
                       size="size-6"
-                      style={{ color: STUDIO_PRIMARY }}
+                      className="text-studio-primary"
                     />
                   </div>
                   <div className="flex-1 overflow-hidden">
@@ -398,12 +393,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                       <CardTitle className="truncate text-lg">{persona.name}</CardTitle>
                       {(persona.isIcp || index === 0) && (
                         <Badge
-                          className="shrink-0 text-[10px]"
-                          style={{
-                            backgroundColor: `${STUDIO_GOLD}20`,
-                            color: STUDIO_GOLD,
-                            borderColor: `${STUDIO_GOLD}30`,
-                          }}
+                          className="shrink-0 border-studio-accent/30 bg-studio-accent/10 text-[10px] text-studio-accent"
                         >
                           ICP
                         </Badge>
@@ -416,8 +406,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p
-                    className="line-clamp-2 border-l-2 pl-3 text-sm italic text-muted-foreground"
-                    style={{ borderColor: `${STUDIO_PRIMARY}30` }}
+                    className="line-clamp-2 border-l-2 border-studio-primary/30 pl-3 text-sm italic text-muted-foreground"
                   >
                     "{persona.definingQuote}"
                   </p>
@@ -440,7 +429,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                         {persona.desires.length} desejos
                       </span>
                     </div>
-                    <span className="flex items-center gap-1 font-medium transition-colors group-hover:text-[#538096]">
+                    <span className="flex items-center gap-1 font-medium transition-colors group-hover:text-studio-primary">
                       Ver <Icon name="arrow-right" size="size-3" />
                     </span>
                   </div>
@@ -449,27 +438,28 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
             ))}
 
             {/* Create New Persona Card */}
-            <button
+            <Button
+              variant="ghost"
               onClick={() => {
                 setInputText('');
                 setView('input');
               }}
-              className="group flex min-h-[280px] flex-col items-center justify-center rounded-xl border border-dashed border-border/50 transition-all duration-300 hover:border-[#538096]/50 hover:bg-[#538096]/5"
+              className="group flex min-h-[280px] flex-col items-center justify-center rounded-xl border border-dashed border-border/50 transition-all duration-300 hover:border-studio-primary/50 hover:bg-studio-primary/5 h-auto"
             >
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted/30 text-muted-foreground transition-colors group-hover:bg-[#538096]/20 group-hover:text-[#538096]">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted/30 text-muted-foreground transition-colors group-hover:bg-studio-primary/20 group-hover:text-studio-primary">
                 <Icon name="plus" size="size-8" />
               </div>
-              <span className="text-sm font-bold uppercase tracking-wide text-muted-foreground group-hover:text-[#538096]">
+              <span className="text-sm font-bold uppercase tracking-wide text-muted-foreground group-hover:text-studio-primary">
                 Nova Persona
               </span>
-              <span className="mt-1 text-xs text-muted-foreground/60">Gerar com IA</span>
-            </button>
+              <span className="mt-1 text-xs text-muted-foreground/60 font-normal">Gerar com IA</span>
+            </Button>
           </div>
         )}
 
         {/* Empty State */}
         {!loading && !error && personas.length === 0 && (
-          <Card className="border-dashed">
+          <Card className={cn(STUDIO_CARD_CLASSES, "border-dashed")}>
             <CardContent className="flex flex-col items-center justify-center p-12 text-center">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted/30">
                 <Icon name="users-alt" size="size-8" className="text-muted-foreground" />
@@ -480,8 +470,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               </p>
               <Button
                 onClick={() => setView('input')}
-                className="gap-2 text-white"
-                style={{ backgroundColor: STUDIO_PRIMARY }}
+                className="gap-2 bg-studio-primary text-white shadow-lg shadow-studio-primary/20"
               >
                 <Icon name="sparkles" size="size-4" /> Criar Primeira Persona
               </Button>
@@ -503,8 +492,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
           <h2 className="text-xl font-bold">Editando Persona</h2>
           <Button
             onClick={handleSave}
-            className="text-[#0A0A0F]"
-            style={{ backgroundColor: STUDIO_GOLD }}
+            className="bg-studio-accent text-studio-bg hover:opacity-90"
           >
             <Icon name="check" className="mr-2" size="size-4" /> Salvar Alterações
           </Button>
@@ -512,7 +500,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
 
         <div className="grid gap-6">
           {/* Identity */}
-          <Card>
+          <Card className={STUDIO_CARD_CLASSES}>
             <CardHeader>
               <CardTitle className="text-base">Identidade</CardTitle>
             </CardHeader>
@@ -541,25 +529,23 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                     'star',
                     'users-alt',
                   ].map((iconName) => (
-                    <button
+                    <Button
                       key={iconName}
                       type="button"
+                      variant="ghost"
                       onClick={() => handleEditField('icon', iconName)}
                       className={cn(
-                        'flex h-10 w-10 items-center justify-center rounded-lg border transition-all',
+                        'flex h-10 w-10 items-center justify-center rounded-lg border transition-all p-0',
                         currentPersona.icon === iconName
-                          ? 'border-[#538096] bg-[#538096]/20'
-                          : 'border-border/50 hover:border-[#538096]/50 hover:bg-muted/30'
+                          ? 'border-studio-primary bg-studio-primary/20 text-studio-primary'
+                          : 'border-border/50 hover:border-studio-primary/50 hover:bg-muted/30'
                       )}
                     >
                       <Icon
                         name={iconName as any}
                         size="size-5"
-                        style={{
-                          color: currentPersona.icon === iconName ? STUDIO_PRIMARY : undefined,
-                        }}
                       />
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -574,7 +560,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
           </Card>
 
           {/* Demographics */}
-          <Card>
+          <Card className={STUDIO_CARD_CLASSES}>
             <CardHeader>
               <CardTitle className="text-base">Demografia</CardTitle>
             </CardHeader>
@@ -611,7 +597,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
           </Card>
 
           {/* Psychographics (Simple Text Areas for Arrays simplification in this demo) */}
-          <Card>
+          <Card className={STUDIO_CARD_CLASSES}>
             <CardHeader>
               <CardTitle className="text-base">
                 Psicografia (Separar por vírgula para arrays)
@@ -680,14 +666,12 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
             <div className="group relative w-full overflow-hidden rounded-2xl border border-border bg-card p-8 shadow-xl">
               {/* Decorative Top Line */}
               <div
-                className="absolute left-0 top-0 h-1 w-full"
-                style={{ backgroundColor: STUDIO_PRIMARY }}
+                className="absolute left-0 top-0 h-1 w-full bg-studio-primary"
               />
 
               <div className="mb-6 flex items-center gap-3">
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: STUDIO_ACCENT, color: STUDIO_PRIMARY }}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-studio-accent/20 text-studio-primary"
                 >
                   <Icon name="magic-wand" size="size-5" />
                 </div>
@@ -696,7 +680,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
 
               <AutosizeTextarea
                 placeholder="Descreva seu cliente: idade, profissão, o que tira o sono dele, o que ele sonha..."
-                className="min-h-[150px] resize-none border-border/50 bg-muted/20 p-4 text-base focus:border-[#538096]/50"
+                className="min-h-[150px] resize-none border-border/50 bg-muted/20 p-4 text-base focus:border-studio-primary/50"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
               />
@@ -707,7 +691,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                     <Badge
                       key={tag}
                       variant="outline"
-                      className="cursor-pointer transition-colors hover:border-[#538096]/30 hover:bg-[#538096]/10 hover:text-[#538096]"
+                      className="cursor-pointer transition-colors hover:border-studio-primary/30 hover:bg-studio-primary/10 hover:text-studio-primary"
                       onClick={() => setInputText((prev) => prev + (prev ? ' ' : '') + tag)}
                     >
                       {tag}
@@ -717,11 +701,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                 <Button
                   onClick={handleGenerate}
                   disabled={!inputText.trim()}
-                  className="text-white shadow-lg transition-all hover:scale-105"
-                  style={{
-                    backgroundColor: STUDIO_PRIMARY,
-                    boxShadow: `0 10px 15px -3px ${STUDIO_PRIMARY}30`,
-                  }}
+                  className="bg-studio-primary text-white shadow-lg shadow-studio-primary/20 transition-all hover:scale-105"
                 >
                   <Icon name="sparkles" className="mr-2 size-4" /> Gerar Persona
                 </Button>
@@ -736,15 +716,13 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
             <div className="relative mb-8 h-24 w-24">
               <div className="absolute inset-0 rounded-full border-4 border-muted"></div>
               <div
-                className="absolute inset-0 animate-spin rounded-full border-4 border-t-transparent"
-                style={{ borderColor: `${STUDIO_PRIMARY} transparent transparent transparent` }}
+                className="absolute inset-0 animate-spin rounded-full border-4 border-studio-primary border-t-transparent"
               />
               <div className="absolute inset-0 flex items-center justify-center">
                 <Icon
                   name="brain"
                   size="size-8"
-                  className="animate-pulse"
-                  style={{ color: STUDIO_PRIMARY }}
+                  className="animate-pulse text-studio-primary"
                 />
               </div>
             </div>
@@ -759,13 +737,12 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
             {/* Header Profile */}
             <div className="flex flex-col items-center gap-6 rounded-xl border border-border bg-card p-6 shadow-sm md:flex-row md:items-start">
               <div
-                className="flex h-20 w-20 items-center justify-center rounded-xl border-2 shadow-inner"
-                style={{ backgroundColor: STUDIO_ACCENT, borderColor: `${STUDIO_PRIMARY}20` }}
+                className="flex h-20 w-20 items-center justify-center rounded-xl border-2 border-studio-primary/20 bg-studio-accent/10 shadow-inner"
               >
                 <Icon
                   name={currentPersona.icon as any}
                   size="size-10"
-                  style={{ color: STUDIO_PRIMARY }}
+                  className="text-studio-primary"
                 />
               </div>
               <div className="flex-1 space-y-2 text-center md:text-left">
@@ -773,19 +750,13 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                   <h2 className="font-sans text-2xl font-bold">{currentPersona.name}</h2>
                   <Badge
                     variant="outline"
-                    className="mx-auto w-fit md:mx-0"
-                    style={{
-                      borderColor: `${STUDIO_PRIMARY}30`,
-                      color: STUDIO_PRIMARY,
-                      backgroundColor: `${STUDIO_PRIMARY}10`,
-                    }}
+                    className="mx-auto w-fit border-studio-primary/30 bg-studio-primary/10 text-studio-primary md:mx-0"
                   >
                     ICP Principal
                   </Badge>
                 </div>
                 <p
-                  className="border-l-2 pl-4 text-lg italic leading-relaxed text-muted-foreground"
-                  style={{ borderColor: `${STUDIO_PRIMARY}30` }}
+                  className="border-l-2 border-studio-primary/30 pl-4 text-lg italic leading-relaxed text-muted-foreground"
                 >
                   "{currentPersona.definingQuote}"
                 </p>
@@ -800,8 +771,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                 <Button
                   size="sm"
                   onClick={handleSave}
-                  className="text-[#0A0A0F]"
-                  style={{ backgroundColor: STUDIO_GOLD }}
+                  className="bg-studio-accent text-studio-bg hover:opacity-90"
                 >
                   <Icon name="check" className="mr-2 size-3" /> Salvar
                 </Button>
@@ -811,7 +781,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
             {/* Main Grid */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* Demographics */}
-              <Card className="h-full">
+              <Card className={cn(STUDIO_CARD_CLASSES, "h-full")}>
                 <CardHeader className="border-b border-border bg-muted/5 pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
                     <Icon name="id-card-clip-alt" size="size-4" /> Demografia
@@ -844,7 +814,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               </Card>
 
               {/* Psychographics */}
-              <Card className="h-full lg:col-span-2">
+              <Card className={cn(STUDIO_CARD_CLASSES, "h-full lg:col-span-2")}>
                 <CardHeader className="border-b border-border bg-muted/5 pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
                     <Icon name="brain" size="size-4" /> Psicografia & Mindset
@@ -852,7 +822,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                 </CardHeader>
                 <CardContent className="grid gap-8 p-6 md:grid-cols-2">
                   <div className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase" style={{ color: STUDIO_PRIMARY }}>
+                    <h4 className="text-xs font-bold uppercase text-studio-primary">
                       Valores Core
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -863,8 +833,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                       ))}
                     </div>
                     <h4
-                      className="mt-4 text-xs font-bold uppercase"
-                      style={{ color: STUDIO_PRIMARY }}
+                      className="mt-4 text-xs font-bold uppercase text-studio-primary"
                     >
                       Medos Secretos
                     </h4>
@@ -885,15 +854,10 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                     </ul>
                   </div>
                   <div
-                    className="rounded-lg border p-4"
-                    style={{
-                      backgroundColor: `${STUDIO_PRIMARY}10`,
-                      borderColor: `${STUDIO_PRIMARY}20`,
-                    }}
+                    className="rounded-lg border border-studio-primary/20 bg-studio-primary/10 p-4"
                   >
                     <h4
-                      className="mb-2 text-xs font-bold uppercase"
-                      style={{ color: STUDIO_PRIMARY }}
+                      className="mb-2 text-xs font-bold uppercase text-studio-primary"
                     >
                       Pensamento Dominante (Loop)
                     </h4>
@@ -905,7 +869,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               </Card>
 
               {/* Pain Points */}
-              <Card className="h-full border-t-4 border-t-orange-500">
+              <Card className={cn(STUDIO_CARD_CLASSES, "h-full border-t-4 border-t-orange-500")}>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-orange-500">
                     <Icon name="flame" size="size-4" /> Dores (Inferno)
@@ -927,7 +891,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               </Card>
 
               {/* Desires */}
-              <Card className="h-full border-t-4 border-t-emerald-500">
+              <Card className={cn(STUDIO_CARD_CLASSES, "h-full border-t-4 border-t-emerald-500")}>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-emerald-500">
                     <Icon name="star" size="size-4" /> Desejos (Céu)
@@ -949,7 +913,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
               </Card>
 
               {/* Flags */}
-              <Card className="h-full bg-muted/10">
+              <Card className={cn(STUDIO_CARD_CLASSES, "h-full bg-muted/10")}>
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground">
                     <Icon name="flag" size="size-4" /> Sinais de Compra

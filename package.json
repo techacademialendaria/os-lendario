@@ -29,8 +29,10 @@
     "@uiw/react-md-editor": "^4.0.11",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "file-saver": "^2.0.5",
+    "framer-motion": "^12.23.26",
     "iconoir-react": "^7.11.0",
     "jszip": "^3.10.1",
     "marked": "^17.0.1",
@@ -43,6 +45,7 @@
     "tailwind-merge": "^2.2.1",
     "turndown": "^7.2.2",
     "web-vitals": "^5.1.0",
+    "xlsx": "^0.18.5",
     "yaml": "^2.8.2"
   },
   "devDependencies": {

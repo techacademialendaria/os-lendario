@@ -10,6 +10,8 @@ import { MIUSection } from '../sections/MIUSection';
 import { DriversSection } from '../sections/DriversSection';
 import { MappingSection } from '../sections/MappingSection';
 import { ToolsSection } from '../sections/ToolsSection';
+import { ToolStackMappingSection } from '../sections/ToolStackMappingSection';
+import { ToolStacksGridSection } from '../sections/ToolStacksGridSection';
 import { GapsSection } from '../sections/GapsSection';
 import { ExampleSection } from '../sections/ExampleSection';
 import { MindsSection } from '../sections/MindsSection';
@@ -49,6 +51,8 @@ const NAV_GROUPS = [
       { id: 'mapping', label: 'Mapping Systems', icon: 'chart-pie', count: 'systems' },
       { id: 'assessment', label: 'Assessment Systems', icon: 'layers', count: 'systems' },
       { id: 'tools', label: 'Tools & Models', icon: 'settings-sliders', count: 'tools' },
+      { id: 'tool-stacks', label: 'Tool Stacks x Mapping', icon: 'grid-3x3', count: null },
+      { id: 'stacks-grid', label: 'Tool Stacks Grid', icon: 'layout-grid', count: null },
       { id: 'mental-models', label: 'Mental Models', icon: 'lightbulb', count: null },
     ]
   },
@@ -107,6 +111,8 @@ const OpsDBTemplate: React.FC<OpsDBTemplateProps> = ({ setSection }) => {
       case 'mapping': return <MappingSection />;
       case 'assessment': return <AssessmentSystemsSection />;
       case 'tools': return <ToolsSection />;
+      case 'tool-stacks': return <ToolStackMappingSection />;
+      case 'stacks-grid': return <ToolStacksGridSection />;
       case 'jobs': return <JobsSection />;
       case 'gaps': return <GapsSection stats={stats} loading={loading} />;
       case 'example': return <ExampleSection />;

@@ -74,13 +74,15 @@ const CourseSidebar = ({
   return (
     <div className="flex h-[calc(100vh-64px)] w-64 shrink-0 flex-col border-r border-border bg-card/50">
       <div className="border-b border-border p-4">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onNavigate('overview')}
-          className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-2 gap-2"
         >
           <Icon name="arrow-left" size="size-3" />
           <span>Voltar ao curso</span>
-        </button>
+        </Button>
         <h3 className="truncate font-bold text-foreground">{courseTitle}</h3>
       </div>
 
@@ -104,16 +106,18 @@ const CourseSidebar = ({
             const isActive = currentStep === step.key;
 
             return (
-              <button
+              <Button
                 key={step.key}
+                variant="ghost"
+                size="sm"
                 onClick={() => step.status !== 'pending' && onNavigate(step.key)}
                 disabled={step.status === 'pending'}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all',
+                  'w-full justify-start gap-3',
                   isActive
                     ? 'bg-primary/10 font-medium text-primary ring-1 ring-primary/20'
                     : step.status === 'pending'
-                      ? 'cursor-not-allowed text-muted-foreground/50'
+                      ? 'cursor-not-allowed'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
@@ -124,7 +128,7 @@ const CourseSidebar = ({
                   type={step.status === 'completed' ? 'solid' : 'regular'}
                 />
                 <span>{step.label}</span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -332,7 +336,7 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
               </Button>
               <Button
                 onClick={() => onNavigate('curriculum')}
-                className="bg-primary text-white" style={{ backgroundColor: STUDIO_PRIMARY }}
+                className="bg-studio-primary hover:bg-studio-primary/90 text-white"
               >
                 Aprovar e Gerar Currículo
                 <Icon name="arrow-right" className="ml-2 size-4" />
@@ -344,8 +348,8 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
           <div className="flex-1 overflow-y-auto p-6">
             <div className="mx-auto max-w-6xl space-y-6">
               {/* AI Insights Alert */}
-              <Alert className="border-primary/20" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}>
-                <Icon name="lightbulb-on" className="size-4" style={{ color: STUDIO_PRIMARY }} />
+              <Alert className="border-primary/20 bg-studio-primary/5">
+                <Icon name="lightbulb-on" className="size-4 text-studio-primary" />
                 <AlertTitle>Insight Principal da IA</AlertTitle>
                 <AlertDescription>
                   90% dos cursos de didática focam em teoria. A maior reclamação dos alunos é{' '}
@@ -473,7 +477,9 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
                         )}
                       >
                         <CardContent className="flex items-center gap-4 p-4">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => {
                               setGaps((prev) =>
                                 prev.map((g) =>
@@ -482,14 +488,14 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
                               );
                             }}
                             className={cn(
-                              'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
+                              'h-6 w-6 rounded-full border-2 transition-colors',
                               gap.addressed
                                 ? 'bg-success border-success text-white'
                                 : 'border-muted-foreground/30'
                             )}
                           >
                             {gap.addressed && <Icon name="check" size="size-3" />}
-                          </button>
+                          </Button>
 
                           <div className="flex-1">
                             <p
@@ -529,7 +535,7 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
 
                   <div className="rounded-lg border border-border bg-muted/20 p-4">
                     <div className="mb-2 flex items-center gap-2">
-                      <Icon name="chart-pie" className="size-4" style={{ color: STUDIO_PRIMARY }} />
+                      <Icon name="chart-pie" className="size-4 text-studio-primary" />
                       <span className="text-sm font-medium">Resumo</span>
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-center">
@@ -594,7 +600,7 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
                                 {source.url && (
                                   <a
                                     href={source.url}
-                                    className="text-xs hover:underline" style={{ color: STUDIO_PRIMARY }}
+                                    className="text-xs hover:underline text-studio-primary"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >

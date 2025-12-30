@@ -14,7 +14,7 @@ import { Progress } from '../../ui/progress';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../ui/tooltip';
 import { cn } from '../../../lib/utils';
 import { FileUpload } from '../../ui/file-upload';
-import { STUDIO_PRIMARY, STUDIO_ACCENT } from '../studio-tokens';
+import { STUDIO_PRIMARY, STUDIO_ACCENT, STUDIO_CARD_CLASSES, INPUT_CLASSES, TEXTAREA_CLASSES } from '../studio-tokens';
 
 interface LessonEditorProps {
   onBack: () => void;
@@ -181,8 +181,7 @@ vault/
           </Button>
           <Button
             size="sm"
-            className="gap-2 text-white"
-            style={{ backgroundColor: STUDIO_PRIMARY }}
+            className="gap-2 text-white bg-studio-primary hover:bg-studio-primary-dark"
           >
             <Icon name="check" size="size-4" /> Salvar Alterações
           </Button>
@@ -203,41 +202,39 @@ vault/
             <>
               {/* Tab Switcher */}
               <div className="flex border-b border-border">
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => setSidebarTab('index')}
                   className={cn(
-                    'flex-1 px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors',
+                    'flex-1 rounded-none px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors',
                     sidebarTab === 'index'
-                      ? 'border-b-2 text-foreground'
+                      ? 'border-b-2 border-studio-primary text-foreground'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
-                  style={{
-                    borderBottomColor: sidebarTab === 'index' ? STUDIO_PRIMARY : undefined,
-                  }}
                 >
                   Índice
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
                   onClick={() => setSidebarTab('audit')}
                   className={cn(
-                    'flex flex-1 items-center justify-center gap-1.5 px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors',
+                    'flex h-auto flex-1 items-center justify-center gap-1.5 rounded-none px-4 py-3 text-xs font-bold uppercase tracking-wider transition-colors',
                     sidebarTab === 'audit'
-                      ? 'border-b-2 text-foreground'
+                      ? 'border-b-2 border-studio-primary text-foreground'
                       : 'text-muted-foreground hover:text-foreground'
                   )}
-                  style={{
-                    borderBottomColor: sidebarTab === 'audit' ? STUDIO_PRIMARY : undefined,
-                  }}
                 >
                   <Icon name="sparkles" size="size-3" />
                   Auditoria
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={() => setSidebarCollapsed(true)}
-                  className="border-l border-border px-3 py-3 text-muted-foreground transition-colors hover:text-foreground"
+                  className="rounded-none border-l border-border px-3 py-3 text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <Icon name="angle-double-left" size="size-4" />
-                </button>
+                </Button>
               </div>
 
               {/* Sidebar Content */}
@@ -248,8 +245,7 @@ vault/
                     {modules.map((mod) => (
                       <div key={mod.id} className="space-y-1">
                         <div
-                          className="flex items-center justify-between px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider"
-                          style={{ color: STUDIO_PRIMARY, borderBottomColor: undefined }}
+                          className="flex items-center justify-between px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-studio-primary"
                         >
                           <span className="truncate">{mod.title}</span>
                           <span className="font-mono text-[10px] font-normal text-muted-foreground">
@@ -257,36 +253,30 @@ vault/
                           </span>
                         </div>
                         {mod.lessons.map((lesson) => (
-                          <button
+                          <Button
                             key={lesson.id}
+                            variant="ghost"
                             className={cn(
-                              'flex w-full items-start gap-2 rounded-lg px-2 py-2 text-left text-xs transition-all',
+                              'flex h-auto w-full items-start justify-start gap-2 rounded-lg px-2 py-2 text-left text-xs transition-all',
                               lesson.active
-                                ? 'font-medium text-foreground'
+                                ? 'bg-studio-primary/10 font-medium text-foreground'
                                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                             )}
-                            style={{
-                              backgroundColor: lesson.active ? `${STUDIO_PRIMARY}10` : undefined,
-                            }}
                           >
                             <span
                               className={cn(
-                                'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border',
+                                'mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all',
                                 lesson.active
-                                  ? ''
+                                  ? 'border-studio-primary bg-studio-primary'
                                   : 'border-muted-foreground/30'
                               )}
-                              style={{
-                                borderColor: lesson.active ? STUDIO_PRIMARY : undefined,
-                                backgroundColor: lesson.active ? STUDIO_PRIMARY : undefined,
-                              }}
                             >
                               {lesson.active && (
                                 <Icon name="check" size="size-2" className="text-white" />
                               )}
                             </span>
                             <span className="line-clamp-2 leading-tight">{lesson.title}</span>
-                          </button>
+                          </Button>
                         ))}
                       </div>
                     ))}
@@ -307,11 +297,7 @@ vault/
                         <Button
                           variant="outline"
                           size="sm"
-                          className="gap-2"
-                          style={{
-                            borderColor: `${STUDIO_PRIMARY}40`,
-                            color: STUDIO_PRIMARY,
-                          }}
+                          className="gap-2 border-studio-primary/40 text-studio-primary hover:bg-studio-primary/5 hover:text-studio-primary"
                         >
                           <Icon name="sparkles" size="size-3" />
                           Analisar Conteúdo
@@ -343,12 +329,7 @@ vault/
                               />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                              <span
-                                className="text-2xl font-bold"
-                                style={{
-                                  color: STUDIO_PRIMARY,
-                                }}
-                              >
+                              <span className="text-2xl font-bold text-studio-primary">
                                 {aiAudit.overallScore}
                               </span>
                             </div>
@@ -398,56 +379,54 @@ vault/
           ) : (
             /* COLLAPSED STATE */
             <div className="flex flex-col items-center gap-2 py-3">
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setSidebarCollapsed(false)}
                 className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <Icon name="angle-double-right" size="size-4" />
-              </button>
+              </Button>
               <div className="my-1 h-px w-6 bg-border" />
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => {
                       setSidebarCollapsed(false);
                       setSidebarTab('index');
                     }}
                     className={cn(
-                      'flex h-8 w-8 items-center justify-center rounded-lg transition-colors',
+                      'flex h-8 w-8 items-center justify-center rounded-lg transition-all',
                       sidebarTab === 'index'
-                        ? 'text-white'
+                        ? 'bg-studio-primary/20 text-studio-primary'
                         : 'text-muted-foreground hover:bg-muted'
                     )}
-                    style={{
-                      backgroundColor: sidebarTab === 'index' ? `${STUDIO_PRIMARY}40` : undefined,
-                      color: sidebarTab === 'index' ? STUDIO_PRIMARY : undefined,
-                    }}
                   >
                     <Icon name="list" size="size-4" />
-                  </button>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">Índice do Curso</TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => {
                       setSidebarCollapsed(false);
                       setSidebarTab('audit');
                     }}
                     className={cn(
-                      'flex h-8 w-8 items-center justify-center rounded-lg transition-colors',
+                      'flex h-8 w-8 items-center justify-center rounded-lg transition-all',
                       sidebarTab === 'audit'
-                        ? 'text-white'
+                        ? 'bg-studio-primary/20 text-studio-primary'
                         : 'text-muted-foreground hover:bg-muted'
                     )}
-                    style={{
-                      backgroundColor: sidebarTab === 'audit' ? `${STUDIO_PRIMARY}40` : undefined,
-                      color: sidebarTab === 'audit' ? STUDIO_PRIMARY : undefined,
-                    }}
                   >
                     <Icon name="sparkles" size="size-4" />
-                  </button>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">Auditoria Didática</TooltipContent>
               </Tooltip>
@@ -462,7 +441,7 @@ vault/
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="h-auto border-none bg-transparent px-0 text-2xl font-bold shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0"
+              className={cn(INPUT_CLASSES, "h-auto border-none bg-transparent px-0 text-2xl font-bold shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0")}
               placeholder="Título da Aula"
             />
 
@@ -558,19 +537,19 @@ vault/
                   <AutosizeTextarea
                     value={script}
                     onChange={(e) => setScript(e.target.value)}
-                    className="min-h-[500px] w-full resize-none border-none bg-transparent p-0 font-sans text-base leading-relaxed focus-visible:ring-0"
+                    className={cn(TEXTAREA_CLASSES, "min-h-[500px] w-full resize-none border-none bg-transparent p-0 font-sans text-base leading-relaxed focus-visible:ring-0")}
                     placeholder="Escreva o conteúdo da aula..."
                   />
                 </div>
               </TabsContent>
 
               <TabsContent value="markdown" className="animate-fade-in pt-6">
-                <Card>
+                <Card className={STUDIO_CARD_CLASSES}>
                   <CardContent className="p-0">
                     <AutosizeTextarea
                       value={script}
                       onChange={(e) => setScript(e.target.value)}
-                      className="min-h-[500px] resize-none border-none p-6 font-mono text-sm leading-relaxed focus-visible:ring-0"
+                      className={cn(TEXTAREA_CLASSES, "min-h-[500px] resize-none border-none p-6 font-mono text-sm leading-relaxed focus-visible:ring-0")}
                       placeholder="Escreva em Markdown..."
                     />
                   </CardContent>

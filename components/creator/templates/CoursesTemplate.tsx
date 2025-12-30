@@ -743,8 +743,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
         {view === 'list' && (
           <Button
             onClick={() => setView('new')}
-            className="shadow-lg transition-transform hover:scale-105 text-white"
-            style={{backgroundColor: STUDIO_PRIMARY}}
+            className="bg-studio-primary text-white shadow-lg shadow-studio-primary/20 transition-transform hover:scale-105"
           >
             <Icon name="plus" className="mr-2 size-4" /> Novo Curso
           </Button>
@@ -764,11 +763,11 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
     const avgFidelity =
       courses.filter((c) => c.fidelityScore !== null).length > 0
         ? Math.round(
-            courses
-              .filter((c) => c.fidelityScore !== null)
-              .reduce((acc, c) => acc + (c.fidelityScore || 0), 0) /
-              courses.filter((c) => c.fidelityScore !== null).length
-          )
+          courses
+            .filter((c) => c.fidelityScore !== null)
+            .reduce((acc, c) => acc + (c.fidelityScore || 0), 0) /
+          courses.filter((c) => c.fidelityScore !== null).length
+        )
         : null;
 
     // Calculate Top Instructors with MMOS flag
@@ -894,12 +893,12 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
           ].map((metric, idx) => (
             <Card
               key={idx}
-              className="group relative overflow-hidden border-border bg-card transition-all hover:border-[#538096]/50"
+              className="group relative overflow-hidden border-border bg-card transition-all hover:border-studio-primary/50"
             >
               {/* Sparkline Background */}
               <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 opacity-10 transition-opacity group-hover:opacity-20">
                 <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="h-full w-full">
-                  <path d={`M0,30 L${metric.sparkline} L100,30 Z`} fill={STUDIO_PRIMARY} />
+                  <path d={`M0,30 L${metric.sparkline} L100,30 Z`} fill="hsl(var(--primary-color))" />
                 </svg>
               </div>
               <CardContent className="relative z-10 flex items-start justify-between p-5">
@@ -928,11 +927,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
                   </div>
                 </div>
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: STUDIO_ACCENT,
-                    color: STUDIO_PRIMARY,
-                  }}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg bg-studio-accent text-studio-primary transition-colors"
                 >
                   <Icon name={metric.icon} size="size-5" />
                 </div>
@@ -942,15 +937,15 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
         </div>
 
         {/* --- PIPELINE DE PRODUÇÃO --- */}
-        <Card className="group cursor-pointer border-border bg-card transition-colors hover:border-[#538096]/50">
+        <Card className="group cursor-pointer border-border bg-card transition-colors hover:border-studio-primary/50">
           <CardContent className="p-6">
             <div className="mb-6 flex items-center justify-between">
-              <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-[#538096]">
+              <h3 className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-studio-primary">
                 <Icon name="sitemap" size="size-4" /> Pipeline de Produção
               </h3>
               <Badge
                 variant="outline"
-                className="border-border text-muted-foreground transition-colors group-hover:border-[#538096] group-hover:text-[#538096]"
+                className="border-border text-muted-foreground transition-colors group-hover:border-studio-primary group-hover:text-studio-primary"
               >
                 Clique para Gerenciar <Icon name="arrow-right" size="size-3" className="ml-2" />
               </Badge>
@@ -960,8 +955,8 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
               {/* Connecting line with progress */}
               <div className="absolute left-0 top-5 -z-0 h-0.5 w-full bg-muted">
                 <div
-                  className="h-full w-[15%] transition-all duration-1000"
-                  style={{ backgroundColor: STUDIO_PRIMARY }}
+                  className="h-full bg-studio-primary transition-all duration-1000"
+                  style={{ width: '15%' }}
                 />
               </div>
 
@@ -1024,20 +1019,11 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
                     className={cn(
                       'flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all duration-300',
                       stage.status === 'active'
-                        ? 'scale-110 text-white shadow-lg'
+                        ? 'border-studio-primary bg-studio-primary text-white shadow-[0_0_20px_hsl(var(--primary-color)/.4)] scale-110'
                         : stage.status === 'done'
-                          ? 'bg-card text-foreground'
+                          ? 'border-studio-primary bg-card text-studio-primary'
                           : 'border-border bg-card text-muted-foreground group-hover/step:text-foreground'
                     )}
-                    style={{
-                      backgroundColor: stage.status === 'active' ? STUDIO_PRIMARY : undefined,
-                      borderColor:
-                        stage.status === 'active' || stage.status === 'done'
-                          ? STUDIO_PRIMARY
-                          : undefined,
-                      boxShadow:
-                        stage.status === 'active' ? `0 0 20px ${STUDIO_PRIMARY}40` : undefined,
-                    }}
                   >
                     {stage.status === 'done' ? (
                       <Icon name="check" size="size-4" />
@@ -1047,12 +1033,10 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
                   </div>
                   <div className="text-center">
                     <p
-                      className="mb-0.5 text-xs font-bold uppercase tracking-wider"
-                      style={
-                        stage.status === 'active' || stage.status === 'done'
-                          ? { color: STUDIO_PRIMARY }
-                          : {}
-                      }
+                      className={cn(
+                        'mb-0.5 text-xs font-bold uppercase tracking-wider',
+                        (stage.status === 'active' || stage.status === 'done') ? 'text-studio-primary' : 'text-muted-foreground'
+                      )}
                     >
                       {stage.label}
                     </p>
@@ -1065,11 +1049,11 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
         </Card>
 
         {/* --- MAIN CONTENT GRID --- */}
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-4" >
           {/* Left: Course List */}
-          <div className="space-y-4 xl:col-span-3">
+          <div className="space-y-4 xl:col-span-3" >
             {/* Search + Filters */}
-            <Card className="border-border/30 bg-card/50">
+            <Card className="border-border/30 bg-card/50" >
               <CardContent className="flex flex-col items-stretch gap-3 p-3 sm:flex-row sm:items-center">
                 <div className="relative flex-1">
                   <Icon
@@ -1124,160 +1108,160 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
 
             {/* Course Cards - List or Grid */}
             <div
-              className={cn(
-                'transition-all duration-300',
-                viewMode === 'grid'
-                  ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
-                  : 'space-y-3'
-              )}
+              className={
+                cn(
+                  'transition-all duration-300',
+                  viewMode === 'grid'
+                    ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
+                    : 'space-y-3'
+                )}
             >
-              {courses.map((course) => (
-                <Card
-                  key={course.id}
-                  className="group relative cursor-pointer overflow-hidden border-border bg-card transition-all hover:shadow-md"
-                  onClick={() => navigate(`/creator/cursos/${course.slug}`)}
-                >
-                  {/* Hover Border Effect */}
-                  <div className="pointer-events-none absolute inset-0 rounded-xl border-2 border-transparent transition-colors group-hover:border-[#538096]/30" />
+              {
+                courses.map((course) => (
+                  <Card
+                    key={course.id}
+                    className="group relative cursor-pointer overflow-hidden border-border bg-card transition-all hover:shadow-md"
+                    onClick={() => navigate(`/creator/cursos/${course.slug}`)}
+                  >
+                    {/* Hover Border Effect */}
+                    <div className="pointer-events-none absolute inset-0 rounded-xl border-2 border-transparent transition-colors group-hover:border-studio-primary/30" />
 
-                  <CardContent className={cn('p-4', viewMode === 'grid' && 'p-5')}>
-                    <div
-                      className={cn(
-                        'flex gap-4',
-                        viewMode === 'grid' ? 'flex-col' : 'items-center'
-                      )}
-                    >
-                      {/* Icon Box - Bege com hover para azul */}
+                    <CardContent className={cn('p-4', viewMode === 'grid' && 'p-5')}>
                       <div
                         className={cn(
-                          'flex shrink-0 items-center justify-center rounded-lg transition-colors group-hover:bg-[#538096] group-hover:text-white',
-                          viewMode === 'grid' ? 'h-14 w-14' : 'h-12 w-12'
-                        )}
-                        style={{ backgroundColor: STUDIO_ACCENT, color: STUDIO_PRIMARY }}
-                      >
-                        <Icon name={course.icon} size="size-5" />
-                      </div>
-
-                      {/* Title + Meta */}
-                      <div className={cn('min-w-0 flex-1', viewMode === 'grid' && 'w-full')}>
-                        {/* Title row with menu for grid */}
-                        <div
-                          className={cn(
-                            'mb-1.5 flex gap-2',
-                            viewMode === 'grid' ? 'items-start justify-between' : 'items-center'
-                          )}
-                        >
-                          <h4 className="truncate text-base font-bold text-foreground transition-colors group-hover:text-[#538096]">
-                            {course.title}
-                          </h4>
-                          {viewMode === 'grid' && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="-mr-2 -mt-1 h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Icon name="menu-dots-vertical" size="size-4" />
-                            </Button>
-                          )}
-                        </div>
-
-                        <div className="mb-2 flex items-center gap-2">
-                          <Badge
-                            variant="outline"
-                            className="h-4 border-[#538096]/30 bg-[#538096]/5 px-1.5 text-[9px] text-[#538096]"
-                          >
-                            {course.category}
-                          </Badge>
-                        </div>
-
-                        <div
-                          className={cn(
-                            'flex text-xs text-muted-foreground',
-                            viewMode === 'grid'
-                              ? 'mt-3 flex-col gap-2 border-t border-border pt-3'
-                              : 'items-center gap-4'
-                          )}
-                        >
-                          <span
-                            className="flex items-center gap-1.5 font-medium"
-                            style={{ color: STUDIO_GOLD }}
-                          >
-                            <Icon name="user" size="size-3" /> {course.instructor.name}
-                          </span>
-                          <div className="flex items-center gap-4">
-                            <span className="flex items-center gap-1.5">
-                              <Icon name="layers" size="size-3" /> {course.modulesCount} mód
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                              <Icon name="document" size="size-3" /> {course.lessonsCount} aulas
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Status + Date */}
-                      <div
-                        className={cn(
-                          'flex shrink-0 gap-1.5',
-                          viewMode === 'grid'
-                            ? 'mt-auto w-full items-center justify-between border-t border-border pt-3'
-                            : 'hidden flex-col items-end md:flex'
+                          'flex gap-4',
+                          viewMode === 'grid' ? 'flex-col' : 'items-center'
                         )}
                       >
-                        {course.progress === 100 ? (
-                          <Badge
-                            variant="outline"
-                            className="border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-emerald-600"
-                          >
-                            <span className="mr-1.5 h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                            Completo
-                          </Badge>
-                        ) : (
+                        {/* Icon Box - Bege com hover para azul */}
+                        <div
+                          className={cn(
+                            'flex shrink-0 items-center justify-center rounded-lg bg-studio-accent text-studio-primary transition-colors group-hover:bg-studio-primary group-hover:text-white',
+                            viewMode === 'grid' ? 'h-14 w-14' : 'h-12 w-12'
+                          )}
+                        >
+                          <Icon name={course.icon} size="size-5" />
+                        </div>
+
+                        {/* Title + Meta */}
+                        <div className={cn('min-w-0 flex-1', viewMode === 'grid' && 'w-full')}>
+                          {/* Title row with menu for grid */}
                           <div
                             className={cn(
-                              'space-y-1',
-                              viewMode === 'grid' ? 'mr-4 flex-1' : 'w-28'
+                              'mb-1.5 flex gap-2',
+                              viewMode === 'grid' ? 'items-start justify-between' : 'items-center'
                             )}
                           >
-                            <div
-                              className="flex justify-between text-[10px] font-bold uppercase"
-                              style={{ color: STUDIO_PRIMARY }}
-                            >
-                              <span>Produzindo</span>
-                              <span>{course.progress}%</span>
-                            </div>
-                            <Progress value={course.progress} className="h-1.5 bg-muted" />
+                            <h4 className="truncate text-base font-bold text-foreground transition-colors group-hover:text-studio-primary">
+                              {course.title}
+                            </h4>
+                            {viewMode === 'grid' && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="-mr-2 -mt-1 h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Icon name="menu-dots-vertical" size="size-4" />
+                              </Button>
+                            )}
                           </div>
-                        )}
-                        <div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground">
-                          <Icon name="calendar" size="size-3" />
-                          <span>{course.updatedAt}</span>
-                        </div>
-                      </div>
 
-                      {/* Menu - List view only */}
-                      {viewMode === 'list' && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
-                          onClick={(e) => e.stopPropagation()}
+                          <div className="mb-2 flex items-center gap-2">
+                            <Badge
+                              variant="outline"
+                              className="h-4 border-studio-primary/30 bg-studio-primary/5 px-1.5 text-[9px] text-studio-primary"
+                            >
+                              {course.category}
+                            </Badge>
+                          </div>
+
+                          <div
+                            className={cn(
+                              'flex text-xs text-muted-foreground',
+                              viewMode === 'grid'
+                                ? 'mt-3 flex-col gap-2 border-t border-border pt-3'
+                                : 'items-center gap-4'
+                            )}
+                          >
+                            <span
+                              className="flex items-center gap-1.5 font-medium text-studio-accent"
+                            >
+                              <Icon name="user" size="size-3" /> {course.instructor.name}
+                            </span>
+                            <div className="flex items-center gap-4">
+                              <span className="flex items-center gap-1.5">
+                                <Icon name="layers" size="size-3" /> {course.modulesCount} mód
+                              </span>
+                              <span className="flex items-center gap-1.5">
+                                <Icon name="document" size="size-3" /> {course.lessonsCount} aulas
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Status + Date */}
+                        <div
+                          className={cn(
+                            'flex shrink-0 gap-1.5',
+                            viewMode === 'grid'
+                              ? 'mt-auto w-full items-center justify-between border-t border-border pt-3'
+                              : 'hidden flex-col items-end md:flex'
+                          )}
                         >
-                          <Icon name="menu-dots-vertical" size="size-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                          {course.progress === 100 ? (
+                            <Badge
+                              variant="outline"
+                              className="border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-emerald-600"
+                            >
+                              <span className="mr-1.5 h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                              Completo
+                            </Badge>
+                          ) : (
+                            <div
+                              className={cn(
+                                'space-y-1',
+                                viewMode === 'grid' ? 'mr-4 flex-1' : 'w-28'
+                              )}
+                            >
+                              <div
+                                className="flex justify-between text-[10px] font-bold uppercase text-studio-primary"
+                              >
+                                <span>Produzindo</span>
+                                <span>{course.progress}%</span>
+                              </div>
+                              <Progress value={course.progress} className="h-1.5 bg-muted" />
+                            </div>
+                          )}
+                          <div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground">
+                            <Icon name="calendar" size="size-3" />
+                            <span>{course.updatedAt}</span>
+                          </div>
+                        </div>
+
+                        {/* Menu - List view only */}
+                        {viewMode === 'list' && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Icon name="menu-dots-vertical" size="size-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              }
             </div>
           </div>
 
           {/* Right: Sidebar */}
-          <div className="h-fit space-y-6 lg:sticky lg:top-24">
+          <div className="h-fit space-y-6 lg:sticky lg:top-24" >
             {/* Activity Feed */}
-            <Card className="border-border bg-card shadow-sm">
+            <Card className="border-border bg-card shadow-sm" >
               <CardHeader className="border-b border-border pb-3">
                 <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider text-muted-foreground">
                   <Icon name="bell" size="size-4" /> Atividade Recente
@@ -1318,8 +1302,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
                         onClick={() => navigate(`/creator/cursos/${activity.project_slug}`)}
                       >
                         <div
-                          className="z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 shadow-sm"
-                          style={{ backgroundColor: STUDIO_ACCENT, color: STUDIO_PRIMARY }}
+                          className="z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-studio-accent text-studio-primary shadow-sm"
                         >
                           <Icon name={getIconForTipoLabel(activity.tipo_label)} size="size-4" />
                         </div>
@@ -1334,7 +1317,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
                             {activity.title}
                           </p>
                           <p className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
-                            <span style={{ color: STUDIO_GOLD }}>{activity.project_name}</span>
+                            <span className="text-studio-accent">{activity.project_name}</span>
                             <span className="text-border">·</span>
                             <span className="font-mono">
                               {formatRelativeTime(activity.updated_at)}
@@ -1349,7 +1332,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
             </Card>
 
             {/* Content by Type */}
-            <Card className="border-border bg-card shadow-sm">
+            <Card className="border-border bg-card shadow-sm" >
               <CardHeader className="border-b border-border pb-3">
                 <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider text-muted-foreground">
                   <Icon name="layers" size="size-4" /> Conteúdos por Tipo
@@ -1376,8 +1359,8 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full"
-                        style={{ width: `${type.percent}%`, backgroundColor: STUDIO_PRIMARY }}
+                        className="h-full rounded-full bg-studio-primary"
+                        style={{ width: `${type.percent}%` }}
                       />
                     </div>
                   </div>
@@ -1412,7 +1395,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
                     <Icon name="seedling" size="size-6" />
                   </div>
                   {mode === 'greenfield' && (
-                    <Icon name="check-circle" className="size-6" style={{ color: STUDIO_PRIMARY }} type="solid" />
+                    <Icon name="check-circle" className="size-6 text-studio-primary" type="solid" />
                   )}
                 </div>
                 <div>
@@ -1493,11 +1476,13 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
             <CardContent className="p-2">
               <nav className="space-y-1">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((id) => (
-                  <button
+                  <Button
                     key={id}
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setActiveSection(id)}
                     className={cn(
-                      'flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors',
+                      'w-full justify-between',
                       activeSection === id
                         ? 'bg-primary/10 font-medium text-primary'
                         : 'text-muted-foreground hover:bg-muted'
@@ -1507,7 +1492,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
                     {activeSection > id && (
                       <Icon name="check-circle" className="text-success size-3" type="solid" />
                     )}
-                  </button>
+                  </Button>
                 ))}
               </nav>
             </CardContent>
@@ -1558,7 +1543,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
         <div className="absolute inset-0 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
         <Icon
           name="search-alt"
-          className="absolute inset-0 m-auto size-10 animate-pulse " style={{ color: STUDIO_PRIMARY }}
+          className="absolute inset-0 m-auto size-10 animate-pulse text-studio-primary"
         />
       </div>
       <div className="space-y-2">
@@ -1608,21 +1593,21 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
             </div>
           </CardContent>
         </Card>
-        <Card className="border-primary/20 " style={{ backgroundColor: `${STUDIO_PRIMARY}5` }}>
+        <Card className="border-studio-primary/20 bg-studio-primary/5">
           <CardHeader>
-            <CardTitle className="" style={{ color: STUDIO_PRIMARY }}>Oportunidades (Gaps)</CardTitle>
+            <CardTitle className="text-studio-primary">Oportunidades (Gaps)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex items-start gap-2">
-              <Icon name="check-circle" className="mt-1 size-4 " style={{ color: STUDIO_PRIMARY }} />
+              <Icon name="check-circle" className="mt-1 size-4 text-studio-primary" />
               <span className="text-sm">Incluir módulo sobre IA aplicada</span>
             </div>
             <div className="flex items-start gap-2">
-              <Icon name="check-circle" className="mt-1 size-4 " style={{ color: STUDIO_PRIMARY }} />
+              <Icon name="check-circle" className="mt-1 size-4 text-studio-primary" />
               <span className="text-sm">Fornecer scripts prontos (Copy & Paste)</span>
             </div>
             <div className="flex items-start gap-2">
-              <Icon name="check-circle" className="mt-1 size-4 " style={{ color: STUDIO_PRIMARY }} />
+              <Icon name="check-circle" className="mt-1 size-4 text-studio-primary" />
               <span className="text-sm">Focar em Mobile-First learning</span>
             </div>
           </CardContent>
@@ -1665,29 +1650,29 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
           </Card>
         </div>
         <div className="space-y-4">
-          <h3 className="text-center text-sm font-bold uppercase tracking-widest " style={{ color: STUDIO_PRIMARY }}>
+          <h3 className="text-center text-sm font-bold uppercase tracking-widest text-studio-primary">
             Sugestão da IA (Baseada em Dados)
           </h3>
-          <Card className="relative border-primary  shadow-lg" style={{ backgroundColor: `${STUDIO_PRIMARY}5` }}>
-            <Badge className="absolute -top-3 right-4 bg-primary -foreground" style={{ color: STUDIO_PRIMARY }}>
+          <Card className="relative border-primary shadow-lg" style={{ backgroundColor: 'hsl(var(--primary-color) / 0.05)' }}>
+            <Badge className="absolute -top-3 right-4 bg-primary text-primary-foreground">
               Otimizado
             </Badge>
             <CardContent className="p-6 font-serif text-sm">
               <p className="mb-2">
                 <strong>Promessa:</strong>{' '}
-                <span className="rounded  px-1" style={{ backgroundColor: `${STUDIO_PRIMARY}20` }}>
+                <span className="rounded px-1" style={{ backgroundColor: 'hsl(var(--primary-color) / 0.2)' }}>
                   Dominar o ciclo de vendas B2B e fechar contratos High-Ticket em 30 dias.
                 </span>
               </p>
               <p>
                 <strong>Público:</strong>{' '}
-                <span className="rounded  px-1" style={{ backgroundColor: `${STUDIO_PRIMARY}20` }}>
+                <span className="rounded px-1" style={{ backgroundColor: 'hsl(var(--primary-color) / 0.2)' }}>
                   Account Executives e SDRs buscando promoção.
                 </span>
               </p>
               <p>
                 <strong>Diferencial:</strong>{' '}
-                <span className="rounded  px-1" style={{ backgroundColor: `${STUDIO_PRIMARY}20` }}>
+                <span className="rounded px-1" style={{ backgroundColor: 'hsl(var(--primary-color) / 0.2)' }}>
                   Único com templates de IA e foco em Social Selling.
                 </span>
               </p>
@@ -1698,7 +1683,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
 
       <div className="flex justify-center gap-4 pt-8">
         <Button variant="outline">Manter Original</Button>
-        <Button onClick={goToCurriculum} className="bg-primary -foreground shadow-xl" style={{ color: STUDIO_PRIMARY }}>
+        <Button onClick={goToCurriculum} className="shadow-xl">
           Aceitar & Gerar Currículo <Icon name="check" className="ml-2" />
         </Button>
       </div>
@@ -1801,7 +1786,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
               <Card key={mod.id}>
                 <CardHeader className="border-b border-border bg-muted/20 py-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base font-bold " style={{ color: STUDIO_PRIMARY }}>
+                    <CardTitle className="text-base font-bold text-studio-primary">
                       Módulo {modIndex + 1}: {mod.title}
                     </CardTitle>
                     <Badge variant="outline" className="text-[10px]">
@@ -1961,7 +1946,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="text-center">
-              <div className="mb-2 font-mono text-4xl font-bold " style={{ color: STUDIO_PRIMARY }}>35%</div>
+              <div className="mb-2 font-mono text-4xl font-bold text-studio-primary">35%</div>
               <Progress value={35} className="h-2" />
               <p className="mt-2 text-xs text-muted-foreground">Estimativa: 4 min restantes</p>
             </div>
@@ -2030,7 +2015,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
         <Button variant="outline" size="lg" onClick={goBack}>
           Voltar ao Dashboard
         </Button>
-        <Button size="lg" className="bg-primary -foreground shadow-xl" style={{ color: STUDIO_PRIMARY }}>
+        <Button size="lg" className="shadow-xl">
           Publicar Agora
         </Button>
       </div>

@@ -184,8 +184,7 @@ const CourseBrief: React.FC<CourseBriefProps> = ({ setSection }) => {
               {hasChanges && (
                 <span className="flex items-center gap-2">
                   <span
-                    className="h-2 w-2 animate-pulse rounded-full"
-                    style={{ backgroundColor: STUDIO_GOLD }}
+                    className="h-2 w-2 animate-pulse rounded-full bg-studio-gold"
                   />
                   Alterações não salvas
                 </span>
@@ -211,8 +210,7 @@ const CourseBrief: React.FC<CourseBriefProps> = ({ setSection }) => {
               <Button
                 onClick={handleSaveAndContinue}
                 disabled={isSaving}
-                className="text-white"
-                style={{ backgroundColor: STUDIO_PRIMARY }}
+                className="text-white bg-studio-primary hover:bg-studio-primary/90"
               >
                 {isSaving ? 'Salvando...' : 'Salvar e Continuar'}
                 <Icon name="arrow-right" className="ml-2" size="size-4" />

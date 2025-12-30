@@ -15,12 +15,6 @@ export const MIND_EXPLANATION = {
       icon: 'circle-user'
     },
     {
-      name: 'mind_profiles',
-      desc: 'System prompts e profiles gerados (generalista, specialist)',
-      color: '#a55eea',
-      icon: 'document'
-    },
-    {
       name: 'mind_drivers',
       desc: 'Drivers inferidos com strength e confidence',
       color: '#ff6b6b',
@@ -340,13 +334,6 @@ export const MIND_RELATIONSHIPS = {
       icon: 'bolt'
     },
     {
-      table: 'mind_profiles',
-      relationship: 'System prompts e profiles gerados',
-      via: 'mind_profiles.mind_id',
-      cardinality: '1:N',
-      icon: 'circle-user'
-    },
-    {
       table: 'mind_tools',
       relationship: 'Ferramentas que o mind usa',
       via: 'mind_tools.mind_id',
@@ -375,14 +362,7 @@ export const MIND_RELATIONSHIPS = {
       icon: 'layers'
     },
     {
-      table: 'mind_obsessions',
-      relationship: 'Topicos de interesse intenso',
-      via: 'mind_obsessions.mind_id',
-      cardinality: '1:N',
-      icon: 'heart'
-    },
-    {
-      table: 'mind_values',
+      table: 'mind_drivers',
       relationship: 'Valores fundamentais',
       via: 'mind_values.mind_id',
       cardinality: '1:N',
@@ -467,12 +447,8 @@ export const EXAMPLE_MIND = {
     { tool: 'Lollapalooza Effect', frequency: 'frequent', proficiency: 'master' }
   ],
 
-  obsessions: [
-    { name: 'Human Misjudgment', intensity: 10 },
-    { name: 'Mental Models', intensity: 10 },
-    { name: 'Business Quality', intensity: 9 },
-    { name: 'Reading & Learning', intensity: 10 }
-  ],
+  // Obsession is now a single text field consolidated from mind_obsessions
+  obsession: 'Human Misjudgment',
 
   values: [
     { name: 'Rationality', importance: 10 },
@@ -505,16 +481,6 @@ export const MIND_SCHEMA = {
     { column: 'apex_score', type: 'NUMERIC', desc: 'Score APEX geral' },
     { column: 'avatar_url', type: 'TEXT', desc: 'URL do avatar' },
     { column: 'mmos_metadata', type: 'JSONB', desc: 'Metadados adicionais' }
-  ],
-
-  mind_profiles: [
-    { column: 'id', type: 'UUID', desc: 'Primary key' },
-    { column: 'mind_id', type: 'UUID FK', desc: 'Referencia ao mind' },
-    { column: 'profile_type', type: 'TEXT', desc: 'generalista, specialist, etc' },
-    { column: 'storage_format', type: 'TEXT', desc: 'md, json, yaml' },
-    { column: 'content_text', type: 'TEXT', desc: 'Conteudo markdown/texto' },
-    { column: 'content_json', type: 'JSONB', desc: 'Dados estruturados' },
-    { column: 'is_ai_generated', type: 'BOOLEAN', desc: 'Se foi gerado por AI' }
   ],
 
   mind_drivers: [

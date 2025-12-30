@@ -64,13 +64,15 @@ const CourseSidebar = ({
   return (
     <div className="flex h-[calc(100vh-64px)] w-64 shrink-0 flex-col border-r border-border bg-card/50">
       <div className="border-b border-border p-4">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onNavigate('overview')}
-          className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-2 gap-2"
         >
           <Icon name="arrow-left" size="size-3" />
           <span>Voltar ao curso</span>
-        </button>
+        </Button>
         <h3 className="truncate font-bold text-foreground">{courseTitle}</h3>
       </div>
 
@@ -94,16 +96,18 @@ const CourseSidebar = ({
             const isActive = currentStep === step.key;
 
             return (
-              <button
+              <Button
                 key={step.key}
+                variant="ghost"
+                size="sm"
                 onClick={() => step.status !== 'pending' && onNavigate(step.key)}
                 disabled={step.status === 'pending'}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all',
+                  'w-full justify-start gap-3',
                   isActive
                     ? 'bg-primary/10 font-medium text-primary ring-1 ring-primary/20'
                     : step.status === 'pending'
-                      ? 'cursor-not-allowed text-muted-foreground/50'
+                      ? 'cursor-not-allowed'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
@@ -114,7 +118,7 @@ const CourseSidebar = ({
                   type={step.status === 'completed' ? 'solid' : 'regular'}
                 />
                 <span>{step.label}</span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -400,7 +404,7 @@ const CourseCurriculumTemplate: React.FC<CourseCurriculumTemplateProps> = ({
               </Button>
               <Button
                 onClick={() => onNavigate('lessons')}
-                className="bg-primary text-white" style={{ backgroundColor: STUDIO_PRIMARY }}
+                className="bg-studio-primary hover:bg-studio-primary/90 text-white"
               >
                 Gerar Lições
                 <Icon name="arrow-right" className="ml-2 size-4" />
@@ -423,7 +427,7 @@ const CourseCurriculumTemplate: React.FC<CourseCurriculumTemplateProps> = ({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg font-bold" style={{ color: STUDIO_PRIMARY, backgroundColor: `${STUDIO_PRIMARY}10` }}>
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg font-bold text-studio-primary bg-studio-primary/10">
                           {modIndex + 1}
                         </div>
                         <div>
@@ -564,7 +568,7 @@ const CourseCurriculumTemplate: React.FC<CourseCurriculumTemplateProps> = ({
               {/* Add Module Button */}
               <Button
                 variant="outline"
-                className="w-full border-dashed py-8 hover:bg-primary/5 hover:border-primary/50" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}
+                className="w-full border-dashed py-8 hover:bg-primary/5 hover:border-primary/50 bg-studio-primary/5"
                 onClick={() => setIsAddModuleOpen(true)}
               >
                 <Icon name="plus" className="mr-2 size-5" />

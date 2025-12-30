@@ -75,6 +75,13 @@ export const THEMES: Record<string, ThemeConfig> = {
     light: '195 28% 65%',          // Lighter Petróleo
     foreground: '0 0% 100%',       // White
     hex: '#538096'
+  },
+  Creator: {
+    label: 'Course Creator',
+    primary: '195 28% 45%',        // #538096 (Petróleo Blue)
+    light: '195 28% 65%',          // Lighter Petróleo
+    foreground: '0 0% 100%',       // White
+    hex: '#538096'
   }
 };
 

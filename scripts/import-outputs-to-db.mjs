@@ -278,13 +278,14 @@ async function upsertValues(mindId, values) {
 
   // Delete existing values first
   await supabase
-    .from('mind_values')
-    .delete()
+    .from("mind_drivers")
+    .delete() // Commenting out as mind_values is consolidated
     .eq('mind_id', mindId);
 
   const { error } = await supabase
-    .from('mind_values')
-    .insert(values.map(v => ({
+    .from("mind_drivers")
+    .insert( // TODO: map values to drivers
+  // values.map(v => ({
       mind_id: mindId,
       name: v.name,
       importance_10: v.importance_10

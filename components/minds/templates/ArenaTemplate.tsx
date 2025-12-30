@@ -21,6 +21,8 @@ import { MindCardSelect } from '../arena/MindCardSelect';
 import { ArenaCreate, type DebateConfig } from './ArenaCreate';
 import { FrameworksLibrary } from '../arena/FrameworksLibrary';
 import { DebatesList } from '../arena/DebatesList';
+import { STUDIO_CARD_CLASSES } from '../studio-tokens';
+import { usePageTitle } from '../../../hooks/usePageTitle';
 
 // Helper: Extract initials from full name (e.g., "Steve Jobs" -> "SJ")
 const getInitials = (name: string): string => {
@@ -379,7 +381,7 @@ const LiveDebateCard: React.FC<{
   onClick?: () => void;
 }> = ({ topic, mind1, mind2, round, totalRounds, viewers, score1, score2, onClick }) => (
   <Card
-    className="group cursor-pointer border-border bg-card transition-all hover:border-primary/30"
+    className={cn(STUDIO_CARD_CLASSES, "group cursor-pointer transition-all hover:border-studio-primary/30")}
     onClick={onClick}
   >
     <CardContent className="p-6">
@@ -438,6 +440,9 @@ const LiveDebateCard: React.FC<{
 // --- MAIN COMPONENT ---
 
 export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
+  // Page title
+  usePageTitle('Arena');
+
   // Centralized state management via useArena hook
   const arena = useArena(INITIAL_MINDS);
   const {

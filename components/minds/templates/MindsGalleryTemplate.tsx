@@ -9,6 +9,7 @@ import { Input } from '../../ui/input';
 import { Select } from '../../ui/select';
 import { Tabs, TabsList, TabsTrigger } from '../../ui/tabs';
 import { useMinds } from '../../../hooks/useMinds';
+import { usePageTitle } from '../../../hooks/usePageTitle';
 
 interface MindsGalleryProps {
   setSection: (s: Section) => void;
@@ -21,6 +22,9 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
   const [searchQuery, setSearchQuery] = useState('');
 
   const { minds, loading, error, totalMinds } = useMinds();
+
+  // Page title
+  usePageTitle('Galeria de Mentes');
 
   // Filter minds by status and search, then sort: with avatar first, then alphabetically
   const filteredMinds = minds
@@ -51,9 +55,9 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
   };
 
   const renderListView = () => (
-    <div className="bg-studio-card w-full overflow-hidden rounded-xl border border-white/5">
+    <div className="bg-studio-card w-full overflow-hidden rounded-xl border border-studio-border">
       {/* Table Header */}
-      <div className="grid grid-cols-12 gap-4 border-b border-white/5 bg-white/[0.02] px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+      <div className="grid grid-cols-12 gap-4 border-b border-studio-border bg-studio-primary/5 px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
         <div className="col-span-3">Mente Sintética</div>
         <div className="col-span-2">Habilidade Assinatura</div>
         <div className="col-span-3">Resumo</div>
@@ -63,7 +67,7 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
       </div>
 
       {/* Table Body */}
-      <div className="divide-y divide-white/5">
+      <div className="divide-y divide-studio-border">
         {filteredMinds.map((mind) => (
           <div
             key={mind.id}
@@ -72,7 +76,7 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
           >
             {/* Name & Avatar */}
             <div className="col-span-3 flex items-center gap-3">
-              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-zinc-800">
+              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-studio-primary/20 bg-zinc-800">
                 <img
                   src={mind.avatar}
                   alt={mind.name}
@@ -123,7 +127,7 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
             <div className="col-span-2">
               {mind.expertise && mind.expertise.length > 0 ? (
                 <div className="flex flex-col gap-1">
-                  <span className="inline-flex w-fit whitespace-nowrap rounded border border-white/5 bg-white/5 px-1.5 py-0.5 text-[10px] text-zinc-400">
+                  <span className="inline-flex w-fit whitespace-nowrap rounded border border-studio-primary/10 bg-studio-primary/5 px-1.5 py-0.5 text-[10px] text-zinc-400">
                     {mind.expertise[0]}
                   </span>
                   {mind.expertise.length > 1 && (
@@ -140,11 +144,10 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
             {/* Status */}
             <div className="col-span-1">
               <div
-                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${
-                  mind.status === 'production'
+                className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium ${mind.status === 'production'
                     ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
                     : 'border-yellow-500/20 bg-yellow-500/10 text-yellow-400'
-                }`}
+                  }`}
               >
                 {mind.status === 'production' ? 'Ativo' : 'Criando'}
               </div>
@@ -172,7 +175,7 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
 
       <main className="mx-auto w-full max-w-[1400px] flex-1 space-y-8 p-6">
         {/* --- FILTERS BAR --- */}
-        <div className="bg-studio-card flex flex-col items-start justify-between gap-4 rounded-xl border border-white/5 p-2 shadow-sm xl:flex-row xl:items-center">
+        <div className="bg-studio-card flex flex-col items-start justify-between gap-4 rounded-xl border border-studio-border p-2 shadow-sm xl:flex-row xl:items-center">
           {/* Search */}
           <div className="relative w-full xl:w-96">
             <Icon
@@ -182,7 +185,7 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
             />
             <Input
               placeholder="Buscar por nome, tag ou categoria..."
-              className="h-10 rounded-lg border-transparent bg-transparent pl-10 text-sm transition-all hover:bg-white/5 focus:border-white/10 focus:bg-white/5"
+              className="h-10 rounded-lg border-transparent bg-transparent pl-10 text-sm transition-all hover:bg-studio-primary/5 focus:border-studio-primary/20 focus:bg-studio-primary/5"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -198,7 +201,7 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
                 { label: 'Negócios', value: 'business_strategy' },
                 { label: 'Filosofia', value: 'philosophy' },
               ]}
-              className="h-9 w-[160px] border-white/5 bg-transparent text-xs hover:border-white/10"
+              className="h-9 w-[160px] border-studio-border bg-transparent text-xs hover:border-studio-primary/20"
             />
 
             <Tabs
@@ -206,10 +209,10 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
               onValueChange={(v) => setStatusFilter(v as 'all' | 'production' | 'progress')}
               className="w-auto"
             >
-              <TabsList className="h-9 rounded-lg border border-white/5 bg-white/5 p-1">
+              <TabsList className="h-9 rounded-lg border border-studio-border bg-studio-card p-1">
                 <TabsTrigger
                   value="all"
-                  className="h-7 rounded-sm text-[10px] text-zinc-500 data-[state=active]:bg-white/10 data-[state=active]:text-white"
+                  className="h-7 rounded-sm text-[10px] text-zinc-500 data-[state=active]:bg-studio-primary/10 data-[state=active]:text-white"
                 >
                   Todas
                 </TabsTrigger>
@@ -228,18 +231,18 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
               </TabsList>
             </Tabs>
 
-            <div className="mx-2 hidden h-6 w-px bg-white/10 md:block"></div>
+            <div className="mx-2 hidden h-6 w-px bg-studio-border md:block"></div>
 
-            <div className="flex gap-1 rounded-lg border border-white/5 bg-white/5 p-1">
+            <div className="flex gap-1 rounded-lg border border-studio-border bg-studio-card p-1">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`rounded p-1.5 transition-all ${viewMode === 'grid' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                className={`rounded p-1.5 transition-all ${viewMode === 'grid' ? 'bg-studio-primary/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
               >
                 <Icon name="grid" size="size-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`rounded p-1.5 transition-all ${viewMode === 'list' ? 'bg-white/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                className={`rounded p-1.5 transition-all ${viewMode === 'list' ? 'bg-studio-primary/10 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
               >
                 <Icon name="list" size="size-4" />
               </button>
@@ -277,7 +280,7 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
           )}
 
           {!loading && !error && filteredMinds.length === 0 && (
-            <div className="rounded-xl border border-dashed border-white/10 py-20 text-center">
+            <div className="rounded-xl border border-dashed border-studio-border py-20 text-center">
               <p className="text-sm text-zinc-500">Nenhuma mente encontrada.</p>
             </div>
           )}
@@ -296,8 +299,8 @@ const MindsGalleryTemplate: React.FC<MindsGalleryProps> = ({ setSection, onSelec
                   ))}
 
                   {/* Create New Mind Placeholder Card */}
-                  <button className="group flex h-full min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-white/10 transition-all duration-300 hover:border-studio-primary/50 hover:bg-studio-primary/5">
-                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-zinc-600 transition-colors group-hover:bg-studio-primary/20 group-hover:text-studio-primary">
+                  <button className="group flex h-full min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-studio-border transition-all duration-300 hover:border-studio-primary/50 hover:bg-studio-primary/5">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-studio-primary/5 text-zinc-600 transition-colors group-hover:bg-studio-primary/20 group-hover:text-studio-primary">
                       <Icon name="plus" size="size-8" />
                     </div>
                     <span className="text-sm font-bold uppercase tracking-wide text-zinc-500 group-hover:text-studio-primary">

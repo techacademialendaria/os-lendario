@@ -844,26 +844,14 @@ async function seedExtendedData() {
       }
     }
 
-    // Insert values
-    if (data.values) {
-      for (const val of data.values) {
-        const { error } = await supabase
-          .from('mind_values')
-          .insert({
-            mind_id: mindId,
-            name: val.name,
-            importance_10: val.importance,
-            notes: val.notes
-          });
-
-        if (error && !error.message.includes('duplicate')) {
-          console.log('ERR   value ' + slug + '/' + val.name + ': ' + error.message);
-          errors++;
-        } else {
-          valCount++;
-        }
-      }
-    }
+    // NOTE: Values have been consolidated into mind_drivers table
+    // Values are now mapped to drivers and stored in mind_drivers table
+    // To add values for a mind, use mind_drivers with driver_id + strength + evidence
+    // Original values data is preserved but not inserted here
+    // if (data.values) {
+    //   // This would require mapping Portuguese values to English drivers
+    //   // See: docs/mmos/MIGRATION_MIND_VALUES_COMPLETE.md
+    // }
 
     console.log('OK    ' + slug);
   }

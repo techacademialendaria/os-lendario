@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
 import { Icon } from '../../ui/icon';
+import { Button } from '../../ui/button';
 import { cn } from '../../../lib/utils';
 import OpsTopbar from '../OpsTopbar';
 import { useOpsStats, OpsStats } from '../../../hooks/useOpsStats';
@@ -99,12 +100,9 @@ function getModules(stats: OpsStats): ModuleStats[] {
     {
       title: 'Mind Mappings',
       icon: 'brain',
-      description: 'Obsessoes, valores, psicometrics',
+      description: 'Psicometrics e scores',
       tables: [
-        { name: 'mind_obsessions', records: stats.mindObsessions, status: calculateStatus(stats.mindObsessions, 1), description: 'Topicos de interesse', fields: 6 },
-        { name: 'mind_values', records: stats.mindValues, status: calculateStatus(stats.mindValues, 1), description: 'Valores fundamentais', fields: 5 },
-        { name: 'mind_psychometrics', records: stats.mindPsychometrics, status: calculateStatus(stats.mindPsychometrics, 1), description: 'Scores JSONB (legado)', fields: 5 },
-        { name: 'mind_profiles', records: stats.mindProfiles, status: calculateStatus(stats.mindProfiles, 1), description: 'System prompts', fields: 9 }
+        { name: 'mind_psychometrics', records: stats.mindPsychometrics, status: calculateStatus(stats.mindPsychometrics, 1), description: 'Scores JSONB (legado)', fields: 5 }
       ]
     },
     {
@@ -289,14 +287,16 @@ const OpsSchemaTemplate: React.FC<OpsSchemaTemplateProps> = ({ setSection }) => 
                   {criticalIssues} Critical Gaps
                 </Badge>
               )}
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => refetch()}
                 disabled={loading}
-                className="p-2 rounded-lg bg-card border border-border hover:bg-muted/50 transition-colors disabled:opacity-50"
+                className="h-9 w-9"
                 title="Refresh Data"
               >
                 <Icon name={loading ? "loader" : "refresh-cw"} size="size-4" className={loading ? "animate-spin" : ""} />
-              </button>
+              </Button>
             </div>
           </div>
 

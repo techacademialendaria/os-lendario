@@ -16,6 +16,7 @@ const OpsTopbar: React.FC<OpsTopbarProps> = ({ currentSection, setSection }) => 
 
   const navItems = [
     { label: 'Database', icon: 'database', section: Section.STUDIO_OPS_DB, path: '/studio/ops/db' },
+    { label: 'Views', icon: 'table', section: Section.STUDIO_OPS_VIEWS, path: '/studio/ops/views' },
     { label: 'Schema', icon: 'sitemap', section: Section.STUDIO_OPS_SCHEMA, path: '/studio/ops/schema' },
   ];
 

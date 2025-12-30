@@ -54,13 +54,15 @@ const CourseSidebar = ({
   return (
     <div className="flex h-[calc(100vh-64px)] w-64 shrink-0 flex-col border-r border-border bg-card/50">
       <div className="border-b border-border p-4">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onNavigate('overview')}
-          className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-2 gap-2"
         >
           <Icon name="arrow-left" size="size-3" />
           <span>Voltar ao curso</span>
-        </button>
+        </Button>
         <h3 className="truncate font-bold text-foreground">{courseTitle}</h3>
       </div>
 
@@ -84,16 +86,18 @@ const CourseSidebar = ({
             const isActive = currentStep === step.key;
 
             return (
-              <button
+              <Button
                 key={step.key}
+                variant="ghost"
+                size="sm"
                 onClick={() => step.status !== 'pending' && onNavigate(step.key)}
                 disabled={step.status === 'pending'}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all',
+                  'w-full justify-start gap-3',
                   isActive
                     ? 'bg-primary/10 font-medium text-primary ring-1 ring-primary/20'
                     : step.status === 'pending'
-                      ? 'cursor-not-allowed text-muted-foreground/50'
+                      ? 'cursor-not-allowed'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
@@ -104,7 +108,7 @@ const CourseSidebar = ({
                   type={step.status === 'completed' ? 'solid' : 'regular'}
                 />
                 <span>{step.label}</span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -323,7 +327,7 @@ const CourseLessonsTemplate: React.FC<CourseLessonsTemplateProps> = ({
         );
       case 'generating':
         return (
-          <Badge className="animate-pulse border-0 text-[10px]" style={{ color: STUDIO_PRIMARY, backgroundColor: `${STUDIO_PRIMARY}10` }}>
+          <Badge className="animate-pulse border-0 text-[10px] text-studio-primary bg-studio-primary/10">
             Gerando...
           </Badge>
         );
@@ -399,7 +403,7 @@ const CourseLessonsTemplate: React.FC<CourseLessonsTemplateProps> = ({
               )}
               <Button
                 onClick={() => onNavigate('validation')}
-                className="bg-primary text-white" style={{ backgroundColor: STUDIO_PRIMARY }}
+                className="bg-studio-primary hover:bg-studio-primary/90 text-white"
                 disabled={stats.completed < stats.total}
               >
                 Ir para Validação

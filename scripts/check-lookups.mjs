@@ -41,9 +41,9 @@ console.log('\nEXISTING DATA:');
 console.log('  mind_obsessions: ' + (obsCount || 0));
 
 const { count: valCount } = await supabase
-  .from('mind_values')
+  .from('mind_drivers')
   .select('*', { count: 'exact', head: true });
-console.log('  mind_values: ' + (valCount || 0));
+console.log('  mind_drivers: ' + (valCount || 0));
 
 const { count: profCount } = await supabase
   .from('mind_proficiencies')

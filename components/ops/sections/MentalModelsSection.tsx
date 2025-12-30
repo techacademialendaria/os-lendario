@@ -14,17 +14,18 @@ import { MermaidDiagram } from '../components/MermaidDiagram';
 import { StatusBadge } from '../components/StatusBadge';
 import {
   MENTAL_MODELS_EXPLANATION,
-  MENTAL_MODELS_CATEGORIES,
   MENTAL_MODELS_RELATIONSHIPS,
   MENTAL_MODELS_FRAMEWORK,
   MENTAL_MODELS_RECOMMENDATIONS,
   MENTAL_MODELS_REFERENCES
 } from '../data/mental-models-content';
 import { MENTAL_MODELS_DIAGRAM, MENTAL_MODELS_TABLE } from '../data/tables';
+import { useMentalModels } from '../../../hooks/useMentalModels';
 
 const MentalModelsSection: React.FC = () => {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [expandedModel, setExpandedModel] = useState<string | null>(null);
+  const { categories, loading, error, totalModels } = useMentalModels();
 
   return (
     <OpsPage>
@@ -46,12 +47,50 @@ const MentalModelsSection: React.FC = () => {
         </OpsCardContent>
       </OpsCard>
 
+      {/* Loading State */}
+      {loading && (
+        <OpsCard>
+          <OpsCardContent className="flex items-center justify-center py-12">
+            <div className="flex flex-col items-center gap-3">
+              <Icon name="spinner" size="size-6" className="animate-spin text-primary" />
+              <span className="text-sm text-muted-foreground">Carregando modelos mentais...</span>
+            </div>
+          </OpsCardContent>
+        </OpsCard>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <OpsCard>
+          <OpsCardContent className="flex items-center justify-center py-12">
+            <div className="flex flex-col items-center gap-3">
+              <Icon name="exclamation-circle" size="size-6" className="text-destructive" />
+              <span className="text-sm text-destructive">Erro ao carregar modelos mentais</span>
+              <span className="text-xs text-muted-foreground">{error.message}</span>
+            </div>
+          </OpsCardContent>
+        </OpsCard>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && categories.length === 0 && (
+        <OpsCard>
+          <OpsCardContent className="flex items-center justify-center py-12">
+            <div className="flex flex-col items-center gap-3">
+              <Icon name="info-circle" size="size-6" className="text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Nenhum modelo mental encontrado</span>
+            </div>
+          </OpsCardContent>
+        </OpsCard>
+      )}
+
       {/* Categories Deep Dive */}
-      <OpsCard>
-        <OpsCardHeader title="Categorias de Modelos Mentais" accentColor="text-muted-foreground" />
-        <OpsCardContent>
-          <div className="space-y-4">
-            {MENTAL_MODELS_CATEGORIES.map((category, idx) => (
+      {!loading && !error && categories.length > 0 && (
+        <OpsCard>
+          <OpsCardHeader title="Categorias de Modelos Mentais" accentColor="text-muted-foreground" />
+          <OpsCardContent>
+            <div className="space-y-4">
+              {categories.map((category, idx) => (
               <div
                 key={idx}
                 className="rounded-lg border border-border/40 overflow-hidden hover:border-border/60 transition-colors"
@@ -148,6 +187,7 @@ const MentalModelsSection: React.FC = () => {
           </div>
         </OpsCardContent>
       </OpsCard>
+      )}
 
       {/* Relationships */}
       <OpsCard>

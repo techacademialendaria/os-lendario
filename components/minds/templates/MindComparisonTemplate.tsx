@@ -6,6 +6,7 @@ import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
 import RadarChart from '../ui/RadarChart';
 import { getDiscTheme, getBigFiveColor } from '../../../utils/psychometrics';
+import { usePageTitle } from '../../../hooks/usePageTitle';
 
 interface MindComparisonProps {
   setSection: (s: Section) => void;
@@ -87,6 +88,9 @@ const bigFiveLabels = [
 
 const MindComparisonTemplate: React.FC<MindComparisonProps> = ({ setSection }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Page title
+  usePageTitle('Matriz de Comparação');
 
   const renderGridView = () => (
     <div className="animate-in fade-in slide-in-from-bottom-4 space-y-12 duration-500">

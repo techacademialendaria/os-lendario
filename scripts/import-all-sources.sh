@@ -1,8 +1,13 @@
 #!/bin/bash
-export VITE_SUPABASE_URL="https://uvoikabnkjfvcccjeypi.supabase.co"
-export VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2b2lrYWJua2pmdmNjY2pleXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0OTE2OTYsImV4cCI6MjA3NzA2NzY5Nn0.-FyNBGXcf7RHIV3wiI5nMeZsH5ifwpWslNPfTtTJK-M"
+# Load environment variables from .env.local
+set -a
+source "$(dirname "$0")/../.env.local" 2>/dev/null || {
+  echo "Error: .env.local not found. Create it with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY"
+  exit 1
+}
+set +a
 
-cd /Users/alan/Code/mmos/app
+cd "$(dirname "$0")/.."
 
 minds=(
   naval_ravikant

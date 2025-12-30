@@ -33,13 +33,10 @@ import {
 
 const MINDS_DIAGRAM = `
 erDiagram
-    minds ||--o{ mind_profiles : has
     minds ||--o{ mind_drivers : has
     minds ||--o{ mind_psychometrics : has
     minds ||--o{ mind_component_scores : has
     minds ||--o{ mind_system_mappings : has
-    minds ||--o{ mind_obsessions : has
-    minds ||--o{ mind_values : has
     minds ||--o{ mind_tools : uses
     minds ||--o{ mind_tags : tagged_with
     minds ||--o{ contents : about
@@ -58,15 +55,6 @@ erDiagram
         text short_bio
         text privacy_level
         numeric apex_score
-    }
-
-    mind_profiles {
-        uuid id
-        uuid mind_id
-        text profile_type
-        text storage_format
-        text content_text
-        jsonb content_json
     }
 
     mind_drivers {
@@ -91,15 +79,12 @@ erDiagram
 // =============================================================================
 
 const MINDS_TABLE = [
-  { table: 'minds', records: 8, status: 'ok' as const, desc: 'Registro central de cada mind' },
-  { table: 'mind_profiles', records: 12, status: 'partial' as const, desc: 'System prompts e profiles gerados' },
-  { table: 'mind_drivers', records: 0, status: 'empty' as const, desc: 'Drivers inferidos - CRITICO' },
+  { table: 'minds', records: 8, status: 'ok' as const, desc: 'Registro central de cada mind (inclui obsession)' },
+  { table: 'mind_drivers', records: 0, status: 'empty' as const, desc: 'Drivers inferidos (includes migrated values)' },
   { table: 'mind_psychometrics', records: 0, status: 'empty' as const, desc: 'Scores Big Five e outros' },
   { table: 'mind_component_scores', records: 0, status: 'empty' as const, desc: 'Scores em componentes de sistemas' },
   { table: 'mind_tags', records: 15, status: 'ok' as const, desc: 'Tags para categorizacao' },
-  { table: 'mind_tools', records: 0, status: 'empty' as const, desc: 'Ferramentas usadas por cada mind' },
-  { table: 'mind_obsessions', records: 0, status: 'empty' as const, desc: 'Topicos de interesse intenso' },
-  { table: 'mind_values', records: 0, status: 'empty' as const, desc: 'Valores fundamentais' }
+  { table: 'mind_tools', records: 0, status: 'empty' as const, desc: 'Ferramentas usadas por cada mind' }
 ];
 
 // =============================================================================
@@ -523,25 +508,21 @@ export const MindsSection: React.FC = () => {
               </div>
             </div>
 
-            {/* Obsessions */}
+            {/* Obsession (consolidated to single field on minds table) */}
             <div className="p-5 rounded-xl bg-muted/5 border border-border/10">
-              <h5 className="font-bold text-xs uppercase tracking-widest text-muted-foreground mb-4">Obsessions</h5>
+              <h5 className="font-bold text-xs uppercase tracking-widest text-muted-foreground mb-4">Obsession</h5>
               <div className="flex flex-wrap gap-2.5">
-                {EXAMPLE_MIND.obsessions.map((o, i) => (
-                  <OpsBadge
-                    key={i}
-                    variant="outline"
-                    className="px-3 py-1.5 rounded-full text-xs"
-                    style={{
-                      backgroundColor: `#a55eea15`,
-                      color: '#a55eea',
-                      borderColor: `#a55eea30`
-                    }}
-                  >
-                    <span className="font-bold">{o.name}</span>
-                    <span className="opacity-60 text-[10px] border-l border-current pl-2 ml-1">{o.intensity}/10</span>
-                  </OpsBadge>
-                ))}
+                <OpsBadge
+                  variant="outline"
+                  className="px-3 py-1.5 rounded-full text-xs"
+                  style={{
+                    backgroundColor: `#a55eea15`,
+                    color: '#a55eea',
+                    borderColor: `#a55eea30`
+                  }}
+                >
+                  <span className="font-bold">{EXAMPLE_MIND.obsession}</span>
+                </OpsBadge>
               </div>
             </div>
 

@@ -164,25 +164,15 @@ interface DbMindWithRelations extends DbMind {
   mind_tags?: Array<{
     tags: { id: string; name: string } | null;
   }>;
-  mind_profiles?: Array<{
-    id: string;
-    profile_type?: string | null;
-    storage_format?: string | null;
-    content_text?: string | null;
-    content_json?: Record<string, unknown> | null;
-  }>;
 }
 
 // Map database status/completion to UI status
 const deriveStatus = (mind: DbMindWithRelations): MindData['status'] => {
-  // Check if mind has profiles (indicates completion)
-  const hasProfiles = mind.mind_profiles && mind.mind_profiles.length > 0;
+  // Check if mind has tags (indicates completion)
   const hasTags = mind.mind_tags && mind.mind_tags.length > 0;
 
-  if (hasProfiles && hasTags) {
+  if (hasTags) {
     return 'production';
-  } else if (hasProfiles || hasTags) {
-    return 'progress';
   }
   return 'draft';
 };
@@ -196,13 +186,9 @@ const calculateProgress = (mind: DbMindWithRelations): number => {
   if (mind.short_bio) progress += 10;
   if (mind.primary_language) progress += 5;
 
-  // Tags (40%)
+  // Tags (80%)
   const tagCount = mind.mind_tags?.length || 0;
-  progress += Math.min(tagCount * 10, 40);
-
-  // Profiles (40%)
-  const profileCount = mind.mind_profiles?.length || 0;
-  progress += Math.min(profileCount * 10, 40);
+  progress += Math.min(tagCount * 10, 80);
 
   return Math.min(progress, 100);
 };
@@ -244,20 +230,6 @@ const extractSignatureSkill = (mindTags: DbMindWithRelations['mind_tags']): stri
   }
 
   return mindTags[0]?.tags?.name || 'Synthetic Mind';
-};
-
-// Extract differentials from profiles
-// Note: Currently returns defaults since expertise_areas was moved to profile content
-const extractDifferentials = (mindProfiles: DbMindWithRelations['mind_profiles']): string[] => {
-  const defaults = ['Clone cognitivo treinado', 'Base de conhecimento estruturada'];
-
-  if (!mindProfiles || mindProfiles.length === 0) {
-    return defaults;
-  }
-
-  // Profile data is now stored in content_text/content_json, not in structured columns
-  // Return defaults - expertise is extracted from mind_tags instead
-  return defaults;
 };
 
 // Derive taxonomy from tags
@@ -316,7 +288,7 @@ const transformToMindData = (dbMind: DbMindWithRelations): MindData => {
     status,
     signatureSkill,
     expertise: extractExpertise(dbMind.mind_tags),
-    differentials: extractDifferentials(dbMind.mind_profiles),
+    differentials: ['Clone cognitivo treinado', 'Base de conhecimento estruturada'],
     taxonomy: deriveTaxonomy(dbMind.mind_tags),
     progressPercent,
     psychometrics, // Attach the full profile
@@ -360,13 +332,6 @@ export function useMinds(): UseMindsResult {
           *,
           mind_tags(
             tags(id, name)
-          ),
-          mind_profiles(
-            id,
-            profile_type,
-            storage_format,
-            content_text,
-            content_json
           )
         `
         )

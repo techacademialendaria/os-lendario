@@ -103,23 +103,23 @@ export const STUDIO_TOKENS: Record<string, StudioPalette> = {
   app_creator: {
     name: 'app_creator',
     label: 'Course Creator',
-    description: 'Indigo theme for Course Creator Studio',
+    description: 'Petróleo Blue & Beige theme for Course Creator Studio',
 
-    'primary-color': '241 61% 59%', // #5856D6 Indigo
-    'primary-dark': '241 61% 50%', // Darker indigo
-    'primary-light': '241 61% 80%', // Lighter indigo
-    'primary-lighter': '241 61% 90%', // Very light indigo
+    'primary-color': '195 28% 45%', // #538096 Petróleo Blue
+    'primary-dark': '195 28% 38%', // Darker petróleo
+    'primary-light': '195 28% 65%', // Lighter petróleo
+    'primary-lighter': '195 28% 80%', // Very light petróleo
 
-    'secondary-color': '261 61% 55%', // Purple
-    'secondary-dark': '261 61% 45%', // Dark purple
-    'secondary-light': '261 61% 75%', // Light purple
+    'secondary-color': '27 30% 92%', // #F2EBE4 Beige
+    'secondary-dark': '27 30% 85%', // Darker beige
+    'secondary-light': '27 30% 96%', // Brighter beige
 
-    'accent-color': '32 27% 69%', // Gold accent
-    'accent-dark': '33 27% 50%', // Dark gold
+    'accent-color': '27 30% 92%', // #F2EBE4 Beige
+    'accent-dark': '27 30% 85%', // Darker beige
 
     'studio-bg': '240 5% 4%', // Dark background
     'studio-card-bg': '240 4% 8%', // Card background
-    'studio-border': '241 61% 59% / 0.2', // Indigo border
+    'studio-border': '195 28% 45% / 0.2', // Petróleo border
 
     'text-primary': '0 0% 98%', // White text
     'text-secondary': '0 0% 64%', // Secondary text
@@ -128,7 +128,7 @@ export const STUDIO_TOKENS: Record<string, StudioPalette> = {
     'status-success': '142 76% 51%', // Green
     'status-warning': '37 100% 52%', // Amber
     'status-error': '4 100% 62%', // Red
-    'status-info': '211 100% 52%', // Blue
+    'status-info': '195 28% 45%', // Petróleo (matching primary)
   },
 
   // ============================================================================

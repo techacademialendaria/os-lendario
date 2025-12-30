@@ -7,6 +7,7 @@ import { Button } from '../../ui/button';
 import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
+import { cn } from '../../../lib/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,10 +34,17 @@ import { WritingStylesTab } from './WritingStylesTab';
 import { HistoryTab } from './HistoryTab';
 import { ArtifactsTab } from './ArtifactsTab';
 import { FragmentsTab } from './FragmentsTab';
+import { RecommendedToolsTab } from './RecommendedToolsTab';
 import { MOCK_COMMUNICATION_DATA } from '../data/mock-communication';
 import { MOCK_HISTORY_DATA, PROFESSIONAL_ACHIEVEMENTS } from '../data/mock-history';
 import { supabase, isSupabaseConfigured } from '../../../lib/supabase';
 import { MindEditDialog } from '../ui/MindEditDialog';
+import { usePageTitle } from '../../../hooks/usePageTitle';
+import {
+  STUDIO_CARD_CLASSES,
+  STUDIO_PRIMARY,
+  STUDIO_BADGE_CLASSES,
+} from '../studio-tokens';
 
 interface MindProfileProps {
   setSection: (s: Section) => void;
@@ -49,7 +57,7 @@ const getDiceBearUrl = (slug: string): string => {
 };
 
 // Valid tab IDs for URL hash
-const VALID_TABS = ['overview', 'dna', 'communication', 'history', 'artifacts', 'contents', 'fragments', 'prompts'];
+const VALID_TABS = ['overview', 'psychometrics', 'communication', 'history', 'artifacts', 'contents', 'fragments', 'prompts', 'recommended-tools'];
 
 const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug: propSlug }) => {
   const { mindSlug: paramSlug } = useParams<{ mindSlug: string }>();
@@ -86,6 +94,9 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
   const [isDeleting, setIsDeleting] = useState(false);
 
   const { mind, loading, error, refetch } = useMind(mindSlug);
+
+  // Dynamic page title with mind name
+  usePageTitle(mind?.name);
 
   const handleDeleteMind = async () => {
     if (!mind || !isSupabaseConfigured()) return;
@@ -164,29 +175,32 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
       <main className="p-6 flex-1 max-w-[1400px] mx-auto w-full">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-8">
           <TabsList className="bg-transparent w-full justify-start p-0 h-auto gap-2 flex-wrap">
-            <TabsTrigger value="overview" className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary px-4 py-2 font-medium bg-muted/30">
+            <TabsTrigger value="overview" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="grid" size="size-4" className="mr-1.5" /> Geral
             </TabsTrigger>
-            <TabsTrigger value="psychometrics" className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary px-4 py-2 font-medium bg-muted/30">
+            <TabsTrigger value="psychometrics" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="chart-pie" size="size-4" className="mr-1.5" /> DNA
             </TabsTrigger>
-            <TabsTrigger value="communication" className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary px-4 py-2 font-medium bg-muted/30">
+            <TabsTrigger value="communication" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="comment-alt" size="size-4" className="mr-1.5" /> Comunicação
             </TabsTrigger>
-            <TabsTrigger value="history" className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary px-4 py-2 font-medium bg-muted/30">
+            <TabsTrigger value="history" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="time-past" size="size-4" className="mr-1.5" /> História
             </TabsTrigger>
-            <TabsTrigger value="artifacts" className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary px-4 py-2 font-medium bg-muted/30">
+            <TabsTrigger value="artifacts" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="box" size="size-4" className="mr-1.5" /> Artefatos {artifactsData?.artifacts.length ? `(${artifactsData.artifacts.length})` : ''}
             </TabsTrigger>
-            <TabsTrigger value="contents" className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary px-4 py-2 font-medium bg-muted/30">
+            <TabsTrigger value="contents" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="document" size="size-4" className="mr-1.5" /> Conteúdos
             </TabsTrigger>
-            <TabsTrigger value="fragments" className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary px-4 py-2 font-medium bg-muted/30">
+            <TabsTrigger value="fragments" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="puzzle-piece" size="size-4" className="mr-1.5" /> Fragmentos {fragmentsData?.total ? `(${fragmentsData.total})` : ''}
             </TabsTrigger>
-            <TabsTrigger value="prompts" className="rounded-md data-[state=active]:bg-primary/10 data-[state=active]:text-primary px-4 py-2 font-medium bg-muted/30">
+            <TabsTrigger value="prompts" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="terminal" size="size-4" className="mr-1.5" /> Prompts {artifactsData?.prompts.length ? `(${artifactsData.prompts.length})` : ''}
+            </TabsTrigger>
+            <TabsTrigger value="recommended-tools" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
+              <Icon name="toolbox" size="size-4" className="mr-1.5" /> Ferramentas
             </TabsTrigger>
           </TabsList>
 
@@ -197,7 +211,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
               {/* Left Column */}
               <div className="lg:col-span-7 space-y-8">
                 {/* Bio */}
-                <Card className="rounded-xl border-border">
+                <Card className={STUDIO_CARD_CLASSES}>
                   <CardHeader className="border-b border-border pb-3">
                     <CardTitle className="text-base uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Icon name="user" /> Sobre a Mente
@@ -210,7 +224,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
 
                 {/* Values */}
                 {mind.values.length > 0 && (
-                  <Card className="rounded-xl border-border">
+                  <Card className={STUDIO_CARD_CLASSES}>
                     <CardHeader className="border-b border-border pb-3">
                       <CardTitle className="text-base uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                         <Icon name="heart" /> Valores Centrais
@@ -223,7 +237,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
                             <span className="text-sm font-medium text-foreground w-40">{value.name}</span>
                             <div className="flex-1 h-2 bg-muted/50 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-primary transition-all"
+                                className="h-full bg-studio-primary transition-all"
                                 style={{ width: `${value.importance * 10}%` }}
                               />
                             </div>
@@ -240,10 +254,10 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
               <div className="lg:col-span-5 space-y-8">
                 {/* Skills/Proficiencies */}
                 {mind.proficiencies.length > 0 && (
-                  <Card className="rounded-xl border-border bg-gradient-to-br from-card to-primary/5">
+                  <Card className={cn(STUDIO_CARD_CLASSES, "bg-gradient-to-br from-card to-studio-primary/5")}>
                     <CardHeader className="border-b border-border pb-3">
                       <CardTitle className="text-base uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                        <Icon name="chart-pie" className="text-primary" /> Proficiências
+                        <Icon name="chart-pie" className="text-studio-primary" /> Proficiências
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
@@ -254,7 +268,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
                               {prof.skillName}
                             </span>
                             <div className="flex-1 h-2 bg-muted/50 rounded-full overflow-hidden">
-                              <div className="h-full bg-primary" style={{ width: `${prof.level * 10}%` }} />
+                              <div className="h-full bg-studio-primary" style={{ width: `${prof.level * 10}%` }} />
                             </div>
                             <span className="text-xs font-mono font-bold w-8">{prof.level}</span>
                           </div>
@@ -265,7 +279,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
                 )}
 
                 {/* Communication Style */}
-                <Card className="rounded-xl border-border">
+                <Card className={STUDIO_CARD_CLASSES}>
                   <CardHeader className="border-b border-border pb-3">
                     <CardTitle className="text-base uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Icon name="comment-alt" /> Comunicação
@@ -280,19 +294,17 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
                   </CardContent>
                 </Card>
 
-                {/* Obsessions */}
-                {mind.obsessions.length > 0 && (
-                  <Card className="rounded-xl border-border">
+                {/* Obsession */}
+                {mind.obsession && (
+                  <Card className={STUDIO_CARD_CLASSES}>
                     <CardHeader className="border-b border-border pb-3">
                       <CardTitle className="text-base uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                        <Icon name="target" /> Obsessões
+                        <Icon name="target" /> Obsessão
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-6">
                       <div className="flex flex-wrap gap-4 justify-center">
-                        {mind.obsessions.slice(0, 4).map((obs, i) => (
-                          <ObsessionRing key={i} name={obs.name} intensity={obs.intensity} />
-                        ))}
+                        <ObsessionRing name={mind.obsession} intensity={10} />
                       </div>
                     </CardContent>
                   </Card>
@@ -315,7 +327,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
           <TabsContent value="prompts" className="animate-fade-in">
             {artifactsLoading ? (
               <div className="flex justify-center py-12">
-                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 border-2 border-studio-primary border-t-transparent rounded-full animate-spin" />
               </div>
             ) : artifactsData?.prompts.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
@@ -325,7 +337,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
             ) : (
               <div className="space-y-4">
                 {artifactsData?.prompts.map((prompt) => (
-                  <Card key={prompt.id} className="rounded-xl border-border">
+                  <Card key={prompt.id} className={STUDIO_CARD_CLASSES}>
                     <CardHeader className="pb-2 flex flex-row items-center justify-between">
                       <CardTitle className="text-sm font-medium">{prompt.title}</CardTitle>
                       <Badge variant="outline" className="text-xs">{prompt.category}</Badge>
@@ -373,6 +385,11 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
               onCreateFragment={createFragment}
             />
           </TabsContent>
+
+          {/* TAB: RECOMMENDED TOOLS */}
+          <TabsContent value="recommended-tools" className="animate-fade-in">
+            <RecommendedToolsTab psychometrics={psychometrics} loading={psychometricsLoading} mindSlug={mindSlug} />
+          </TabsContent>
         </Tabs>
       </main>
 
@@ -410,7 +427,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
             <AlertDialogAction
               onClick={handleDeleteMind}
               disabled={isDeleting}
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-destructive hover:bg-destructive/90 text-white"
             >
               {isDeleting ? (
                 <>

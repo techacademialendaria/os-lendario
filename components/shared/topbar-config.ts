@@ -11,8 +11,8 @@ import { Section } from '../../types';
 // STUDIO TOKENS (Creator & PRD)
 // ============================================================================
 export const CREATOR_TOKENS = {
-  primary: '#538096', // Azul
-  accent: '#F2EBE4', // Bege/Cream
+  primary: 'hsl(var(--primary-color))',
+  accent: 'hsl(var(--accent-color))',
 } as const;
 
 export const PRD_TOKENS = {
@@ -24,8 +24,8 @@ export const PRD_TOKENS = {
 // MINDS & SALES TOKENS
 // ============================================================================
 export const MINDS_TOKENS = {
-  primary: '#30B0C7', // Cyan
-  accent: '#30B0C7',
+  primary: 'hsl(var(--primary-color))',
+  accent: 'hsl(var(--accent-color))',
 } as const;
 
 export const SALES_TOKENS = {

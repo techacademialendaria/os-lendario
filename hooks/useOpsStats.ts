@@ -26,10 +26,6 @@ export interface OpsStats {
   toolRels: number;
   toolAffinities: number;
   mindTools: number;
-  // Mind Mappings
-  mindObsessions: number;
-  mindValues: number;
-  mindProfiles: number;
   // Creator OS - Projects
   projects: number;
   projectMinds: number;
@@ -58,13 +54,12 @@ interface UseOpsStatsResult {
 
 // Fallback stats when Supabase is not configured
 const FALLBACK_STATS: OpsStats = {
-  tables: 32,
+  tables: 31,
   lastUpdated: new Date().toISOString().split('T')[0],
   minds: 0, tags: 0, mindTags: 0,
   drivers: 0, driverRels: 0, mindDrivers: 0, miuDriverEvidence: 0, fragmentDrivers: 0,
   systems: 0, compMaps: 0, systemComponents: 0, mindSystemMappings: 0, mindComponentScores: 0, mindPsychometrics: 0,
   tools: 0, toolRels: 0, toolAffinities: 0, mindTools: 0,
-  mindObsessions: 0, mindValues: 0, mindProfiles: 0,
   projects: 0, projectMinds: 0, audienceProfiles: 0,
   contents: 0, contentMinds: 0, contentTags: 0, contentsWithTranscription: 0,
   fragments: 0, fragmentRels: 0,
@@ -98,7 +93,8 @@ export function useOpsStats(): UseOpsStatsResult {
         supabase.from('drivers').select('*', { count: 'exact', head: true }),
         supabase.from('driver_relationships').select('*', { count: 'exact', head: true }),
         supabase.from('mind_drivers').select('*', { count: 'exact', head: true }),
-        supabase.from('miu_driver_evidence').select('*', { count: 'exact', head: true }),
+        // miu_driver_evidence table doesn't exist - removed obsolete query
+        Promise.resolve({ count: 0, error: null } as any),
         supabase.from('fragment_drivers').select('*', { count: 'exact', head: true }),
         // Mapping
         supabase.from('mapping_systems').select('*', { count: 'exact', head: true }),
@@ -112,10 +108,6 @@ export function useOpsStats(): UseOpsStatsResult {
         supabase.from('tool_relations' as never).select('*', { count: 'exact', head: true }),
         supabase.from('tool_driver_affinities').select('*', { count: 'exact', head: true }),
         supabase.from('mind_tools').select('*', { count: 'exact', head: true }),
-        // Mind Mappings
-        supabase.from('mind_obsessions').select('*', { count: 'exact', head: true }),
-        supabase.from('mind_values').select('*', { count: 'exact', head: true }),
-        supabase.from('mind_profiles').select('*', { count: 'exact', head: true }),
         // Projects
         supabase.from('content_projects').select('*', { count: 'exact', head: true }),
         supabase.from('project_minds').select('*', { count: 'exact', head: true }),
@@ -141,7 +133,6 @@ export function useOpsStats(): UseOpsStatsResult {
         drivers, driverRels, mindDrivers, miuDriverEvidence, fragmentDrivers,
         systems, compMaps, systemComponents, mindSystemMappings, mindComponentScores, mindPsychometrics,
         tools, toolRels, toolAffinities, mindTools,
-        mindObsessions, mindValues, mindProfiles,
         projects, projectMinds, audienceProfiles,
         contents, contentMinds, contentTags, contentsWithTranscription,
         fragments, fragmentRels,
@@ -149,7 +140,7 @@ export function useOpsStats(): UseOpsStatsResult {
       ] = results;
 
       setStats({
-        tables: 33,
+        tables: 31,
         lastUpdated: new Date().toISOString().split('T')[0],
         minds: minds.count ?? 0,
         tags: tags.count ?? 0,
@@ -169,9 +160,6 @@ export function useOpsStats(): UseOpsStatsResult {
         toolRels: toolRels.count ?? 0,
         toolAffinities: toolAffinities.count ?? 0,
         mindTools: mindTools.count ?? 0,
-        mindObsessions: mindObsessions.count ?? 0,
-        mindValues: mindValues.count ?? 0,
-        mindProfiles: mindProfiles.count ?? 0,
         projects: projects.count ?? 0,
         projectMinds: projectMinds.count ?? 0,
         audienceProfiles: audienceProfiles.count ?? 0,

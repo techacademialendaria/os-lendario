@@ -500,7 +500,7 @@ const CoursesList: React.FC<CoursesListProps> = ({ setSection }) => {
           <div />
           <Button
             onClick={() => navigate('/creator/cursos/novo')}
-            className="bg-primary text-white" style={{ backgroundColor: STUDIO_PRIMARY }}
+            className="shadow-lg shadow-studio-primary/20"
           >
             <Icon name="plus" className="mr-2 size-4" /> Novo Curso
           </Button>
@@ -615,7 +615,7 @@ const CoursesList: React.FC<CoursesListProps> = ({ setSection }) => {
                 courses.map((course) => (
                   <Card
                     key={course.id}
-                    className="group cursor-pointer transition-colors hover:border-primary/30"
+                    className="group cursor-pointer transition-colors hover:border-studio-primary/30"
                     onClick={() => navigate(`/creator/cursos/${course.slug}`)}
                   >
                     <CardContent className="flex items-center gap-4 p-4">
@@ -627,7 +627,7 @@ const CoursesList: React.FC<CoursesListProps> = ({ setSection }) => {
                       {/* Title + Meta */}
                       <div className="min-w-0 flex-1">
                         <div className="mb-0.5 flex items-center gap-2">
-                          <span className="truncate text-sm font-semibold text-foreground transition-colors group-hover:text-primary" style={{ color: STUDIO_PRIMARY }}>
+                          <span className="truncate text-sm font-semibold text-foreground transition-colors group-hover:text-studio-primary">
                             {course.title}
                           </span>
                           {course.fidelityScore !== null && course.fidelityScore < 85 && (
@@ -658,7 +658,7 @@ const CoursesList: React.FC<CoursesListProps> = ({ setSection }) => {
                       {/* Arrow */}
                       <Icon
                         name="angle-right"
-                        className="text-muted-foreground transition-colors group-hover:text-primary" style={{ color: STUDIO_PRIMARY }}
+                        className="text-muted-foreground transition-colors group-hover:text-studio-primary"
                         size="size-4"
                       />
                     </CardContent>

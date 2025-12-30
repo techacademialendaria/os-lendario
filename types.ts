@@ -63,6 +63,7 @@ export enum Section {
   APP_CREATOR_FRAMEWORKS = 'app_creator_frameworks',
   APP_CREATOR_PERFORMANCE = 'app_creator_performance',
   APP_CREATOR_SETTINGS = 'app_creator_settings',
+  APP_LEARN_GROUPS = 'app_learn_groups',
   TEMPLATE_SALES_DASHBOARD = 'template_sales_dashboard',
   TEMPLATE_SALES_CALLS = 'template_sales_calls',
   TEMPLATE_SALES_CALL_DETAILS = 'template_sales_call_details',
@@ -104,7 +105,9 @@ export enum Section {
 
   // Ops Studio
   STUDIO_OPS_DB = 'studio_ops_db',
-  STUDIO_OPS_SCHEMA = 'studio_ops_schema'
+  STUDIO_OPS_SCHEMA = 'studio_ops_schema',
+  STUDIO_OPS_VIEWS = 'studio_ops_views',
+  STUDIO_OPS_TOOL_STACKS = 'studio_ops_tool_stacks'
 }
 
 export interface TypeScale {

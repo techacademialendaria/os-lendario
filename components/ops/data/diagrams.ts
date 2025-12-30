@@ -63,8 +63,6 @@ flowchart TB
         MD --> PROFILE
 
         PROFILE --> MINDS[(minds)]
-        MINDS --> MO[(mind_obsessions)]
-        MINDS --> MV[(mind_values)]
     end
 
     subgraph PHASE6[FASE 6 - RECOMENDACAO]

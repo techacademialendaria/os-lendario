@@ -1,6 +1,7 @@
 import React from 'react';
 import { DebateFramework } from '../../../services/frameworkService';
 import { Icon } from '../../ui/icon';
+import { Button } from '../../ui/button';
 
 interface FrameworkDetailModalProps {
   framework: DebateFramework | null;
@@ -28,9 +29,9 @@ export const FrameworkDetailModal: React.FC<FrameworkDetailModalProps> = ({
             <h2 className="text-2xl font-bold text-foreground">{framework.name}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{framework.description}</p>
           </div>
-          <button onClick={onClose} className="rounded-lg p-2 transition-colors hover:bg-accent">
+          <Button variant="ghost" size="icon" onClick={onClose}>
             <Icon name="cross" className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
 
         {/* Content */}

@@ -76,6 +76,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             'learn_challenges': 'Desafios',
             'learn_programs': 'Programas',
             'learn_journey': 'Jornada do Aluno',
+            'learn_groups': 'Grupos WhatsApp',
 
             // Clone Studio Products
             'clone_minds': 'Mentes Sintéticas',
@@ -193,6 +194,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             'learn_challenges': 'Challenge Hub',
             'learn_programs': 'Program Manager',
             'learn_journey': 'Student Journey',
+            'learn_groups': 'WhatsApp Groups',
             'clone_minds': 'Synthetic Minds',
             'clone_voice': 'Voice Cloner',
             'clone_humanizer': 'Humanizer',
@@ -294,6 +296,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             'learn_challenges': 'Challenge Hub',
             'learn_programs': 'Program Manager',
             'learn_journey': 'Student Journey',
+            'learn_groups': 'Grupos WhatsApp',
             'clone_minds': 'Mentes Sintéticas',
             'clone_voice': 'Voice Cloner',
             'clone_humanizer': 'Humanizer',
@@ -325,6 +328,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             'ops_integrations': 'Integration Hub',
             'ops_vault': 'Accesos y Contraseñas',
             'ops_db': 'Database Explorer',
+            'ops_views': 'Vistas de Tablas',
 
             // Design System
             'ds_overview': 'Visión General',
@@ -395,6 +399,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             children: [
                 { key: 'learn_courses', icon: 'book-open-cover', section: Section.APP_CREATOR_COURSES, status: 'active' },
                 { key: 'learn_challenges', icon: 'trophy', section: Section.EXTERNAL_CHALLENGES, status: 'active' },
+                { key: 'learn_groups', icon: 'chat-bubble', section: Section.APP_LEARN_GROUPS, status: 'active' },
                 { key: 'learn_programs', icon: 'sitemap', section: Section.STUDIO_LEARN, status: 'soon' },
                 { key: 'learn_journey', icon: 'route', section: Section.STUDIO_LEARN, status: 'soon' },
             ]
@@ -621,11 +626,11 @@ const Sidebar: React.FC<SidebarProps> = ({
                         variant="ghost"
                         onClick={() => toggleSubmenu(item.key)}
                         className={cn(
-                            "w-full h-auto flex items-center py-2.5 rounded-lg text-sm transition-all duration-200 group relative font-normal hover:bg-transparent",
+                            "w-full h-auto flex items-center py-2.5 rounded-lg text-sm transition-all duration-200 group relative font-normal",
                             alignmentClass,
-                            isRootItem ? "font-semibold text-foreground hover:bg-muted/50" : "text-sm text-muted-foreground hover:text-foreground",
+                            isRootItem ? "font-semibold text-foreground hover:bg-muted/50" : "text-sm text-muted-foreground hover:text-foreground hover:bg-muted/30",
                             isParentActive && !isExpanded && !isRootItem ? "text-primary font-medium" : "",
-                            isRootItem && isParentActive ? "bg-muted/30" : "",
+                            isRootItem && isParentActive ? "bg-muted/30 hover:bg-muted/50" : "",
                             isSoon && "opacity-60"
                         )}
                         title={isCollapsed ? label : undefined}
@@ -685,20 +690,20 @@ const Sidebar: React.FC<SidebarProps> = ({
                     onClick={() => item.section && !isSoon && handleSectionClick(item.section)}
                     disabled={isSoon}
                     className={cn(
-                        "w-full h-auto text-left py-2 rounded-lg text-sm transition-all duration-200 flex items-center font-normal hover:bg-transparent",
+                        "w-full h-auto text-left py-2 rounded-lg text-sm transition-all duration-200 flex items-center font-normal",
                         isCollapsed ? "justify-center px-2" : `gap-3 ${paddingLeftClass}`,
                         isRootItem && isActive
-                            ? "bg-primary text-primary-foreground shadow-sm font-bold"
+                            ? "bg-primary/10 text-primary font-bold hover:bg-primary/15 border-l-2 border-primary"
                             : isRootItem
-                                ? "text-muted-foreground hover:bg-muted hover:text-foreground font-medium"
+                                ? "text-muted-foreground hover:bg-muted/50 hover:text-foreground font-medium"
                                 : isActive && isCreatorItem
-                                    ? "font-medium bg-brand-blue/10 border-r-2 border-brand-blue rounded-r-none"
+                                    ? "font-medium bg-studio-primary/10 border-r-2 border-studio-primary rounded-r-none hover:bg-studio-primary/15"
                                     : isActive
-                                        ? "text-primary font-medium bg-primary/5 border-r-2 border-primary rounded-r-none"
+                                        ? "text-primary font-medium bg-primary/5 border-r-2 border-primary rounded-r-none hover:bg-primary/10"
                                         : "text-muted-foreground hover:text-foreground hover:bg-muted/30",
                         isSoon && "opacity-50 cursor-not-allowed hover:bg-transparent hover:text-muted-foreground"
                     )}
-                    style={isActive && isCreatorItem ? { color: 'hsl(var(--brand-blue))' } : {}}
+                    style={isActive && isCreatorItem ? { color: 'hsl(var(--primary-color))' } : {}}
                     title={isCollapsed ? label : undefined}
                 >
                     {item.icon ? (
@@ -706,10 +711,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                             name={item.icon}
                             size={isRootItem ? "size-5" : "size-4"}
                             className={cn(
-                                isRootItem && isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground",
+                                isRootItem && isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground",
                                 !isRootItem && isActive && !isCreatorItem && "text-primary"
                             )}
-                            style={!isRootItem && isActive && isCreatorItem ? { color: 'hsl(var(--brand-blue))' } : {}}
+                            style={!isRootItem && isActive && isCreatorItem ? { color: 'hsl(var(--primary-color))' } : {}}
                         />
                     ) : (
                         <div
@@ -718,7 +723,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                                 !isCollapsed && "ml-1.5 mr-1",
                                 isActive && !isCreatorItem ? "bg-primary" : !isActive ? "bg-border group-hover:bg-muted-foreground" : ""
                             )}
-                            style={isActive && isCreatorItem ? { backgroundColor: 'hsl(var(--brand-blue))' } : {}}
+                            style={isActive && isCreatorItem ? { backgroundColor: 'hsl(var(--primary-color))' } : {}}
                         />
                     )}
 

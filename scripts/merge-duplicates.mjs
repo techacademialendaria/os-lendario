@@ -29,7 +29,7 @@ async function getMindBySlug(slug) {
 async function getRelatedData(mindId) {
   const [profiles, values, obsessions, proficiencies] = await Promise.all([
     supabase.from('mind_profiles').select('*').eq('mind_id', mindId),
-    supabase.from('mind_values').select('*').eq('mind_id', mindId),
+    supabase.from('mind_drivers').select('*').eq('mind_id', mindId),
     supabase.from('mind_obsessions').select('*').eq('mind_id', mindId),
     supabase.from('mind_proficiencies').select('*').eq('mind_id', mindId)
   ]);
@@ -99,7 +99,7 @@ async function mergeMinds(sourceSlug, targetSlug) {
     console.log(`\n  Migrating ${sourceData.values.length} values...`);
     for (const value of sourceData.values) {
       const { id, mind_id, created_at, ...valueData } = value;
-      await supabase.from('mind_values').insert({ ...valueData, mind_id: target.id });
+      await supabase.from('mind_drivers').insert({ ...valueData, mind_id: target.id });
     }
   }
 

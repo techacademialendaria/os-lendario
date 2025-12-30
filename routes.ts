@@ -75,6 +75,9 @@ export const SECTION_ROUTES: Record<Section, string> = {
     [Section.TEMPLATE_WEBINAR]: '/marketing/webinar',
     [Section.TEMPLATE_THANKYOU]: '/marketing/thank-you',
 
+    // Learn App
+    [Section.APP_LEARN_GROUPS]: '/learn/groups',
+
     // Community Templates
     [Section.TEMPLATE_COMMUNITY_CAPTURE]: '/community/capture',
     [Section.TEMPLATE_COMMUNITY_ADVERTORIAL]: '/community/advertorial',
@@ -100,7 +103,9 @@ export const SECTION_ROUTES: Record<Section, string> = {
 
     // Ops Studio
     [Section.STUDIO_OPS_DB]: '/studio/ops/db',
-    [Section.STUDIO_OPS_SCHEMA]: '/studio/ops/schema'
+    [Section.STUDIO_OPS_VIEWS]: '/studio/ops/views',
+    [Section.STUDIO_OPS_SCHEMA]: '/studio/ops/schema',
+    [Section.STUDIO_OPS_TOOL_STACKS]: '/studio/ops/tool-stacks'
 };
 
 export const getSectionFromPath = (path: string): Section | null => {

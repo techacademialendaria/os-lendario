@@ -13,7 +13,7 @@ import { Separator } from '../../ui/separator';
 import { Progress } from '../../ui/progress';
 import { Alert, AlertDescription } from '../../ui/alert';
 import { cn } from '../../../lib/utils';
-import { STUDIO_PRIMARY, STUDIO_ACCENT } from '../studio-tokens';
+import { STUDIO_PRIMARY, STUDIO_ACCENT, STUDIO_CARD_CLASSES, INPUT_CLASSES, TEXTAREA_CLASSES } from '../studio-tokens';
 
 // --- TYPES ---
 interface BriefData {
@@ -50,13 +50,15 @@ const CourseSidebar = ({
   return (
     <div className="flex h-[calc(100vh-64px)] w-64 shrink-0 flex-col border-r border-border bg-card/50">
       <div className="border-b border-border p-4">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => onNavigate('overview')}
-          className="mb-2 flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-2 h-auto w-full justify-start px-0 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <Icon name="arrow-left" size="size-3" />
+          <Icon name="arrow-left" size="size-3" className="mr-2" />
           <span>Voltar ao curso</span>
-        </button>
+        </Button>
         <h3 className="truncate font-bold text-foreground">{courseTitle}</h3>
       </div>
 
@@ -80,14 +82,15 @@ const CourseSidebar = ({
             const isActive = currentStep === step.key;
 
             return (
-              <button
+              <Button
                 key={step.key}
+                variant="ghost"
                 onClick={() => step.status !== 'pending' && onNavigate(step.key)}
                 disabled={step.status === 'pending'}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all',
+                  'flex w-full items-center justify-start gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-all',
                   isActive
-                    ? 'bg-primary/10 font-medium text-primary ring-1 ring-primary/20'
+                    ? 'bg-studio-primary/10 font-medium text-studio-primary ring-1 ring-studio-primary/20'
                     : step.status === 'pending'
                       ? 'cursor-not-allowed text-muted-foreground/50'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -100,7 +103,7 @@ const CourseSidebar = ({
                   type={step.status === 'completed' ? 'solid' : 'regular'}
                 />
                 <span>{step.label}</span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -252,7 +255,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
             <Label>Qual é a promessa principal do curso?</Label>
             <Textarea
               placeholder="Ex: Dominar vendas B2B e fechar contratos de alto valor em 30 dias..."
-              className="min-h-[120px]"
+              className={TEXTAREA_CLASSES}
               value={briefData.dreamOutcome}
               onChange={(e) => handleInputChange('dreamOutcome', e.target.value)}
             />
@@ -272,18 +275,18 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
             <Label>Descreva seu aluno ideal (ICP)</Label>
             <Textarea
               placeholder="Ex: Gestores de vendas B2B com equipe de 5+ pessoas, buscando aumentar conversão em 30%..."
-              className="min-h-[120px]"
+              className={TEXTAREA_CLASSES}
               value={briefData.targetAudience}
               onChange={(e) => handleInputChange('targetAudience', e.target.value)}
             />
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-xs">Cargo típico</Label>
-                <Input placeholder="Ex: Gerente de Vendas" />
+                <Input placeholder="Ex: Gerente de Vendas" className={INPUT_CLASSES} />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs">Experiência</Label>
-                <Input placeholder="Ex: 3-5 anos" />
+                <Input placeholder="Ex: 3-5 anos" className={INPUT_CLASSES} />
               </div>
             </div>
           </div>
@@ -304,12 +307,13 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
                   key={point.id}
                   className="flex items-start gap-3 rounded-lg border border-border bg-muted/20 p-4"
                 >
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold" style={{ color: STUDIO_PRIMARY, backgroundColor: `${STUDIO_PRIMARY}10` }}>
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-studio-primary/10 text-xs font-bold text-studio-primary">
                     {index + 1}
                   </span>
                   <div className="flex-1 space-y-3">
                     <Input
                       placeholder="Descreva a dor..."
+                      className={INPUT_CLASSES}
                       value={point.text}
                       onChange={(e) => {
                         const newPoints = [...briefData.painPoints];
@@ -324,7 +328,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
                         min="1"
                         max="10"
                         value={point.intensity}
-                        className="flex-1 accent-primary"
+                        className="flex-1 accent-studio-primary"
                         onChange={(e) => {
                           const newPoints = [...briefData.painPoints];
                           newPoints[index].intensity = Number(e.target.value);
@@ -358,7 +362,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
             <Label>O que o aluno precisa saber/ter antes?</Label>
             <Textarea
               placeholder="Ex: Conhecimento básico de Excel, acesso a CRM, disposição para aplicar..."
-              className="min-h-[120px]"
+              className={TEXTAREA_CLASSES}
               value={briefData.prerequisites}
               onChange={(e) => handleInputChange('prerequisites', e.target.value)}
             />
@@ -377,7 +381,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
             <Label>O que diferencia este curso dos concorrentes?</Label>
             <Textarea
               placeholder="Ex: Único curso que combina IA com técnicas de Social Selling, incluindo 50+ templates prontos..."
-              className="min-h-[120px]"
+              className={TEXTAREA_CLASSES}
               value={briefData.uniqueValue}
               onChange={(e) => handleInputChange('uniqueValue', e.target.value)}
             />
@@ -404,23 +408,23 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
             <Label>Como o conteúdo será ensinado?</Label>
             <Textarea
               placeholder="Ex: Método GPS (Definir Destino → Mapear Origem → Traçar Rota) aplicado em cada módulo..."
-              className="min-h-[120px]"
+              className={TEXTAREA_CLASSES}
               value={briefData.methodology}
               onChange={(e) => handleInputChange('methodology', e.target.value)}
             />
-            <div className="rounded-lg border border-primary/20 p-4" style={{ backgroundColor: `${STUDIO_PRIMARY}05` }}>
-              <h4 className="mb-2 text-sm font-bold" style={{ color: STUDIO_PRIMARY }}>Framework GPS Sugerido</h4>
+            <div className="rounded-lg border border-studio-primary/20 bg-studio-primary/5 p-4">
+              <h4 className="mb-2 text-sm font-bold text-studio-primary">Framework GPS Sugerido</h4>
               <ul className="space-y-1 text-xs text-muted-foreground">
                 <li className="flex items-center gap-2">
-                  <Icon name="target" size="size-3" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                  <Icon name="target" size="size-3" className="text-studio-primary" />
                   <strong>Destino:</strong> Onde o aluno quer chegar
                 </li>
                 <li className="flex items-center gap-2">
-                  <Icon name="location-arrow" size="size-3" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                  <Icon name="location-arrow" size="size-3" className="text-studio-primary" />
                   <strong>Origem:</strong> Onde o aluno está hoje
                 </li>
                 <li className="flex items-center gap-2">
-                  <Icon name="route" size="size-3" className="text-primary" style={{ color: STUDIO_PRIMARY }} />
+                  <Icon name="route" size="size-3" className="text-studio-primary" />
                   <strong>Rota:</strong> O caminho otimizado
                 </li>
               </ul>
@@ -434,7 +438,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
             <Label>O que o aluno vai conseguir fazer ao final?</Label>
             <Textarea
               placeholder="Ex: 1. Prospectar via LinkedIn com taxa de resposta de 40%+, 2. Conduzir calls de descoberta, 3. Fechar contratos acima de R$10k..."
-              className="min-h-[120px]"
+              className={TEXTAREA_CLASSES}
               value={briefData.expectedResults}
               onChange={(e) => handleInputChange('expectedResults', e.target.value)}
             />
@@ -457,21 +461,22 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
                 <Label className="text-xs">Duração Total Estimada</Label>
                 <Input
                   placeholder="Ex: 8 horas"
+                  className={INPUT_CLASSES}
                   value={briefData.duration}
                   onChange={(e) => handleInputChange('duration', e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs">Número de Módulos</Label>
-                <Input placeholder="Ex: 6 módulos" />
+                <Input placeholder="Ex: 6 módulos" className={INPUT_CLASSES} />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs">Duração Média por Aula</Label>
-                <Input placeholder="Ex: 8-12 minutos" />
+                <Input placeholder="Ex: 8-12 minutos" className={INPUT_CLASSES} />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs">Formato Principal</Label>
-                <Input placeholder="Ex: Vídeo + PDF" />
+                <Input placeholder="Ex: Vídeo + PDF" className={INPUT_CLASSES} />
               </div>
             </div>
           </div>
@@ -526,7 +531,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
               <div className="flex gap-8">
                 {/* Section Navigator */}
                 <div className="w-64 shrink-0">
-                  <Card>
+                  <Card className={STUDIO_CARD_CLASSES}>
                     <CardHeader className="pb-2">
                       <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                         Seções do Brief
@@ -535,13 +540,14 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
                     <CardContent className="p-2">
                       <nav className="space-y-1">
                         {briefSections.map((section) => (
-                          <button
+                          <Button
                             key={section.id}
+                            variant="ghost"
                             onClick={() => setActiveSection(section.id)}
                             className={cn(
-                              'flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors',
+                              'flex h-auto w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors',
                               activeSection === section.id
-                                ? 'bg-primary/10 font-medium text-primary'
+                                ? 'bg-studio-primary/10 font-medium text-studio-primary'
                                 : 'text-muted-foreground hover:bg-muted'
                             )}
                           >
@@ -556,7 +562,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
                                 type="solid"
                               />
                             )}
-                          </button>
+                          </Button>
                         ))}
                       </nav>
                     </CardContent>
@@ -565,10 +571,10 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
 
                 {/* Form Content */}
                 <div className="flex-1 space-y-6">
-                  <Card>
+                  <Card className={STUDIO_CARD_CLASSES}>
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ color: STUDIO_PRIMARY, backgroundColor: `${STUDIO_PRIMARY}10` }}>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-studio-primary/10 text-studio-primary">
                           <Icon name={currentSectionData?.icon || 'document'} size="size-5" />
                         </div>
                         <div>
@@ -599,7 +605,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
                     ) : (
                       <Button
                         onClick={() => onNavigate('research')}
-                        className="bg-primary text-white shadow-lg shadow-primary/20" style={{ backgroundColor: STUDIO_PRIMARY }}
+                        className="shadow-lg shadow-studio-primary/20"
                       >
                         Concluir Brief e Iniciar Research
                         <Icon name="search-alt" className="ml-2 size-4" />
