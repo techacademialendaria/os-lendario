@@ -13,28 +13,26 @@ import { Skeleton } from '../../ui/skeleton';
 import { useLmsCourse, useLmsLesson } from '../../../hooks/lms';
 import { MarkdownRenderer } from '../../shared/MarkdownRenderer';
 
-// Gradient combinations for covers without images
-const gradients = [
-  'from-violet-600 via-purple-500 to-indigo-600',
-  'from-rose-500 via-pink-500 to-fuchsia-500',
-  'from-amber-500 via-orange-500 to-red-500',
-  'from-emerald-500 via-teal-500 to-cyan-500',
-  'from-blue-500 via-indigo-500 to-violet-500',
-  'from-slate-700 via-slate-600 to-slate-800',
-  'from-fuchsia-600 via-pink-500 to-rose-500',
-  'from-cyan-500 via-sky-500 to-blue-500',
+// Color palettes for organic liquid backgrounds (Academia Lendária brand)
+const liquidPalettes = [
+  { bg: 'bg-zinc-950', blobs: ['bg-brand-indigo', 'bg-brand-teal', 'bg-brand-gold'] },
+  { bg: 'bg-zinc-950', blobs: ['bg-brand-pink', 'bg-brand-orange', 'bg-brand-gold'] },
+  { bg: 'bg-zinc-950', blobs: ['bg-brand-teal', 'bg-brand-mint', 'bg-brand-blue'] },
+  { bg: 'bg-zinc-950', blobs: ['bg-brand-gold', 'bg-brand-brown', 'bg-brand-orange'] },
+  { bg: 'bg-zinc-950', blobs: ['bg-brand-blue', 'bg-brand-cyan', 'bg-brand-indigo'] },
+  { bg: 'bg-zinc-950', blobs: ['bg-brand-pink', 'bg-brand-indigo', 'bg-brand-teal'] },
 ];
 
-// Get gradient based on string hash for consistency
-const getGradient = (str: string) => {
+// Get palette based on string hash
+const getPalette = (str: string) => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return gradients[Math.abs(hash) % gradients.length];
+  return liquidPalettes[Math.abs(hash) % liquidPalettes.length];
 };
 
-// Cover component - shows image or gradient fallback
+// Cover component - shows image or liquid organic fallback
 const GradientCover = ({
   image,
   title,
@@ -48,7 +46,31 @@ const GradientCover = ({
     return <img src={image} alt={title} className={cn('h-full w-full object-cover', className)} />;
   }
 
-  return <div className={cn('h-full w-full bg-gradient-to-br', getGradient(title), className)} />;
+  const palette = getPalette(title);
+
+  return (
+    <div className={cn('relative h-full w-full overflow-hidden', palette.bg, className)}>
+      {/* Organic liquid blobs */}
+      <div
+        className={cn(
+          'absolute -left-1/4 -top-1/4 h-3/4 w-3/4 rounded-full opacity-60 blur-3xl',
+          palette.blobs[0]
+        )}
+      />
+      <div
+        className={cn(
+          'absolute -bottom-1/4 -right-1/4 h-2/3 w-2/3 rounded-full opacity-50 blur-3xl',
+          palette.blobs[1]
+        )}
+      />
+      <div
+        className={cn(
+          'absolute left-1/3 top-1/2 h-1/2 w-1/2 rounded-full opacity-40 blur-2xl',
+          palette.blobs[2]
+        )}
+      />
+    </div>
+  );
 };
 
 type LessonType = 'video' | 'text' | 'quiz';
@@ -337,7 +359,7 @@ export default function LmsStudentTemplate() {
             {renderContent()}
 
             {/* Footer / Context (Below Content) */}
-            <div className="mt-8 space-y-8">
+            <div className="mx-auto mt-8 max-w-3xl space-y-8">
               {/* Lesson Actions */}
               <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
                 <div className="flex gap-3">
