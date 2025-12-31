@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../../ui/button';
 import { Icon } from '../../ui/icon';
@@ -10,68 +10,47 @@ import { cn } from '../../../lib/utils';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../../ui/accordion';
 import { Textarea } from '../../ui/textarea';
 import { Skeleton } from '../../ui/skeleton';
-import { useLmsCourse, useLmsLesson } from '../../../hooks/lms';
+import { MediaCover, StarRating, FavoriteButton } from '../../shared';
+import { useLmsCourse, useLmsLesson, useLessonInteractions, useCourseProgress } from '../../../hooks/lms';
 import { MarkdownRenderer } from '../../shared/MarkdownRenderer';
+import { VideoPlayer, isSupportedVideoUrl, type VideoProgress } from '../ui/VideoPlayer';
 
-// Color palettes for organic liquid backgrounds (Academia Lendária brand)
-const liquidPalettes = [
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-indigo', 'bg-brand-teal', 'bg-brand-gold'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-pink', 'bg-brand-orange', 'bg-brand-gold'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-teal', 'bg-brand-mint', 'bg-brand-blue'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-gold', 'bg-brand-brown', 'bg-brand-orange'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-blue', 'bg-brand-cyan', 'bg-brand-indigo'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-pink', 'bg-brand-indigo', 'bg-brand-teal'] },
-];
+/**
+ * Parse duration string (e.g., "10:05" or "5 min") to seconds
+ */
+function parseDurationToSeconds(duration: string): number {
+  if (!duration) return 600; // 10 min default
 
-// Get palette based on string hash
-const getPalette = (str: string) => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return liquidPalettes[Math.abs(hash) % liquidPalettes.length];
-};
-
-// Cover component - shows image or liquid organic fallback
-const GradientCover = ({
-  image,
-  title,
-  className = '',
-}: {
-  image?: string | null;
-  title: string;
-  className?: string;
-}) => {
-  if (image) {
-    return <img src={image} alt={title} className={cn('h-full w-full object-cover', className)} />;
+  // Handle "MM:SS" format
+  if (duration.includes(':')) {
+    const parts = duration.split(':');
+    if (parts.length === 2) {
+      const minutes = parseInt(parts[0], 10) || 0;
+      const seconds = parseInt(parts[1], 10) || 0;
+      return minutes * 60 + seconds;
+    }
+    if (parts.length === 3) {
+      const hours = parseInt(parts[0], 10) || 0;
+      const minutes = parseInt(parts[1], 10) || 0;
+      const seconds = parseInt(parts[2], 10) || 0;
+      return hours * 3600 + minutes * 60 + seconds;
+    }
   }
 
-  const palette = getPalette(title);
+  // Handle "X min" format
+  const minMatch = duration.match(/(\d+)\s*min/i);
+  if (minMatch) {
+    return parseInt(minMatch[1], 10) * 60;
+  }
 
-  return (
-    <div className={cn('relative h-full w-full overflow-hidden', palette.bg, className)}>
-      {/* Organic liquid blobs */}
-      <div
-        className={cn(
-          'absolute -left-1/4 -top-1/4 h-3/4 w-3/4 rounded-full opacity-60 blur-3xl',
-          palette.blobs[0]
-        )}
-      />
-      <div
-        className={cn(
-          'absolute -bottom-1/4 -right-1/4 h-2/3 w-2/3 rounded-full opacity-50 blur-3xl',
-          palette.blobs[1]
-        )}
-      />
-      <div
-        className={cn(
-          'absolute left-1/3 top-1/2 h-1/2 w-1/2 rounded-full opacity-40 blur-2xl',
-          palette.blobs[2]
-        )}
-      />
-    </div>
-  );
-};
+  // Handle "X hour" format
+  const hourMatch = duration.match(/(\d+)\s*h/i);
+  if (hourMatch) {
+    return parseInt(hourMatch[1], 10) * 3600;
+  }
+
+  return 600; // 10 min default
+}
 
 type LessonType = 'video' | 'text' | 'quiz';
 
@@ -97,10 +76,50 @@ export default function LmsStudentTemplate() {
   const { course: realCourse, loading: courseLoading } = useLmsCourse(slug);
   const { lesson: realLesson, loading: lessonLoading } = useLmsLesson(slug, lessonId);
 
+  // Lesson interactions (complete, favorite, rating, watch progress)
+  const {
+    interactions: lessonInteractions,
+    isLoading: interactionsLoading,
+    toggleFavorite,
+    markComplete,
+    markIncomplete,
+    rateLesson,
+    updateWatchProgress,
+  } = useLessonInteractions(realLesson?.id || '');
+
+  // Course progress
+  const { progress: courseProgress, refetch: refetchProgress } = useCourseProgress(realCourse?.id || '');
+
   // State for Active Lesson
   const [activeLessonId, setActiveLessonId] = useState(lessonId || '');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Loading states for UI feedback
+  const [isMarkingComplete, setIsMarkingComplete] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+
+  // Video progress tracking handlers
+  const handleVideoProgress = useCallback(
+    (progress: VideoProgress) => {
+      updateWatchProgress(progress.currentTime, progress.duration);
+    },
+    [updateWatchProgress]
+  );
+
+  const handleVideoEnded = useCallback(async () => {
+    if (!lessonInteractions?.isCompleted) {
+      setIsMarkingComplete(true);
+      try {
+        await markComplete();
+        refetchProgress();
+      } catch (error) {
+        console.error('Failed to mark lesson complete:', error);
+      } finally {
+        setIsMarkingComplete(false);
+      }
+    }
+  }, [lessonInteractions?.isCompleted, markComplete, refetchProgress]);
 
   // Update activeLessonId when lessonId from URL changes
   useEffect(() => {
@@ -196,10 +215,44 @@ export default function LmsStudentTemplate() {
     }
   }, [courseData, activeLessonId]);
 
-  // New Interaction States
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
+  // Handlers
+  const handleToggleFavorite = async () => {
+    if (isTogglingFavorite || interactionsLoading) return;
+    setIsTogglingFavorite(true);
+    try {
+      await toggleFavorite();
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err);
+    } finally {
+      setIsTogglingFavorite(false);
+    }
+  };
+
+  const handleMarkComplete = async () => {
+    if (isMarkingComplete || interactionsLoading) return;
+    setIsMarkingComplete(true);
+    try {
+      if (lessonInteractions?.isCompleted) {
+        await markIncomplete();
+      } else {
+        await markComplete();
+      }
+      // Refetch course progress after marking
+      await refetchProgress();
+    } catch (err) {
+      console.error('Failed to mark complete:', err);
+    } finally {
+      setIsMarkingComplete(false);
+    }
+  };
+
+  const handleRate = async (stars: number) => {
+    try {
+      await rateLesson(stars);
+    } catch (err) {
+      console.error('Failed to rate lesson:', err);
+    }
+  };
 
   // Find active lesson data from sidebar
   const getActiveLessonData = () => {
@@ -241,40 +294,46 @@ export default function LmsStudentTemplate() {
 
     // Video content (only if has videoUrl)
     if (contentType === 'video' && hasVideo) {
+      const videoUrl = realLesson?.videoUrl || '';
+      const isEmbeddable = isSupportedVideoUrl(videoUrl);
+
       return (
         <div className="w-full">
-          {/* Video Container (16:9 Aspect Ratio) */}
-          <div className="group relative aspect-video w-full overflow-hidden rounded-xl border border-border/20 bg-black shadow-2xl">
-            {/* Placeholder Cover */}
-            <GradientCover
-              image={null}
+          {/* Video Container */}
+          {isEmbeddable ? (
+            <VideoPlayer
+              url={videoUrl}
               title={realLesson?.title || activeLesson.title}
-              className="opacity-50"
+              className="shadow-2xl"
+              estimatedDuration={realLesson?.duration ? parseDurationToSeconds(realLesson.duration) : 600}
+              onProgress={handleVideoProgress}
+              onEnded={handleVideoEnded}
             />
+          ) : (
+            // Fallback for unsupported video URLs - show placeholder
+            <div className="group relative aspect-video w-full overflow-hidden rounded-xl border border-border/20 bg-black shadow-2xl">
+              {/* Placeholder Cover */}
+              <MediaCover
+                image={null}
+                title={realLesson?.title || activeLesson.title}
+                showTitle={false}
+                className="opacity-50"
+              />
 
-            {/* Play Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-full bg-primary/90 pl-1 shadow-[0_0_50px_rgba(201,178,152,0.3)] transition-transform hover:scale-110">
-                <Icon name="play" className="text-3xl text-primary-foreground" />
+              {/* Play Overlay with link to external player */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+                <a
+                  href={videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-20 w-20 cursor-pointer items-center justify-center rounded-full bg-primary/90 pl-1 shadow-[0_0_50px_rgba(201,178,152,0.3)] transition-transform hover:scale-110"
+                >
+                  <Icon name="play" className="text-3xl text-primary-foreground" />
+                </a>
+                <span className="text-sm text-white/70">Clique para abrir o vídeo</span>
               </div>
             </div>
-
-            {/* Hover Controls */}
-            <div className="absolute bottom-0 left-0 right-0 flex h-16 items-end bg-gradient-to-t from-black/80 to-transparent px-4 pb-4 opacity-0 transition-opacity group-hover:opacity-100">
-              <div className="flex w-full items-center gap-4 text-white">
-                <Icon name="play" />
-                <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/20">
-                  <div className="h-full w-[10%] bg-primary"></div>
-                </div>
-                <span className="font-mono text-xs">
-                  02:15 / {realLesson?.duration || activeLesson.duration}
-                </span>
-                <Icon name="volume" />
-                <Icon name="settings" />
-                <Icon name="expand" />
-              </div>
-            </div>
-          </div>
+          )}
 
           {/* Show text content below video if available */}
           {lessonContent && (
@@ -339,10 +398,6 @@ export default function LmsStudentTemplate() {
                 <Icon name={sidebarOpen ? 'expand' : 'compress'} size="size-4" />
                 {sidebarOpen ? 'Modo Foco' : 'Mostrar Menu'}
               </Button>
-              <Avatar className="h-8 w-8 border border-border">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>AL</AvatarFallback>
-              </Avatar>
             </div>
           </div>
         </header>
@@ -389,52 +444,51 @@ export default function LmsStudentTemplate() {
 
                 <div className="flex items-center gap-4">
                   {/* Star Rating System */}
-                  <div
-                    className="mr-4 flex h-8 items-center gap-1 border-r border-border pr-4"
-                    onMouseLeave={() => setHoverRating(0)}
-                  >
-                    <span className="mr-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Avalie:
-                    </span>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onClick={() => setRating(star)}
-                        onMouseEnter={() => setHoverRating(star)}
-                        className="transition-transform hover:scale-110 focus:outline-none"
-                      >
-                        <Icon
-                          name="star"
-                          className={cn(
-                            'h-5 w-5 transition-colors',
-                            (hoverRating || rating) >= star
-                              ? 'text-yellow-500'
-                              : 'text-muted-foreground/50'
-                          )}
-                        />
-                      </button>
-                    ))}
+                  <div className="mr-4 flex h-8 items-center border-r border-border pr-4">
+                    <StarRating
+                      value={lessonInteractions?.rating || 0}
+                      onChange={handleRate}
+                      interactive
+                      size="lg"
+                      disabled={interactionsLoading}
+                      label="Avalie:"
+                    />
                   </div>
 
                   {/* Favorite Button */}
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      'gap-2 transition-colors hover:bg-red-500/10',
-                      isFavorited
-                        ? 'text-red-500 hover:text-red-600'
-                        : 'text-muted-foreground hover:text-red-400'
-                    )}
-                    onClick={() => setIsFavorited(!isFavorited)}
-                  >
-                    <Icon name="heart" size="size-4" />
-                    {isFavorited ? 'Favorito' : 'Favoritar'}
-                  </Button>
+                  <FavoriteButton
+                    isFavorite={lessonInteractions?.isFavorite || false}
+                    onToggle={handleToggleFavorite}
+                    isLoading={isTogglingFavorite}
+                    disabled={interactionsLoading}
+                    variant="labeled"
+                  />
 
                   {/* Complete Button */}
-                  <Button className="gap-2 bg-primary font-bold text-primary-foreground shadow-lg shadow-primary/10 hover:bg-primary/90">
-                    <Icon name="check-circle" size="size-4" />
-                    {activeLesson.type === 'text' ? 'Marcar como Lida' : 'Marcar Concluída'}
+                  <Button
+                    className={cn(
+                      'gap-2 font-bold shadow-lg transition-all',
+                      lessonInteractions?.isCompleted
+                        ? 'bg-green-600 text-white shadow-green-600/20 hover:bg-green-700'
+                        : 'bg-primary text-primary-foreground shadow-primary/10 hover:bg-primary/90'
+                    )}
+                    onClick={handleMarkComplete}
+                    disabled={isMarkingComplete || interactionsLoading}
+                  >
+                    {isMarkingComplete ? (
+                      <Icon name="refresh" size="size-4" className="animate-spin" />
+                    ) : (
+                      <Icon
+                        name={lessonInteractions?.isCompleted ? 'check-circle' : 'check'}
+                        type={lessonInteractions?.isCompleted ? 'solid' : 'regular'}
+                        size="size-4"
+                      />
+                    )}
+                    {lessonInteractions?.isCompleted
+                      ? 'Concluída ✓'
+                      : activeLesson.type === 'text'
+                        ? 'Marcar como Lida'
+                        : 'Marcar Concluída'}
                   </Button>
                 </div>
               </div>
@@ -572,10 +626,20 @@ export default function LmsStudentTemplate() {
               Seu Progresso
             </h3>
             <div className="mb-1 flex items-center justify-between text-sm">
-              <span className="font-mono font-bold text-foreground">35%</span>
-              <span className="text-xs text-muted-foreground">12/42 Aulas</span>
+              <span className="font-mono font-bold text-foreground">
+                {courseProgress.percentage}%
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {courseProgress.completedLessons}/{courseProgress.totalLessons} Aulas
+              </span>
             </div>
-            <Progress value={35} className="h-1 bg-muted" />
+            <Progress
+              value={courseProgress.percentage}
+              className={cn(
+                'h-1 bg-muted',
+                courseProgress.percentage === 100 && '[&>div]:bg-green-500'
+              )}
+            />
           </div>
         </div>
 

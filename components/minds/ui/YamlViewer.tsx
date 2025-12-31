@@ -230,7 +230,7 @@ const MarkdownFallback: React.FC<{ content: string; error?: string }> = ({ conte
     <div className="space-y-4">
       {error && (
         <div className="flex items-center gap-2 rounded-md border border-red-500/20 bg-red-500/10 p-3 font-mono text-xs text-red-400">
-          <Icon name="warning" size="size-3" />
+          <Icon name="exclamation-triangle" size="size-3" />
           <span>Falha ao processar estrutura de dados. Exibindo texto bruto.</span>
         </div>
       )}

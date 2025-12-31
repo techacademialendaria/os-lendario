@@ -144,6 +144,12 @@ export interface PRDDocumentData {
   document?: PRDDocument;
   lineCount: number;
   completedAt?: string;
+  // Legacy/flexible fields for PRDDocumentTemplate
+  requirements?: { id: string; text: string; status: 'pending' | 'approved' | 'rejected'; category: 'must' | 'should' | 'nice' }[];
+  techStack?: { frontend: string; backend: string; ai: string; hosting: string };
+  scopeLimits?: string;
+  screens?: string;
+  vibe?: string;
 }
 
 export interface PRDMetrics {
@@ -157,6 +163,35 @@ export interface PRDMetrics {
 // PROJECT METADATA (stored in content_projects.project_metadata)
 // ============================================
 
+// Epic structure for project_metadata.epics (flexible storage)
+export interface EpicSummary {
+  id: string;
+  sequence_order: number;
+  title: string;
+  description?: string;
+  storiesCount: number;
+  status: string;
+  stories: string[];
+}
+
+// Story structure for project_metadata.stories (flexible storage)
+export interface StorySummary {
+  id: string;
+  epicId?: string;
+  epic_id?: string; // Alternative naming
+  sequence_order?: number | null;
+  title: string;
+  description?: string;
+  userStory?: string;
+  acceptanceCriteria?: string[];
+  criteria?: string[];
+  techNotes?: string;
+  complexity?: 'P' | 'M' | 'G';
+  points?: { effort: number; value: number; risk: number };
+  status?: string;
+  isValid?: boolean;
+}
+
 export interface PRDProjectMetadata {
   prdType: PRDType;
   prdPhase?: PRDStatus; // Current phase in PRD pipeline (upload, brief, prd, epics, stories, exported)
@@ -164,6 +199,8 @@ export interface PRDProjectMetadata {
   brief?: BriefData;
   prdDocument?: PRDDocumentData;
   metrics?: PRDMetrics;
+  epics?: EpicSummary[];
+  stories?: StorySummary[];
 }
 
 // ============================================
@@ -201,11 +238,20 @@ export interface PRDProject extends Omit<ContentProject, 'project_metadata'> {
 // Epic from contents table
 export interface PRDEpic extends Omit<Content, 'metadata'> {
   metadata: EpicMetadata;
+  // Flat properties for UI convenience
+  stories?: string[];
+  storiesCount?: number;
+  description?: string;
 }
 
 // Story from contents table
 export interface PRDStory extends Omit<Content, 'metadata'> {
   metadata: StoryMetadata;
+  // Flat properties for UI convenience (mirrors metadata)
+  userStory?: string;
+  acceptanceCriteria?: string[];
+  complexity?: Complexity;
+  epic_id?: string;
 }
 
 // Type aliases for backward compatibility

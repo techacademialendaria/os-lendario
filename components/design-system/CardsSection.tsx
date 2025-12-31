@@ -173,7 +173,7 @@ const CardsSection: React.FC = () => {
             <CarouselItem key={i}>
               <Card className="h-full">
                 <div className="flex h-32 items-center justify-center rounded-t-xl bg-muted/30">
-                  <Icon name="picture" className="text-muted-foreground opacity-30" size="size-8" />
+                  <Icon name="image" className="text-muted-foreground opacity-30" size="size-8" />
                 </div>
                 <CardHeader>
                   <CardTitle className="text-lg">Curso Destaque {i + 1}</CardTitle>

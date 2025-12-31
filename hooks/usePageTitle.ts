@@ -51,6 +51,10 @@ const SECTION_TITLES: Record<Section, string> = {
   [Section.APP_CREATOR_PERFORMANCE]: 'Performance',
   [Section.APP_CREATOR_SETTINGS]: 'Configurações',
 
+  // Learn App
+  [Section.APP_LEARN_GROUPS]: 'WhatsApp Groups',
+  [Section.APP_LMS_HOME]: 'LMS',
+
   // Sales App
   [Section.TEMPLATE_SALES_DASHBOARD]: 'Sales Dashboard',
   [Section.TEMPLATE_SALES_CALLS]: 'Chamadas',
@@ -105,6 +109,12 @@ const SECTION_TITLES: Record<Section, string> = {
   [Section.STUDIO_OPS_SCHEMA]: 'Schema',
   [Section.STUDIO_OPS_VIEWS]: 'Views',
   [Section.STUDIO_OPS_TOOL_STACKS]: 'Tool Stacks',
+
+  // Books App
+  [Section.APP_BOOKS_LIBRARY]: 'Biblioteca',
+  [Section.APP_BOOKS_DETAIL]: 'Detalhes do Livro',
+  [Section.APP_BOOKS_READER]: 'Leitor',
+  [Section.APP_BOOKS_COLLECTION]: 'Coleção',
 };
 
 /**

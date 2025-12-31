@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../ui/button';
 import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
 import { Skeleton } from '../../ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
+import { Separator } from '../../ui/separator';
 import { cn } from '../../../lib/utils';
+import { FavoriteButton } from '../../shared';
 import { Section } from '../../../types';
 import { useBook, useBooks } from '../../../hooks/useBooks';
 import { usePageTitle } from '../../../hooks/usePageTitle';
+import { useBookInteractions, ReadingStatus } from '../../../hooks/useMyBooks';
 import BookCard from '../ui/BookCard';
 
 interface BookDetailProps {
@@ -20,14 +25,39 @@ const BookDetailTemplate: React.FC<BookDetailProps> = ({ setSection }) => {
   const { book, loading, error } = useBook(bookSlug || '');
   const { books: allBooks } = useBooks();
 
+  // Book interactions (favorites, reading status)
+  const {
+    interactions,
+    isLoading: interactionsLoading,
+    toggleFavorite,
+    setReadingStatus,
+  } = useBookInteractions(book?.id || '');
+
+  // Local state
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+
   usePageTitle(book?.title || 'Carregando...');
 
-  // Get related books (same category, excluding current)
+  // Handlers
+  const handleToggleFavorite = async () => {
+    if (!book?.id || isTogglingFavorite) return;
+    setIsTogglingFavorite(true);
+    try {
+      await toggleFavorite();
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err);
+    } finally {
+      setIsTogglingFavorite(false);
+    }
+  };
+
+  // Related books (same category, excluding current)
   const relatedBooks = allBooks
     .filter((b) => b.id !== book?.id && b.categorySlug === book?.categorySlug)
-    .slice(0, 4);
+    .slice(0, 3);
 
-  // Fallback cover gradient
+  // Fallback gradient for cover
   const coverGradients = [
     'from-amber-600 to-orange-800',
     'from-blue-600 to-indigo-800',
@@ -42,7 +72,7 @@ const BookDetailTemplate: React.FC<BookDetailProps> = ({ setSection }) => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="space-y-4 text-center">
-          <Icon name="exclamation-circle" className="mx-auto text-destructive" size="size-12" />
+          <Icon name="exclamation" className="mx-auto text-destructive" size="size-12" />
           <h2 className="text-xl font-bold">Livro não encontrado</h2>
           <p className="text-muted-foreground">{error.message}</p>
           <Button onClick={() => navigate('/books')}>Voltar à Biblioteca</Button>
@@ -54,8 +84,8 @@ const BookDetailTemplate: React.FC<BookDetailProps> = ({ setSection }) => {
   return (
     <div className="min-h-screen animate-fade-in bg-background pb-20 font-sans text-foreground">
       {/* Navbar */}
-      <header className="sticky top-0 z-40 h-16 border-b border-border bg-background/90 backdrop-blur-md transition-all duration-300">
-        <div className="container mx-auto flex h-full max-w-5xl items-center justify-between px-6">
+      <header className="sticky top-0 z-50 h-16 border-b border-border bg-background/80 backdrop-blur-md transition-all duration-300">
+        <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
           <Button
             variant="ghost"
             size="sm"
@@ -68,104 +98,25 @@ const BookDetailTemplate: React.FC<BookDetailProps> = ({ setSection }) => {
             <Button variant="ghost" size="icon">
               <Icon name="share" />
             </Button>
-            <Button variant="ghost" size="icon">
-              <Icon name="bookmark" />
-            </Button>
+            <FavoriteButton
+              isFavorite={interactions?.isFavorite || false}
+              onToggle={handleToggleFavorite}
+              isLoading={isTogglingFavorite}
+              disabled={interactionsLoading}
+            />
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto max-w-5xl px-6 py-12">
-        {/* Hero Section */}
-        <div className="mb-16 flex flex-col gap-12 md:flex-row">
-          {/* Left: Info */}
-          <div className="flex-1 space-y-6">
+      <main className="mx-auto max-w-7xl px-6 py-12">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
+          {/* LEFT COLUMN: Cover & Actions (Sticky) */}
+          <div className="space-y-6 lg:sticky lg:top-24 lg:col-span-4">
+            {/* Book Cover */}
             {loading ? (
-              <>
-                <Skeleton className="h-12 w-3/4" />
-                <Skeleton className="h-6 w-1/3" />
-                <Skeleton className="h-20 w-full" />
-                <div className="flex gap-4 py-6">
-                  <Skeleton className="h-6 w-20" />
-                  <Skeleton className="h-6 w-20" />
-                  <Skeleton className="h-6 w-20" />
-                </div>
-              </>
-            ) : book ? (
-              <>
-                <h1 className="font-serif text-4xl font-bold leading-tight md:text-5xl">
-                  {book.title}
-                </h1>
-                <p className="text-lg font-medium text-foreground/80">{book.author}</p>
-                {book.summary && (
-                  <p className="font-serif text-xl leading-relaxed text-muted-foreground">
-                    {book.summary}
-                  </p>
-                )}
-
-                {/* Metadata Grid */}
-                <div className="flex flex-wrap gap-6 border-y border-border/50 py-6">
-                  {book.rating && (
-                    <div className="flex items-center gap-2 text-sm font-bold">
-                      <Icon name="star" type="solid" className="text-brand-gold" />
-                      <span>{book.rating.toFixed(1)}</span>
-                    </div>
-                  )}
-                  {book.duration && (
-                    <div className="flex items-center gap-2 text-sm font-bold">
-                      <Icon name="clock" className="text-foreground" />
-                      <span>{book.duration}</span>
-                    </div>
-                  )}
-                  {book.hasAudio && (
-                    <div className="flex items-center gap-2 text-sm font-bold">
-                      <Icon name="headphones" className="text-foreground" />
-                      <span>Áudio & Texto</span>
-                    </div>
-                  )}
-                  {book.pageCount && (
-                    <div className="flex items-center gap-2 text-sm font-bold">
-                      <Icon name="document" className="text-foreground" />
-                      <span>{book.pageCount} páginas</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col gap-4 pt-2 sm:flex-row">
-                  <Button
-                    size="lg"
-                    className="h-12 bg-foreground px-8 font-bold text-background hover:bg-foreground/90"
-                    onClick={() => navigate(`/books/${bookSlug}/read`)}
-                  >
-                    <Icon name="book-open" className="mr-2" /> Ler Resumo
-                  </Button>
-                  {book.hasAudio && (
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="h-12 border-foreground/20 px-8 font-bold hover:bg-muted"
-                    >
-                      <Icon name="play" className="mr-2" /> Ouvir
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    className="h-12 font-bold text-primary hover:bg-primary/10"
-                  >
-                    <Icon name="plus" className="mr-2" /> Salvar na Lista
-                  </Button>
-                </div>
-              </>
-            ) : null}
-          </div>
-
-          {/* Right: Cover */}
-          <div className="flex w-full shrink-0 justify-center md:w-[320px] md:justify-end">
-            {loading ? (
-              <Skeleton className="aspect-[2/3] w-[260px] rounded-lg md:w-[300px]" />
+              <Skeleton className="aspect-[2/3] w-full rounded-lg" />
             ) : (
-              <div className="group relative aspect-[2/3] w-[260px] overflow-hidden rounded-lg shadow-2xl md:w-[300px]">
+              <div className="group relative aspect-[2/3] w-full overflow-hidden rounded-lg border border-white/10 shadow-2xl">
                 {book?.coverUrl ? (
                   <img
                     src={book.coverUrl}
@@ -185,128 +136,298 @@ const BookDetailTemplate: React.FC<BookDetailProps> = ({ setSection }) => {
                     </span>
                   </div>
                 )}
-                {/* Sheen Effect */}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10" />
+                <div className="absolute inset-0 bg-black/10 transition-colors group-hover:bg-transparent"></div>
+              </div>
+            )}
 
-                {/* Category Badge */}
-                {book?.category && (
-                  <div className="absolute right-4 top-4 rounded bg-brand-gold px-3 py-1 text-xs font-bold uppercase tracking-wider text-black shadow-md">
-                    {book.category}
+            {/* Action Buttons */}
+            {!loading && book && (
+              <div className="space-y-3">
+                <Button
+                  size="lg"
+                  className="h-12 w-full bg-brand-gold text-base font-bold text-black shadow-lg shadow-brand-gold/10 hover:bg-brand-gold/90"
+                  onClick={() => navigate(`/books/${bookSlug}/read`)}
+                >
+                  <Icon name="book-open-cover" className="mr-2" /> Ler Resumo
+                </Button>
+                {book.hasAudio && (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="h-12 w-full border-border font-bold hover:bg-muted"
+                  >
+                    <Icon name="play" className="mr-2" /> Ouvir Áudio
+                  </Button>
+                )}
+              </div>
+            )}
+
+            {/* Info Card */}
+            {!loading && book && (
+              <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+                {book.duration && (
+                  <div className="flex items-center justify-between border-b border-border/50 pb-3 text-sm">
+                    <span className="text-muted-foreground">Tempo de Leitura</span>
+                    <span className="flex items-center gap-2 font-bold">
+                      <Icon name="clock" size="size-3" /> {book.duration}
+                    </span>
                   </div>
                 )}
-
-                {/* Audio Icon */}
-                {book?.hasAudio && (
-                  <div className="absolute bottom-4 right-4 text-white opacity-80">
-                    <Icon name="headphones" size="size-6" />
+                {book.pageCount && (
+                  <div className="flex items-center justify-between border-b border-border/50 pb-3 text-sm">
+                    <span className="text-muted-foreground">Páginas</span>
+                    <span className="flex items-center gap-2 font-bold">
+                      <Icon name="document" size="size-3" /> {book.pageCount}
+                    </span>
+                  </div>
+                )}
+                {book.rating && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Avaliação</span>
+                    <span className="flex items-center gap-1 font-bold text-brand-gold">
+                      <Icon name="star" type="solid" size="size-3" /> {book.rating.toFixed(1)}
+                    </span>
                   </div>
                 )}
               </div>
+            )}
+          </div>
+
+          {/* RIGHT COLUMN: Content */}
+          <div className="space-y-10 lg:col-span-8">
+            {/* Header Info */}
+            {loading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-12 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="h-20 w-full" />
+              </div>
+            ) : book ? (
+              <div className="space-y-4">
+                {book.category && (
+                  <Badge
+                    variant="outline"
+                    className="mb-2 border-brand-gold/30 bg-brand-gold/10 text-[10px] uppercase tracking-wider text-brand-gold"
+                  >
+                    {book.category}
+                  </Badge>
+                )}
+                <h1 className="font-serif text-4xl font-bold leading-tight text-foreground md:text-6xl">
+                  {book.title}
+                </h1>
+                {book.summary && (
+                  <p className="text-xl font-light leading-relaxed text-muted-foreground">
+                    {book.summary.substring(0, 150)}...
+                  </p>
+                )}
+
+                <div className="flex items-center gap-4 pt-2">
+                  <Avatar className="h-10 w-10 border border-border">
+                    <AvatarFallback>{book.author.substring(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">{book.author}</p>
+                    <p className="text-xs text-muted-foreground">Autor</p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {/* Tabs */}
+            {!loading && book && (
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="mb-8 h-auto w-full justify-start gap-8 overflow-x-auto border-b border-border bg-transparent p-0">
+                  <TabsTrigger
+                    value="overview"
+                    className="rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 text-base font-bold text-muted-foreground transition-all hover:text-foreground data-[state=active]:border-brand-gold data-[state=active]:text-foreground"
+                  >
+                    Visão Geral
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="learning"
+                    className="rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 text-base font-bold text-muted-foreground transition-all hover:text-foreground data-[state=active]:border-brand-gold data-[state=active]:text-foreground"
+                  >
+                    O que você vai aprender
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="author"
+                    className="rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 text-base font-bold text-muted-foreground transition-all hover:text-foreground data-[state=active]:border-brand-gold data-[state=active]:text-foreground"
+                  >
+                    Sobre o Autor
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="info"
+                    className="rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 text-base font-bold text-muted-foreground transition-all hover:text-foreground data-[state=active]:border-brand-gold data-[state=active]:text-foreground"
+                  >
+                    Informações
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* TAB 1: Visão Geral */}
+                <TabsContent value="overview" className="animate-fade-in space-y-8">
+                  <div className="space-y-4">
+                    <h3 className="font-sans text-lg font-bold">Sinopse</h3>
+                    <p className="font-serif text-lg leading-relaxed text-muted-foreground">
+                      {book.summary || 'Sem descrição disponível.'}
+                    </p>
+                  </div>
+                  {book.tags.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="font-sans text-lg font-bold">Tags</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {book.tags.map((tag) => (
+                          <Badge
+                            key={tag.slug}
+                            variant="secondary"
+                            className="cursor-pointer bg-muted px-3 py-1 text-muted-foreground hover:text-foreground"
+                            onClick={() => navigate(`/books?category=${tag.slug}`)}
+                          >
+                            #{tag.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+
+                {/* TAB 2: O que você vai aprender */}
+                <TabsContent value="learning" className="animate-fade-in space-y-8">
+                  <div className="grid gap-4">
+                    {/* Mock learning points - TODO: get from book metadata */}
+                    {[
+                      'Os conceitos fundamentais apresentados pelo autor.',
+                      'Como aplicar os ensinamentos no seu dia a dia.',
+                      'Estratégias práticas para implementação imediata.',
+                      'Insights sobre os temas centrais do livro.',
+                    ].map((item, i) => (
+                      <div
+                        key={i}
+                        className="group flex items-start gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:border-brand-gold/30"
+                      >
+                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-brand-green/20 bg-brand-green/10 text-brand-green transition-colors group-hover:bg-brand-green group-hover:text-white">
+                          <Icon name="check" size="size-3" />
+                        </div>
+                        <span className="font-serif text-lg font-medium leading-relaxed text-foreground/90">
+                          {item}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
+
+                {/* TAB 3: Sobre o Autor */}
+                <TabsContent value="author" className="animate-fade-in space-y-8">
+                  <div className="rounded-xl border border-border bg-card p-8">
+                    <div className="flex flex-col gap-6">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-20 w-20 border-2 border-background shadow-lg">
+                          <AvatarFallback className="text-2xl">
+                            {book.author.substring(0, 2).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h2 className="text-2xl font-bold text-foreground">{book.author}</h2>
+                          <p className="text-sm font-bold uppercase tracking-wider text-primary">
+                            Autor
+                          </p>
+                        </div>
+                      </div>
+                      <p className="font-serif text-base leading-relaxed text-muted-foreground">
+                        Informações detalhadas sobre o autor serão exibidas aqui quando disponíveis
+                        no banco de dados.
+                      </p>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* TAB 4: Informações */}
+                <TabsContent value="info" className="animate-fade-in space-y-8">
+                  <div className="rounded-xl border border-border bg-card p-6">
+                    <dl className="space-y-4">
+                      <div className="flex justify-between border-b border-border/50 pb-3">
+                        <dt className="text-muted-foreground">Título</dt>
+                        <dd className="font-medium">{book.title}</dd>
+                      </div>
+                      <div className="flex justify-between border-b border-border/50 pb-3">
+                        <dt className="text-muted-foreground">Autor</dt>
+                        <dd className="font-medium">{book.author}</dd>
+                      </div>
+                      {book.publishedYear && (
+                        <div className="flex justify-between border-b border-border/50 pb-3">
+                          <dt className="text-muted-foreground">Ano de Publicação</dt>
+                          <dd className="font-medium">{book.publishedYear}</dd>
+                        </div>
+                      )}
+                      {book.pageCount && (
+                        <div className="flex justify-between border-b border-border/50 pb-3">
+                          <dt className="text-muted-foreground">Páginas</dt>
+                          <dd className="font-medium">{book.pageCount}</dd>
+                        </div>
+                      )}
+                      {book.isbn && (
+                        <div className="flex justify-between border-b border-border/50 pb-3">
+                          <dt className="text-muted-foreground">ISBN</dt>
+                          <dd className="font-mono text-sm font-medium">{book.isbn}</dd>
+                        </div>
+                      )}
+                      {book.category && (
+                        <div className="flex justify-between">
+                          <dt className="text-muted-foreground">Categoria</dt>
+                          <dd className="font-medium">{book.category}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            )}
+
+            {/* Related Books */}
+            {!loading && relatedBooks.length > 0 && (
+              <>
+                <Separator />
+                <div className="space-y-8">
+                  <h3 className="font-sans text-2xl font-bold">Você também pode gostar</h3>
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+                    {relatedBooks.map((related) => (
+                      <div
+                        key={related.id}
+                        className="group flex cursor-pointer items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:border-brand-gold/30"
+                        onClick={() => navigate(`/books/${related.slug}`)}
+                      >
+                        <div className="h-24 w-16 shrink-0 overflow-hidden rounded border border-border shadow-md">
+                          {related.coverUrl ? (
+                            <img
+                              src={related.coverUrl}
+                              alt={related.title}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-muted">
+                              <Icon name="book" className="text-muted-foreground" size="size-4" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            {related.category || 'Geral'}
+                          </p>
+                          <h4 className="mb-1 truncate text-sm font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+                            {related.title}
+                          </h4>
+                          <p className="truncate font-serif text-xs text-muted-foreground">
+                            Por {related.author}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>
-
-        {/* Content Section */}
-        {!loading && book && (
-          <div className="space-y-8">
-            {/* Tags */}
-            {book.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {book.tags.map((tag) => (
-                  <Badge
-                    key={tag.slug}
-                    variant="secondary"
-                    className="cursor-pointer bg-muted text-muted-foreground hover:text-foreground"
-                    onClick={() => navigate(`/books?category=${tag.slug}`)}
-                  >
-                    {tag.name}
-                  </Badge>
-                ))}
-              </div>
-            )}
-
-            {/* Book Info */}
-            <div className="grid gap-8 border-t border-border/50 pt-8 md:grid-cols-2">
-              <div className="space-y-4">
-                <h4 className="text-lg font-bold">Informações</h4>
-                <dl className="space-y-3 text-sm">
-                  {book.author && (
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Autor</dt>
-                      <dd className="font-medium">{book.author}</dd>
-                    </div>
-                  )}
-                  {book.publishedYear && (
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Ano</dt>
-                      <dd className="font-medium">{book.publishedYear}</dd>
-                    </div>
-                  )}
-                  {book.pageCount && (
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Páginas</dt>
-                      <dd className="font-medium">{book.pageCount}</dd>
-                    </div>
-                  )}
-                  {book.isbn && (
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">ISBN</dt>
-                      <dd className="font-mono text-xs font-medium">{book.isbn}</dd>
-                    </div>
-                  )}
-                  {book.category && (
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Categoria</dt>
-                      <dd className="font-medium">{book.category}</dd>
-                    </div>
-                  )}
-                </dl>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="space-y-4">
-                <h4 className="text-lg font-bold">Ações Rápidas</h4>
-                <div className="space-y-3">
-                  <Button
-                    variant="outline"
-                    className="h-12 w-full justify-start"
-                    onClick={() => navigate(`/books/${bookSlug}/read`)}
-                  >
-                    <Icon name="book-open" className="mr-3" /> Ler Resumo Completo
-                  </Button>
-                  {book.hasAudio && (
-                    <Button variant="outline" className="h-12 w-full justify-start">
-                      <Icon name="headphones" className="mr-3" /> Ouvir Audiobook
-                    </Button>
-                  )}
-                  <Button variant="outline" className="h-12 w-full justify-start">
-                    <Icon name="bookmark" className="mr-3" /> Adicionar à Lista
-                  </Button>
-                  <Button variant="outline" className="h-12 w-full justify-start">
-                    <Icon name="share" className="mr-3" /> Compartilhar
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Related Books */}
-        {relatedBooks.length > 0 && (
-          <div className="mt-20 border-t border-border pt-12">
-            <h3 className="mb-8 text-2xl font-bold">Leituras Similares</h3>
-            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-              {relatedBooks.map((related) => (
-                <BookCard
-                  key={related.id}
-                  book={related}
-                  variant="compact"
-                  onClick={() => navigate(`/books/${related.slug}`)}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

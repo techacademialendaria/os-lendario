@@ -221,7 +221,7 @@ export const RecommendedToolsTab: React.FC<RecommendedToolsTabProps> = ({
     return (
       <div className="py-12 text-center text-muted-foreground">
         <Icon
-          name="toolbox"
+          name="box"
           size="size-12"
           className="mx-auto mb-4 opacity-50"
         />
@@ -245,7 +245,7 @@ export const RecommendedToolsTab: React.FC<RecommendedToolsTabProps> = ({
       <Card className="rounded-xl border-border bg-gradient-to-br from-card to-primary/5">
         <CardHeader className="border-b border-border pb-3">
           <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-muted-foreground">
-            <Icon name="toolbox" className="text-primary" /> Ferramentas
+            <Icon name="box" className="text-primary" /> Ferramentas
             Recomendadas
           </CardTitle>
         </CardHeader>

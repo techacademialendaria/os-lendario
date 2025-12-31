@@ -66,7 +66,7 @@ const CourseNew: React.FC<CourseNewProps> = ({ setSection }) => {
                     <div
                       className="flex h-12 w-12 items-center justify-center rounded-xl transition-colors bg-studio-accent text-studio-primary"
                     >
-                      <Icon name="seedling" size="size-6" />
+                      <Icon name="flower-tulip" size="size-6" />
                     </div>
                     {mode === 'greenfield' && (
                       <Icon
@@ -108,7 +108,7 @@ const CourseNew: React.FC<CourseNewProps> = ({ setSection }) => {
                     <div
                       className="flex h-12 w-12 items-center justify-center rounded-xl transition-colors bg-studio-accent text-studio-gold"
                     >
-                      <Icon name="file-import" size="size-6" />
+                      <Icon name="upload" size="size-6" />
                     </div>
                     {mode === 'brownfield' && (
                       <Icon
@@ -173,7 +173,7 @@ const CourseNew: React.FC<CourseNewProps> = ({ setSection }) => {
               className="min-w-[140px] text-white bg-studio-primary hover:bg-studio-primary/90"
             >
               {isCreating ? (
-                <Icon name="spinner" className="mr-2 animate-spin" />
+                <Icon name="refresh" className="mr-2 animate-spin" />
               ) : (
                 <>
                   Criar Curso <Icon name="arrow-right" className="ml-2" />

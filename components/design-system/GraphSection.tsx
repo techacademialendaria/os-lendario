@@ -422,7 +422,7 @@ const GraphSection: React.FC = () => {
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <h3 className="flex items-center gap-2 font-sans text-2xl font-bold">
-              <Icon name="network-cloud" /> Rede Neural
+              <Icon name="network" /> Rede Neural
             </h3>
             <p className="text-sm text-muted-foreground">
               Para visualização de comunidades, conexões de usuários ou clusters de dados não
@@ -473,7 +473,7 @@ const GraphSection: React.FC = () => {
       {/* --- Section 2: Radial --- */}
       <section className="space-y-6 border-t border-border pt-12">
         <h3 className="flex items-center gap-2 font-sans text-2xl font-bold">
-          <Icon name="bullseye" /> Taxonomia Radial
+          <Icon name="target" /> Taxonomia Radial
         </h3>
         <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
           <div className="order-2 md:order-1">

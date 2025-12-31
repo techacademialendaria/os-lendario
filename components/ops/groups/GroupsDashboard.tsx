@@ -171,7 +171,6 @@ export function GroupsDashboard({ groupName, onBack }: GroupsDashboardProps) {
   // Load group data on mount
   useEffect(() => {
     loadGroupData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupName]);
 
   const loadGroupData = async () => {

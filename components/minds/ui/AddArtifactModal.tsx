@@ -217,7 +217,7 @@ export const AddArtifactModal: React.FC<AddArtifactModalProps> = ({
           {/* Error */}
           {error && (
             <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-              <Icon name="exclamation-circle" size="size-4" />
+              <Icon name="exclamation" size="size-4" />
               {error}
             </div>
           )}
@@ -231,7 +231,7 @@ export const AddArtifactModal: React.FC<AddArtifactModalProps> = ({
           <Button onClick={handleSave} disabled={isSaving} className="gap-2">
             {isSaving ? (
               <>
-                <Icon name="spinner" className="animate-spin" size="size-4" />
+                <Icon name="refresh" className="animate-spin" size="size-4" />
                 Salvando...
               </>
             ) : (

@@ -224,7 +224,7 @@ vault/
                       : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  <Icon name="sparkles" size="size-3" />
+                  <Icon name="magic-wand" size="size-3" />
                   Auditoria
                 </Button>
                 <Button
@@ -288,7 +288,7 @@ vault/
                       /* No Analysis State */
                       <div className="py-8 text-center">
                         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted/30">
-                          <Icon name="sparkles" size="size-7" className="text-muted-foreground" />
+                          <Icon name="magic-wand" size="size-7" className="text-muted-foreground" />
                         </div>
                         <h4 className="mb-2 text-sm font-semibold">Sem análise</h4>
                         <p className="mb-6 px-4 text-xs text-muted-foreground">
@@ -299,7 +299,7 @@ vault/
                           size="sm"
                           className="gap-2 border-studio-primary/40 text-studio-primary hover:bg-studio-primary/5 hover:text-studio-primary"
                         >
-                          <Icon name="sparkles" size="size-3" />
+                          <Icon name="magic-wand" size="size-3" />
                           Analisar Conteúdo
                         </Button>
                         <p className="mt-4 text-[10px] text-muted-foreground">
@@ -425,7 +425,7 @@ vault/
                         : 'text-muted-foreground hover:bg-muted'
                     )}
                   >
-                    <Icon name="sparkles" size="size-4" />
+                    <Icon name="magic-wand" size="size-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent side="right">Auditoria Didática</TooltipContent>

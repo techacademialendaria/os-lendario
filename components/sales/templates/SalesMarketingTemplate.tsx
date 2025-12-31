@@ -269,7 +269,7 @@ const SalesMarketingTemplate: React.FC<{ setSection: (s: Section) => void }> = (
         <Card className="overflow-hidden border-border">
           <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/10 px-6 py-4">
             <div className="flex items-center gap-2">
-              <Icon name="list-check" className="text-primary" />
+              <Icon name="check-square" className="text-primary" />
               <CardTitle className="text-sm font-bold uppercase tracking-widest">
                 Fila de Objeções para Conteúdo
               </CardTitle>
@@ -336,7 +336,7 @@ const SalesMarketingTemplate: React.FC<{ setSection: (s: Section) => void }> = (
           <Card className="flex h-[400px] flex-col">
             <CardHeader className="border-b border-border px-6 py-4">
               <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                <Icon name="network-cloud" className="text-brand-blue" /> Correlação Anúncio →
+                <Icon name="network" className="text-brand-blue" /> Correlação Anúncio →
                 Objeção
               </CardTitle>
             </CardHeader>

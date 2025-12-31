@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Section } from '../../../types';
-import { PRDStatus, EpicData, StoryData, Complexity } from '../../../types/prd';
+import { PRDStatus, EpicSummary, StorySummary, Complexity } from '../../../types/prd';
 import { usePRDProject } from '../../../hooks/prd/usePRDProject';
 import PRDTopbar from '../PRDTopbar';
 
@@ -16,7 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { cn } from '../../../lib/utils';
 
 // Re-export types for convenience
-export type { StoryData } from '../../../types/prd';
+export type { StorySummary as StoryData } from '../../../types/prd';
 
 // =============================================================================
 // CONSTANTS
@@ -101,8 +101,8 @@ const PipelineStepper: React.FC = () => (
 
 // Story Detail Panel
 interface StoryDetailProps {
-  story: StoryData | null;
-  onSave: (story: StoryData) => void;
+  story: StorySummary | null;
+  onSave: (story: StorySummary) => void;
   onClose: () => void;
 }
 
@@ -115,7 +115,7 @@ const StoryDetail: React.FC<StoryDetailProps> = ({ story, onSave, onClose }) => 
   React.useEffect(() => {
     if (story) {
       setTitle(story.title);
-      setUserStory(story.userStory);
+      setUserStory(story.userStory || '');
       setCriteria(story.acceptanceCriteria?.join('\n') || '');
       setComplexity(story.complexity || 'M');
     }
@@ -136,7 +136,7 @@ const StoryDetail: React.FC<StoryDetailProps> = ({ story, onSave, onClose }) => 
     return (
       <div className="flex h-full items-center justify-center text-muted-foreground">
         <div className="text-center">
-          <Icon name="mouse-pointer" size="size-12" className="mx-auto mb-4 opacity-30" />
+          <Icon name="cursor" size="size-12" className="mx-auto mb-4 opacity-30" />
           <p>Selecione uma story para editar</p>
         </div>
       </div>
@@ -229,7 +229,7 @@ Scenario: ${title}
   ${criteria
     .split('\n')
     .filter(Boolean)
-    .map((c, i) =>
+    .map((c: string, i: number) =>
       i === 0
         ? `Given ${c}`
         : i === criteria.split('\n').filter(Boolean).length - 1
@@ -268,8 +268,8 @@ export const PRDStoriesTemplate: React.FC<PRDStoriesTemplateProps> = ({ setSecti
   const { project, loading, updateProject, advancePhase } = usePRDProject(slug || '');
 
   // Local state
-  const [epics, setEpics] = useState<EpicData[]>([]);
-  const [stories, setStories] = useState<StoryData[]>([]);
+  const [epics, setEpics] = useState<EpicSummary[]>([]);
+  const [stories, setStories] = useState<StorySummary[]>([]);
   const [selectedEpicId, setSelectedEpicId] = useState<string | null>(null);
   const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -303,7 +303,7 @@ export const PRDStoriesTemplate: React.FC<PRDStoriesTemplateProps> = ({ setSecti
       const epic = epics.find((e) => e.id === epicId);
       if (!epic) return;
 
-      const mockStories: StoryData[] = (epic.stories || ['Story 1', 'Story 2', 'Story 3']).map(
+      const mockStories: StorySummary[] = (epic.stories || ['Story 1', 'Story 2', 'Story 3']).map(
         (title, i) => ({
           id: `story-${epicId}-${i}-${Date.now()}`,
           epic_id: epicId,
@@ -331,7 +331,7 @@ export const PRDStoriesTemplate: React.FC<PRDStoriesTemplateProps> = ({ setSecti
 
   // Save story
   const handleSaveStory = useCallback(
-    async (updatedStory: StoryData) => {
+    async (updatedStory: StorySummary) => {
       const updated = stories.map((s) => (s.id === updatedStory.id ? updatedStory : s));
       setStories(updated);
       await updateProject({ stories: updated });
@@ -371,14 +371,14 @@ export const PRDStoriesTemplate: React.FC<PRDStoriesTemplateProps> = ({ setSecti
               >
                 Projetos
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span
                 className="cursor-pointer hover:text-foreground"
                 onClick={() => navigate(`/prd/${slug}/epicos`)}
               >
                 Épicos
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span className="font-medium text-foreground">User Stories</span>
             </div>
             <Badge
@@ -456,7 +456,7 @@ export const PRDStoriesTemplate: React.FC<PRDStoriesTemplateProps> = ({ setSecti
                 {isGenerating ? (
                   <Icon name="refresh" className="mr-2 size-3 animate-spin" />
                 ) : (
-                  <Icon name="sparkles" className="mr-2 size-3" />
+                  <Icon name="magic-wand" className="mr-2 size-3" />
                 )}
                 {epicStories.length > 0 ? 'Regenerar' : 'Gerar Stories'}
               </Button>
@@ -479,7 +479,7 @@ export const PRDStoriesTemplate: React.FC<PRDStoriesTemplateProps> = ({ setSecti
                     style={{ backgroundColor: STUDIO_TEAL }}
                     className="text-white"
                   >
-                    <Icon name="sparkles" className="mr-2 size-4" />
+                    <Icon name="magic-wand" className="mr-2 size-4" />
                     Gerar Stories com IA
                   </Button>
                 )}
@@ -518,7 +518,7 @@ export const PRDStoriesTemplate: React.FC<PRDStoriesTemplateProps> = ({ setSecti
                         {story.userStory}
                       </p>
                     </div>
-                    <Icon name="nav-arrow-right" className="size-4 text-muted-foreground" />
+                    <Icon name="angle-small-right" className="size-4 text-muted-foreground" />
                   </button>
                 ))}
               </div>

@@ -190,21 +190,21 @@ export const ToolStackMappingSection: React.FC = () => {
                 color = colors[i % colors.length];
               }
 
+              const corrAny = corr as Record<string, unknown>;
               return (
                 <CorrelationCard
                   key={i}
-                  title={corr.type || corr.dimension}
+                  title={(corrAny.type || corrAny.dimension) as string}
                   subtitle={
-                    corr.tagline || corr.traits || corr.dimensions || corr.traits
+                    (corrAny.tagline || corrAny.traits || corrAny.dimensions) as string
                   }
                   primaryStacks={
-                    corr.primaryStacks ||
-                    corr.workingStyle && [corr.workingStyle] ||
-                    []
+                    (corrAny.primaryStacks as string[]) ||
+                    (corrAny.workingStyle ? [corrAny.workingStyle as string] : [])
                   }
-                  explanation={corr.explanation}
-                  avoidStacks={corr.avoidStacks}
-                  avoidanceReason={corr.avoidanceReason || corr.avoidanceReason}
+                  explanation={corrAny.explanation as string}
+                  avoidStacks={corrAny.avoidStacks as string[] | undefined}
+                  avoidanceReason={corrAny.avoidanceReason as string | undefined}
                   color={color}
                 />
               );

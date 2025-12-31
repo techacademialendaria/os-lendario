@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Section } from '../../../types';
-import { PRDStatus } from '../../../types/prd';
+import { PRDStatus, PRDDocumentData } from '../../../types/prd';
 import { usePRDProject } from '../../../hooks/prd/usePRDProject';
 import PRDTopbar from '../PRDTopbar';
 
@@ -192,7 +192,7 @@ const RequirementCard: React.FC<{
               className="size-8 text-muted-foreground hover:text-foreground"
               title="Editar"
             >
-              <Icon name="edit-pencil" size="size-4" />
+              <Icon name="edit" size="size-4" />
             </Button>
             <Button
               size="icon"
@@ -350,15 +350,16 @@ ${scopeLimits}
 
     setIsAdvancing(true);
 
-    // Save PRD document
+    // Save PRD document (merge with existing prdDocument)
     await updateProject({
       prdDocument: {
+        ...project?.project_metadata?.prdDocument,
         requirements,
         techStack,
         scopeLimits,
         screens,
         vibe,
-      },
+      } as PRDDocumentData,
     });
 
     const success = await advancePhase();
@@ -415,14 +416,14 @@ ${scopeLimits}
               >
                 Projetos
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span
                 className="cursor-pointer hover:text-foreground"
                 onClick={() => navigate(`/prd/${slug}/brief`)}
               >
                 Brief
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span className="font-medium text-foreground">Especificação Técnica</span>
             </div>
             <Badge

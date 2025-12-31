@@ -72,7 +72,7 @@ export const FragmentDetailPanel: React.FC<FragmentDetailPanelProps> = ({
         <div className="flex items-center justify-center h-full text-muted-foreground">
           <div className="text-center">
             <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center mx-auto mb-4 border border-border">
-              <Icon name="puzzle-piece" size="size-8" className="opacity-30" />
+              <Icon name="box" size="size-8" className="opacity-30" />
             </div>
             <p className="text-sm font-medium text-muted-foreground">Selecione um fragmento para visualizar</p>
           </div>
@@ -190,7 +190,7 @@ export const FragmentDetailPanel: React.FC<FragmentDetailPanelProps> = ({
               {fragment.context && (
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-2">
-                    <Icon name="info-circle" size="size-3" />
+                    <Icon name="info" size="size-3" />
                     Contexto
                   </h4>
                   <p className="text-sm text-muted-foreground leading-relaxed">

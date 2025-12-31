@@ -218,7 +218,7 @@ export const FragmentsTab: React.FC<FragmentsTabProps> = ({
   if (!fragmentsData || fragmentsData.fragments.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        <Icon name="puzzle-piece" size="size-12" className="mx-auto mb-4 opacity-50" />
+        <Icon name="box" size="size-12" className="mx-auto mb-4 opacity-50" />
         <p>Nenhum fragmento extraído para esta mente.</p>
         <p className="text-sm mt-2 opacity-70">
           Execute o pipeline InnerLens para extrair fragmentos dos conteúdos.
@@ -248,7 +248,7 @@ export const FragmentsTab: React.FC<FragmentsTabProps> = ({
         <Card className="bg-muted/20 border-white/5">
           <CardContent className="p-3 flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Icon name="puzzle-piece" className="text-primary" />
+              <Icon name="box" className="text-primary" />
             </div>
             <div>
               <div className="text-2xl font-bold">{fragmentsData.total}</div>
@@ -281,7 +281,7 @@ export const FragmentsTab: React.FC<FragmentsTabProps> = ({
         <Card className="bg-zinc-500/5 border-zinc-500/20">
           <CardContent className="p-3 flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-zinc-500/10 flex items-center justify-center">
-              <Icon name="arrow-down" className="text-zinc-400" />
+              <Icon name="arrow-small-down" className="text-zinc-400" />
             </div>
             <div>
               <div className="text-2xl font-bold text-zinc-400">{fragmentsData.byRelevance.low}</div>

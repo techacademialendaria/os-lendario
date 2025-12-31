@@ -103,7 +103,7 @@ const SalesSettingsTemplate: React.FC<{ setSection: (s: Section) => void }> = ({
             </TabsTrigger>
             <TabsTrigger value="objections" className="gap-2">
               {' '}
-              <Icon name="shield-exclamation" size="size-4" /> Categorias
+              <Icon name="shield" size="size-4" /> Categorias
             </TabsTrigger>
             <TabsTrigger value="logs" className="gap-2">
               {' '}

@@ -80,7 +80,7 @@ export const DebatesList: React.FC<DebatesListProps> = ({ state }) => {
         <div className="space-y-6 lg:col-span-2">
           <div className="flex items-center justify-between">
             <h3 className="flex items-center gap-2 text-xl font-bold text-foreground">
-              <Icon name="flame" className="text-red-500" /> Ao Vivo Agora
+              <Icon name="flash" className="text-red-500" /> Ao Vivo Agora
             </h3>
             <Button variant="link" className="text-muted-foreground">
               Ver Todos

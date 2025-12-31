@@ -203,7 +203,7 @@ export function MindAvatarUpload({
             ) : (
               <div className="flex flex-col items-center justify-center p-6 text-center">
                 <div className="mb-4 rounded-full bg-muted p-3">
-                  <Icon name="cloud-upload" className="text-muted-foreground" size="size-6" />
+                  <Icon name="upload" className="text-muted-foreground" size="size-6" />
                 </div>
                 <p className="mb-1 font-sans text-sm font-semibold">
                   <span className="text-primary hover:underline">Clique para upload</span> ou
@@ -219,7 +219,7 @@ export function MindAvatarUpload({
           {/* Error Message */}
           {error && (
             <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-              <Icon name="warning" size="size-4" />
+              <Icon name="exclamation-triangle" size="size-4" />
               <span>{error}</span>
             </div>
           )}
@@ -232,7 +232,7 @@ export function MindAvatarUpload({
           <Button onClick={handleSave} disabled={!selectedFile || isUploading}>
             {isUploading ? (
               <>
-                <Icon name="spinner" size="size-4" className="mr-2 animate-spin" />
+                <Icon name="refresh" size="size-4" className="mr-2 animate-spin" />
                 Salvando...
               </>
             ) : (

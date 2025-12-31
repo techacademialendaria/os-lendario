@@ -1,6 +1,9 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
-import { iconMap, DefaultIcon } from './icons';
+import { iconMap, DefaultIcon, hasIcon, type IconName } from './icons';
+
+// Re-export IconName for convenience
+export type { IconName };
 
 // Mapping from current size props to Tailwind width/height classes
 // This ensures the SVG icons match the previous font-based sizing
@@ -15,9 +18,12 @@ const sizeMap: Record<string, string> = {
   'size-10': 'w-9 h-9',     // 36px
 };
 
-export interface IconProps extends React.HTMLAttributes<HTMLElement> {
-  /** Nome do ícone (kebab-case, compatível com sistema antigo) */
-  name: string;
+export interface IconProps extends React.SVGAttributes<SVGSVGElement> {
+  /**
+   * Nome do ícone (kebab-case). Use apenas nomes válidos de icon-map.ts
+   * @see app/components/ui/icons/icon-map.ts para lista completa
+   */
+  name: IconName | (string & {}); // IconName preferred, string allowed for gradual migration
   /** Tamanho usando classes Tailwind size-* (mapeado) ou classes arbitrárias */
   size?: keyof typeof sizeMap | string;
   /** Texto acessível para screen readers */
@@ -38,20 +44,33 @@ export function Icon({
   fill, // SVGs might receive fill
   strokeWidth,
   ...props
-}: IconProps & { fill?: string }) {
+}: IconProps) {
   // 1. Resolve Component
   // Tries to find the component in the map, falls back to DefaultIcon
-  const normalizedName = name?.toLowerCase()?.trim();
-  const IconComponent = iconMap[normalizedName] || DefaultIcon;
+  const normalizedName = name?.toLowerCase()?.trim() ?? '';
+  const isValidIcon = hasIcon(normalizedName);
+  const IconComponent = isValidIcon ? iconMap[normalizedName] : DefaultIcon;
+
+  // DEV WARNING: Log invalid icons to help catch LLM-generated invalid names
+  if (!isValidIcon && process.env.NODE_ENV === 'development') {
+    console.warn(
+      `⚠️ Icon "${name}" not found in icon-map.ts. ` +
+      `Check app/components/ui/icons/icon-map.ts for valid names.`
+    );
+  }
 
   // 2. Resolve Size
   // If size is a mapped key (size-5), use the map. Otherwise, pass it through (if it's w-8 etc)
   const sizeClass = sizeMap[size as string] || size;
 
-  // 3. Render
+  // 3. Render (with visual indicator for invalid icons in dev)
+  const invalidIconClass = !isValidIcon && process.env.NODE_ENV === 'development'
+    ? 'ring-2 ring-red-500 rounded'
+    : undefined;
+
   return (
     <IconComponent
-      className={cn(sizeClass, className)}
+      className={cn(sizeClass, invalidIconClass, className)}
       aria-hidden={label ? undefined : 'true'}
       aria-label={label}
       role={label ? 'img' : undefined}

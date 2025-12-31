@@ -205,7 +205,7 @@ export const PRDNewTemplate: React.FC<PRDNewTemplateProps> = ({ setSection }) =>
           {/* Error Message */}
           {error && (
             <div className="flex items-center gap-2 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              <Icon name="exclamation-circle" size="size-4" />
+              <Icon name="exclamation" size="size-4" />
               {error}
             </div>
           )}
@@ -224,7 +224,7 @@ export const PRDNewTemplate: React.FC<PRDNewTemplateProps> = ({ setSection }) =>
             >
               {isCreating ? (
                 <>
-                  <Icon name="spinner" className="mr-2 size-4 animate-spin" />
+                  <Icon name="refresh" className="mr-2 size-4 animate-spin" />
                   Criando...
                 </>
               ) : (

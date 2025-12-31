@@ -43,6 +43,7 @@ import { Progress } from '../../ui/progress';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '../../ui/alert';
 import LessonEditor from './LessonEditor';
+import { PipelineVisual, CoursesHeader, type PipelineState } from '../ui';
 import { useCourses, Course as HookCourse } from '../../../hooks/useCourses';
 import { useCourseContents } from '../../../hooks/useCourseContents';
 import {
@@ -659,98 +660,6 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
   const handleRemoveFile = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
-
-  // --- VISUAL COMPONENTS ---
-
-  const PipelineStep = ({
-    status,
-    label,
-  }: {
-    status: 'completed' | 'current' | 'pending';
-    label: string;
-  }) => {
-    let iconName = 'circle';
-    let colorClass = 'text-muted-foreground/30';
-    let labelClass = 'text-muted-foreground';
-
-    if (status === 'completed') {
-      iconName = 'check-circle';
-      colorClass = 'text-success';
-      labelClass = 'text-success font-medium';
-    } else if (status === 'current') {
-      iconName = 'target';
-      colorClass = 'text-primary animate-pulse';
-      labelClass = 'text-primary font-bold';
-    }
-
-    return (
-      <div className="group relative flex cursor-help flex-col items-center gap-1">
-        <Icon
-          name={iconName}
-          className={cn('size-4 transition-colors', colorClass)}
-          type={status === 'completed' ? 'solid' : 'regular'}
-        />
-        <span className={cn('text-[9px] uppercase tracking-wider transition-colors', labelClass)}>
-          {label}
-        </span>
-      </div>
-    );
-  };
-
-  const PipelineVisual = ({ pipeline }: { pipeline: Course['pipeline'] }) => (
-    <div className="relative flex w-full items-center justify-between">
-      <div className="absolute left-0 top-[7px] -z-10 h-0.5 w-full bg-muted"></div>
-      <div className="z-10 bg-card px-1">
-        <PipelineStep status={pipeline.brief} label="Brief" />
-      </div>
-      <div className="z-10 bg-card px-1">
-        <PipelineStep status={pipeline.research} label="Research" />
-      </div>
-      <div className="z-10 bg-card px-1">
-        <PipelineStep status={pipeline.curriculum} label="Currículo" />
-      </div>
-      <div className="z-10 bg-card px-1">
-        <PipelineStep status={pipeline.lessons} label="Lições" />
-      </div>
-      <div className="z-10 bg-card px-1">
-        <PipelineStep status={pipeline.validation} label="Validação" />
-      </div>
-    </div>
-  );
-
-  const CoursesHeader = ({ title, breadcrumb }: { title: string; breadcrumb?: string }) => (
-    <div className="mb-8 flex animate-fade-in items-center justify-between">
-      <div>
-        <div className="mb-1 flex items-center gap-2 text-sm text-muted-foreground">
-          <span className="cursor-pointer hover:text-foreground" onClick={() => setView('list')}>
-            Cursos
-          </span>
-          {breadcrumb && (
-            <>
-              <Icon name="angle-small-right" size="size-3" />
-              <span className="text-foreground">{breadcrumb}</span>
-            </>
-          )}
-        </div>
-        <h1 className="font-sans text-3xl font-bold tracking-tight text-foreground">{title}</h1>
-      </div>
-      <div className="flex gap-3">
-        {view !== 'list' && (
-          <Button variant="outline" onClick={goBack}>
-            <Icon name="angle-left" className="mr-2 size-4" /> Voltar
-          </Button>
-        )}
-        {view === 'list' && (
-          <Button
-            onClick={() => setView('new')}
-            className="bg-studio-primary text-white shadow-lg shadow-studio-primary/20 transition-transform hover:scale-105"
-          >
-            <Icon name="plus" className="mr-2 size-4" /> Novo Curso
-          </Button>
-        )}
-      </div>
-    </div>
-  );
 
   // --- RENDERERS ---
 
@@ -1375,7 +1284,13 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
 
   const renderNewCourse = () => (
     <>
-      <CoursesHeader title="Novo Curso" breadcrumb="Cursos > Novo" />
+      <CoursesHeader
+        title="Novo Curso"
+        breadcrumb="Novo"
+        showBackButton
+        onBack={goBack}
+        onBreadcrumbClick={() => setView('list')}
+      />
       <div className="mx-auto max-w-4xl animate-fade-in space-y-12 pb-20">
         <div className="space-y-6">
           <h3 className="font-sans text-xl font-bold">Como você quer criar seu curso?</h3>
@@ -1392,7 +1307,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
               <CardContent className="space-y-6 p-8">
                 <div className="flex items-center justify-between">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-green/10 text-brand-green">
-                    <Icon name="seedling" size="size-6" />
+                    <Icon name="flower-tulip" size="size-6" />
                   </div>
                   {mode === 'greenfield' && (
                     <Icon name="check-circle" className="size-6 text-studio-primary" type="solid" />
@@ -1447,7 +1362,7 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
           </Button>
           <Button onClick={handleCreateCourse} disabled={!mode || !slug} className="min-w-[140px]">
             {isCreating ? (
-              <Icon name="spinner" className="mr-2 animate-spin" />
+              <Icon name="refresh" className="mr-2 animate-spin" />
             ) : (
               <>
                 Criar Curso <Icon name="arrow-right" className="ml-2" />
@@ -1463,7 +1378,10 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
     <div className="animate-fade-in pb-20">
       <CoursesHeader
         title="Briefing Estratégico"
-        breadcrumb={`Cursos > ${slug || 'novo'} > Brief`}
+        breadcrumb="Brief"
+        showBackButton
+        onBack={goBack}
+        onBreadcrumbClick={() => setView('list')}
       />
       <div className="flex flex-col gap-8 lg:flex-row">
         <div className="w-full shrink-0 space-y-6 lg:w-64">
@@ -1565,7 +1483,10 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
     <div className="animate-fade-in space-y-8 pb-20">
       <CoursesHeader
         title="Inteligência de Mercado"
-        breadcrumb={`Cursos > ${slug || 'novo'} > Pesquisa`}
+        breadcrumb="Pesquisa"
+        showBackButton
+        onBack={goBack}
+        onBreadcrumbClick={() => setView('list')}
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -1627,7 +1548,10 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
     <div className="animate-fade-in space-y-8 pb-20">
       <CoursesHeader
         title="Reformulação do Brief"
-        breadcrumb={`Cursos > ${slug || 'novo'} > Diff`}
+        breadcrumb="Diff"
+        showBackButton
+        onBack={goBack}
+        onBreadcrumbClick={() => setView('list')}
       />
 
       <div className="grid grid-cols-2 gap-8">
@@ -1749,7 +1673,13 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
 
     return (
       <div className="animate-fade-in space-y-8 pb-20">
-        <CoursesHeader title={courseName} breadcrumb={`${selectedCourseSlug} > Currículo`} />
+        <CoursesHeader
+          title={courseName}
+          breadcrumb="Currículo"
+          showBackButton
+          onBack={goBack}
+          onBreadcrumbClick={() => setView('list')}
+        />
 
         <div className="mb-4 flex items-center justify-between">
           <p className="text-muted-foreground">
@@ -1864,7 +1794,13 @@ const CoursesTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setSe
   // --- AGENT RUNNING: GENERATION ---
   const renderGeneration = () => (
     <div className="animate-fade-in space-y-8 pb-20">
-      <CoursesHeader title="Gerando Aulas" breadcrumb={`Cursos > ${slug || 'novo'} > Geração`} />
+      <CoursesHeader
+        title="Gerando Aulas"
+        breadcrumb="Geração"
+        showBackButton
+        onBack={goBack}
+        onBreadcrumbClick={() => setView('list')}
+      />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Log / Terminal */}

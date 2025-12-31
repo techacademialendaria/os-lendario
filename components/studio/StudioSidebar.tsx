@@ -139,7 +139,7 @@ export const StudioSidebar: React.FC<StudioSidebarProps> = ({
           <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
             {isSaving ? (
               <>
-                <Icon name="spinner" size="size-3" className="animate-spin" />
+                <Icon name="refresh" size="size-3" className="animate-spin" />
                 <span>Salvando...</span>
               </>
             ) : (

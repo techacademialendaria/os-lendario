@@ -91,18 +91,18 @@ const GroupsTemplate: React.FC<GroupsTemplateProps> = ({ setSection }) => {
     return stats[key as keyof typeof stats] ?? null;
   };
 
-  // Filter groups by sentiment
+  // Filter groups by sentiment (uses lastSentiment from GroupSummary)
   const getFilteredGroups = () => {
-    if (!groups) return [];
+    if (!groupsSummary) return [];
     switch (activeTab) {
       case 'positive':
-        return groups.filter(g => g.sentiment === 'positivo');
+        return groupsSummary.filter((g) => g.lastSentiment === 'positivo');
       case 'neutral':
-        return groups.filter(g => g.sentiment === 'neutro');
+        return groupsSummary.filter((g) => g.lastSentiment === 'neutro');
       case 'negative':
-        return groups.filter(g => g.sentiment === 'negativo');
+        return groupsSummary.filter((g) => g.lastSentiment === 'negativo');
       default:
-        return groups;
+        return groupsSummary;
     }
   };
 

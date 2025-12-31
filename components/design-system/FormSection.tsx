@@ -47,7 +47,7 @@ const FormSection: React.FC = () => {
           {/* Texto & Area */}
           <div className="h-full space-y-6 rounded-xl border border-border bg-card p-6">
             <h4 className="flex items-center gap-2 font-sans text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              <Icon name="text" size="size-4" /> Texto
+              <Icon name="edit" size="size-4" /> Texto
             </h4>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -75,7 +75,7 @@ const FormSection: React.FC = () => {
           {/* Seleção */}
           <div className="h-full space-y-6 rounded-xl border border-border bg-card p-6">
             <h4 className="flex items-center gap-2 font-sans text-sm font-medium uppercase tracking-wider text-muted-foreground">
-              <Icon name="list-check" size="size-4" /> Seleção
+              <Icon name="check" size="size-4" /> Seleção
             </h4>
             <div className="space-y-4">
               <div className="space-y-2">
@@ -174,7 +174,7 @@ const FormSection: React.FC = () => {
                   className="absolute bottom-1 right-1 h-8 w-8"
                   disabled={!chatMessage}
                 >
-                  <Icon name="arrow-up" size="size-4" />
+                  <Icon name="arrow-small-up" size="size-4" />
                 </Button>
               </div>
             </CardContent>

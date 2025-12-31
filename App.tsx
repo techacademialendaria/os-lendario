@@ -23,6 +23,7 @@ const App: React.FC = () => {
 
   // UI state
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const [isSidebarHidden, setIsSidebarHidden] = useState(false); // For focus/reader modes
   const [language, setLanguage] = useState<Language>('pt');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -57,6 +58,7 @@ const App: React.FC = () => {
           setLanguage={setLanguage}
           isMobileOpen={isMobileMenuOpen}
           closeMobileMenu={() => setIsMobileMenuOpen(false)}
+          isHidden={isSidebarHidden}
         />
 
         {/* Main Content */}
@@ -70,6 +72,8 @@ const App: React.FC = () => {
               setSection={setSection}
               currentTheme={currentTheme}
               language={language}
+              setSidebarCollapsed={setIsSidebarCollapsed}
+              setSidebarHidden={setIsSidebarHidden}
             />
           </div>
         </main>

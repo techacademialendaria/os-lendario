@@ -516,7 +516,7 @@ const ListSection: React.FC = () => {
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                  <Icon name="marker" size="size-4" />
+                  <Icon name="map-marker" size="size-4" />
                 </div>
                 <span className="text-muted-foreground">São Paulo, SP - Brasil</span>
               </div>

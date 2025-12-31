@@ -320,14 +320,14 @@ ${metrics || '_Não definido_'}
               >
                 Projetos
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span
                 className="cursor-pointer hover:text-foreground"
                 onClick={() => navigate(`/prd/${slug}`)}
               >
                 {project.name}
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span className="font-medium text-foreground">Brief Builder</span>
             </div>
             <Badge
@@ -417,7 +417,7 @@ ${metrics || '_Não definido_'}
                 className="border-[var(--studio-teal)]/20 bg-[var(--studio-teal)]/5 gap-2 text-[var(--studio-teal)]"
                 style={{ '--studio-teal': STUDIO_TEAL } as React.CSSProperties}
               >
-                <Icon name="sparkles" size="size-3" /> IA Generated
+                <Icon name="magic-wand" size="size-3" /> IA Generated
               </Badge>
             </div>
 

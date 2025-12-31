@@ -84,7 +84,7 @@ export const CloneCardSelect: React.FC<CloneCardSelectProps> = ({
             <Icon name="trophy" className="h-3 w-3" /> {clone.winRate}%
           </span>
           <span className="flex items-center gap-1">
-            <Icon name="shield-check" className="h-3 w-3" /> {clone.fidelity}%
+            <Icon name="shield" className="h-3 w-3" /> {clone.fidelity}%
           </span>
         </div>
       )}

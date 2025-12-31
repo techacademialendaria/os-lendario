@@ -95,7 +95,7 @@ export const FragmentEditForm: React.FC<FragmentEditFormProps> = ({
       {/* Read-only content notice */}
       <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
         <div className="flex items-start gap-2">
-          <Icon name="info-circle" size="size-4" className="text-amber-400 mt-0.5" />
+          <Icon name="info" size="size-4" className="text-amber-400 mt-0.5" />
           <div className="text-xs text-amber-200/80">
             <p className="font-medium">Conteúdo, contexto e insight são somente leitura</p>
             <p className="mt-1 opacity-70">

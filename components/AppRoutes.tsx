@@ -7,6 +7,7 @@ const DesignSystemRouter = React.lazy(() => import('./design-system/DesignSystem
 const DocsRouter = React.lazy(() => import('./design-system/DesignSystemRouter').then(m => ({ default: m.DocsRouter })));
 const PRDRouter = React.lazy(() => import('./prd/PRDRouter'));
 const CoursesRouter = React.lazy(() => import('./creator/CoursesRouter'));
+const LmsRouter = React.lazy(() => import('./lms/LmsRouter'));
 
 // Creator Templates
 const PersonasTemplate = React.lazy(() => import('./creator/templates/PersonasTemplate'));
@@ -54,6 +55,12 @@ const GroupsTemplate = React.lazy(() => import('./ops/templates/GroupsTemplate')
 const OpsViewsTemplate = React.lazy(() => import('./ops/templates/OpsViewsTemplate'));
 const OpsSchemaTemplate = React.lazy(() => import('./ops/templates/OpsSchemaTemplate'));
 
+// Books Templates
+const BooksLibraryTemplate = React.lazy(() => import('./books/templates/BooksLibraryTemplate'));
+const BookDetailTemplate = React.lazy(() => import('./books/templates/BookDetailTemplate'));
+const BookReaderTemplate = React.lazy(() => import('./books/templates/BookReaderTemplate'));
+const BookCollectionTemplate = React.lazy(() => import('./books/templates/BookCollectionTemplate'));
+
 // Loading fallback
 const RouteLoader: React.FC = () => (
   <div className="flex items-center justify-center h-full min-h-[200px]">
@@ -84,9 +91,11 @@ interface AppRoutesProps {
   setSection: (section: Section) => void;
   currentTheme: string;
   language: string;
+  setSidebarCollapsed?: (collapsed: boolean) => void;
+  setSidebarHidden?: (hidden: boolean) => void;
 }
 
-const AppRoutes: React.FC<AppRoutesProps> = ({ setSection, currentTheme, language }) => {
+const AppRoutes: React.FC<AppRoutesProps> = ({ setSection, currentTheme, language, setSidebarCollapsed, setSidebarHidden }) => {
   const navigate = useNavigate();
 
   const handleSelectMind = (slug: string) => {
@@ -158,6 +167,9 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ setSection, currentTheme, languag
         {/* Learn App */}
         <Route path="/learn/groups" element={<GroupsTemplate setSection={setSection} />} />
 
+        {/* LMS (Student View) */}
+        <Route path="/lms/*" element={<LmsRouter />} />
+
         {/* Marketing Templates */}
         <Route path="/marketing/guide" element={<MarketingTemplatesPage />} />
         <Route path="/marketing/landing" element={<LandingPageTemplate />} />
@@ -184,6 +196,12 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ setSection, currentTheme, languag
         <Route path="/studio/ops/db" element={<OpsDBTemplate setSection={setSection} />} />
         <Route path="/studio/ops/views" element={<OpsViewsTemplate setSection={setSection} />} />
         <Route path="/studio/ops/schema" element={<OpsSchemaTemplate setSection={setSection} />} />
+
+        {/* Books Library */}
+        <Route path="/books" element={<BooksLibraryTemplate setSection={setSection} onSelectBook={(slug) => navigate(`/books/${slug}`)} />} />
+        <Route path="/books/collections/:collectionSlug" element={<BookCollectionTemplate setSection={setSection} />} />
+        <Route path="/books/:bookSlug" element={<BookDetailTemplate setSection={setSection} />} />
+        <Route path="/books/:bookSlug/read" element={<BookReaderTemplate setSection={setSection} setSidebarCollapsed={setSidebarCollapsed} setSidebarHidden={setSidebarHidden} />} />
 
         {/* Default / 404 */}
         <Route path="/" element={<SalesDashboardTemplate setSection={setSection} />} />

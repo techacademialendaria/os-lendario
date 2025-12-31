@@ -1,2 +1,2 @@
 export * from 'iconoir-react';
-export { iconMap, DefaultIcon } from './icon-map';
+export { iconMap, DefaultIcon, hasIcon, validIconNames, type IconName } from './icon-map';

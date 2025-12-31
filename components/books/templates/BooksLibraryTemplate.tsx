@@ -1,16 +1,30 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../ui/button';
-import { Icon } from '../../ui/icon';
+import { Icon, type IconName } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
-import { Input } from '../../ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from '../../ui/sheet';
 import { cn } from '../../../lib/utils';
 import { Section } from '../../../types';
 import { useBooks, useBookCategories, type BookData } from '../../../hooks/useBooks';
+import { useBookCollections } from '../../../hooks/useBookCollections';
 import { usePageTitle } from '../../../hooks/usePageTitle';
 import BookCard from '../ui/BookCard';
+import BookCardHorizontal from '../ui/BookCardHorizontal';
+import CollectionCard, { type Collection } from '../ui/CollectionCard';
+import SectionHeader from '../ui/SectionHeader';
 import { BookCardSkeleton, HeroSkeleton, CategorySkeleton } from '../ui/BookSkeletons';
+import BooksTopbar from '../BooksTopbar';
+
+// Map collection slugs to icons and colors
+const COLLECTION_STYLES: Record<string, { icon: IconName; color: string }> = {
+  mente_alta_performance: { icon: 'brain', color: 'bg-purple-500' },
+  visoes_do_futuro: { icon: 'rocket', color: 'bg-blue-500' },
+  mentes_brilhantes: { icon: 'bulb', color: 'bg-yellow-500' },
+  default: { icon: 'book-stack', color: 'bg-brand-gold' },
+};
+
+const getCollectionStyle = (slug: string) => COLLECTION_STYLES[slug] || COLLECTION_STYLES.default;
 
 interface BooksLibraryProps {
   setSection: (s: Section) => void;
@@ -18,12 +32,14 @@ interface BooksLibraryProps {
 }
 
 const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelectBook }) => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
 
   const { books, loading, error, totalBooks } = useBooks();
   const { categories, loading: categoriesLoading } = useBookCategories();
+  const { collections, loading: collectionsLoading } = useBookCollections();
 
   usePageTitle('Biblioteca');
 
@@ -47,6 +63,14 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
     () =>
       [...books]
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 2), // Only 2 for horizontal cards
+    [books]
+  );
+
+  const popularBooks = useMemo(
+    () =>
+      [...books]
+        .sort((a, b) => (b.rating || 0) - (a.rating || 0))
         .slice(0, 5),
     [books]
   );
@@ -71,7 +95,7 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="space-y-4 text-center">
-          <Icon name="exclamation-circle" className="mx-auto text-destructive" size="size-12" />
+          <Icon name="exclamation" className="mx-auto text-destructive" size="size-12" />
           <h2 className="text-xl font-bold">Erro ao carregar biblioteca</h2>
           <p className="text-muted-foreground">{error.message}</p>
           <Button onClick={() => window.location.reload()}>Tentar novamente</Button>
@@ -81,61 +105,15 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
   }
 
   return (
-    <div className="min-h-screen animate-fade-in bg-background pb-20 font-sans text-foreground">
-      {/* Top Bar */}
-      <header className="sticky top-0 z-50 h-16 border-b border-border bg-background/90 backdrop-blur-xl transition-all duration-300">
-        <div className="container mx-auto flex h-full max-w-7xl items-center justify-between px-6">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-2 text-lg font-bold tracking-tight">
-              <Icon name="book-open" className="text-brand-gold" /> Biblioteca
-            </span>
+    <div className="flex min-h-screen flex-col bg-background pb-20 font-sans">
+      <BooksTopbar
+        currentSection={Section.APP_BOOKS_LIBRARY}
+        setSection={setSection}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
 
-            {/* Desktop Nav */}
-            <nav className="ml-8 hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
-              <button
-                className={cn(
-                  'flex h-16 items-center transition-colors',
-                  !selectedCategory && 'border-b-2 border-foreground font-bold text-foreground'
-                )}
-                onClick={() => setSelectedCategory(null)}
-              >
-                Explorar
-              </button>
-              <button className="transition-colors hover:text-foreground">Meus Livros</button>
-              <button
-                className="transition-colors hover:text-foreground"
-                onClick={() => {
-                  // Filter to audiobooks
-                }}
-              >
-                Audiobooks
-              </button>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="relative hidden w-64 md:block">
-              <Icon
-                name="search"
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                size="size-3"
-              />
-              <Input
-                placeholder="Título, autor ou ISBN..."
-                className="h-9 rounded-full border-border bg-muted/30 pl-9 text-xs focus:border-brand-gold/50"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Avatar className="h-8 w-8 border border-border">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>AL</AvatarFallback>
-            </Avatar>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto max-w-7xl space-y-12 px-6 py-8">
+      <main className="mx-auto w-full max-w-[1400px] flex-1 space-y-12 p-6">
         {/* Hero Section */}
         {loading ? (
           <HeroSkeleton />
@@ -165,7 +143,7 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
                     className="bg-brand-gold font-bold text-black hover:bg-brand-gold/90"
                     onClick={() => handleBookClick(recentBooks[0])}
                   >
-                    <Icon name="book-open" className="mr-2" /> Continuar Lendo
+                    <Icon name="book-open-cover" className="mr-2" /> Continuar Lendo
                   </Button>
                 )}
                 <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
@@ -209,19 +187,41 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
           </div>
         )}
 
-        {/* Recent Books */}
-        {!selectedCategory && !searchQuery && (
+        {/* Lançamentos Section - Horizontal Cards */}
+        {!selectedCategory && !searchQuery && recentBooks.length > 0 && (
           <section>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="font-sans text-2xl font-bold">Adicionados Recentemente</h2>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 rounded-full border-muted-foreground/30 px-4 text-xs font-bold text-muted-foreground hover:text-foreground"
-              >
-                Ver todos <Icon name="angle-small-right" className="ml-1" />
-              </Button>
+            <SectionHeader
+              title="Lançamentos"
+              onViewAll={() => {}}
+              viewAllVariant="primary"
+            />
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {loading
+                ? Array.from({ length: 2 }).map((_, i) => (
+                    <div key={i} className="h-52 animate-pulse rounded-2xl bg-muted"></div>
+                  ))
+                : recentBooks.map((book, index) => (
+                    <BookCardHorizontal
+                      key={book.id}
+                      book={book}
+                      onClick={() => handleBookClick(book)}
+                      progress={Math.random() * 100} // TODO: replace with real progress
+                      curator={book.author}
+                      accentColor={index === 0 ? 'text-purple-400' : 'text-orange-400'}
+                    />
+                  ))}
             </div>
+          </section>
+        )}
+
+        {/* Mais Populares Section */}
+        {!selectedCategory && !searchQuery && popularBooks.length > 0 && (
+          <section>
+            <SectionHeader
+              title="Mais Populares"
+              onViewAll={() => {}}
+            />
 
             <div className="scrollbar-hide -mx-6 flex snap-x gap-6 overflow-x-auto px-6 pb-8 md:mx-0 md:px-0">
               {loading
@@ -230,7 +230,7 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
                       <BookCardSkeleton variant="grid" />
                     </div>
                   ))
-                : recentBooks.map((book) => (
+                : popularBooks.map((book) => (
                     <div key={book.id} className="min-w-[240px] snap-start">
                       <BookCard book={book} variant="grid" onClick={() => handleBookClick(book)} />
                     </div>
@@ -239,21 +239,47 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
           </section>
         )}
 
+        {/* Coleções Section */}
+        {!selectedCategory && !searchQuery && collections.length > 0 && (
+          <section>
+            <SectionHeader
+              title="Coleções"
+              onViewAll={() => collections[0] && navigate(`/books/collections/${collections[0].slug}`)}
+            />
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {collectionsLoading
+                ? Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="h-36 animate-pulse rounded-xl bg-muted"></div>
+                  ))
+                : collections.slice(0, 3).map((col) => {
+                    const style = getCollectionStyle(col.slug);
+                    return (
+                      <CollectionCard
+                        key={col.id}
+                        collection={{
+                          id: col.id,
+                          title: col.name,
+                          bookCount: col.bookCount,
+                          icon: style.icon,
+                          color: style.color,
+                        }}
+                        onClick={() => navigate(`/books/collections/${col.slug}`)}
+                      />
+                    );
+                  })}
+            </div>
+          </section>
+        )}
+
         {/* Audiobooks Section */}
         {!selectedCategory && !searchQuery && booksWithAudio.length > 0 && (
           <section>
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-sans text-2xl font-bold">
-                <Icon name="headphones" className="text-brand-gold" /> Com Audiobook
-              </h2>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 rounded-full border-muted-foreground/30 px-4 text-xs font-bold text-muted-foreground hover:text-foreground"
-              >
-                Ver todos <Icon name="angle-small-right" className="ml-1" />
-              </Button>
-            </div>
+            <SectionHeader
+              title="Com Audiobook"
+              icon="headset"
+              onViewAll={() => {}}
+            />
 
             <div className="scrollbar-hide -mx-6 flex snap-x gap-6 overflow-x-auto px-6 pb-8 md:mx-0 md:px-0">
               {booksWithAudio.map((book) => (
@@ -329,7 +355,7 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
                     className="flex-1 bg-brand-gold font-bold text-black hover:bg-brand-gold/90"
                     onClick={() => handleReadSummary(selectedBook)}
                   >
-                    <Icon name="book-open" className="mr-2" size="size-4" /> Ler Resumo
+                    <Icon name="book-open-cover" className="mr-2" size="size-4" /> Ler Resumo
                   </Button>
                   <Button
                     variant="outline"
@@ -374,7 +400,7 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
                     )}
                     {selectedBook.hasAudio && (
                       <div className="flex items-center gap-2 text-sm">
-                        <Icon name="headphones" size="size-4" className="text-brand-gold" />
+                        <Icon name="headset" size="size-4" className="text-brand-gold" />
                         <span>Audiobook disponível</span>
                       </div>
                     )}

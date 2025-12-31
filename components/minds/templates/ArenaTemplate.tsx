@@ -21,6 +21,7 @@ import { MindCardSelect } from '../arena/MindCardSelect';
 import { ArenaCreate, type DebateConfig } from './ArenaCreate';
 import { FrameworksLibrary } from '../arena/FrameworksLibrary';
 import { DebatesList } from '../arena/DebatesList';
+import { ChatMessage } from '../arena/ChatMessage';
 import { STUDIO_CARD_CLASSES } from '../studio-tokens';
 import { usePageTitle } from '../../../hooks/usePageTitle';
 
@@ -39,16 +40,7 @@ const getInitials = (name: string): string => {
 
 type ViewState = 'lobby' | 'create' | 'live' | 'replay' | 'frameworks';
 
-interface Mind {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  winRate: number;
-  debates: number;
-  fidelity: number;
-  color: string;
-}
+// Mind type is imported from useArena hook
 
 interface Framework {
   id: string;
@@ -345,97 +337,6 @@ That said, both matter. The debate is about emphasis, not exclusion.`,
     ],
   },
 ];
-
-// --- SUB-COMPONENTS ---
-
-const ChatMessage: React.FC<{
-  user: string;
-  text: string;
-  time: string;
-}> = ({ user, text, time }) => (
-  <div className="animate-in fade-in slide-in-from-bottom-2 flex gap-3 text-sm duration-300">
-    <Avatar className="h-6 w-6 border border-border">
-      <AvatarFallback className="bg-muted text-[9px] text-muted-foreground">
-        {user.substring(0, 2).toUpperCase()}
-      </AvatarFallback>
-    </Avatar>
-    <div>
-      <div className="mb-0.5 flex items-center gap-2">
-        <span className="text-xs font-bold text-muted-foreground">{user}</span>
-        <span className="text-[10px] text-muted-foreground/50">{time}</span>
-      </div>
-      <p className="leading-snug text-muted-foreground">{text}</p>
-    </div>
-  </div>
-);
-
-const LiveDebateCard: React.FC<{
-  topic: string;
-  mind1: Mind;
-  mind2: Mind;
-  round: number;
-  totalRounds: number;
-  viewers: number;
-  score1: number;
-  score2: number;
-  onClick?: () => void;
-}> = ({ topic, mind1, mind2, round, totalRounds, viewers, score1, score2, onClick }) => (
-  <Card
-    className={cn(STUDIO_CARD_CLASSES, "group cursor-pointer transition-all hover:border-studio-primary/30")}
-    onClick={onClick}
-  >
-    <CardContent className="p-6">
-      <div className="mb-4 flex items-start justify-between">
-        <Badge variant="destructive" className="animate-pulse">
-          LIVE
-        </Badge>
-        <span className="flex items-center gap-1 font-mono text-xs text-muted-foreground">
-          <Icon name="users" size="size-3" /> {viewers.toLocaleString()} watching
-        </span>
-      </div>
-      <h4 className="mb-6 text-lg font-bold text-foreground transition-colors group-hover:text-primary">
-        "{topic}"
-      </h4>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Avatar className={cn('border-2', mind1.color.replace('text-', 'border-'))}>
-            <AvatarImage src={mind1.avatar} alt={mind1.name} />
-            <AvatarFallback className="bg-muted text-xs">{getInitials(mind1.name)}</AvatarFallback>
-          </Avatar>
-          <span className="text-sm font-bold text-muted-foreground">
-            {mind1.name.split(' ')[1]}
-          </span>
-        </div>
-        <div className="text-xs font-bold uppercase tracking-widest text-muted-foreground/50">
-          VS
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-bold text-muted-foreground">
-            {mind2.name.split(' ')[1]}
-          </span>
-          <Avatar className={cn('border-2', mind2.color.replace('text-', 'border-'))}>
-            <AvatarImage src={mind2.avatar} alt={mind2.name} />
-            <AvatarFallback className="bg-muted text-xs">{getInitials(mind2.name)}</AvatarFallback>
-          </Avatar>
-        </div>
-      </div>
-      <div className="mt-6">
-        <div className="mb-1 flex justify-between text-[10px] font-bold uppercase text-muted-foreground">
-          <span>
-            {mind1.name.split(' ')[1]} ({score1}%)
-          </span>
-          <span>
-            Round {round}/{totalRounds}
-          </span>
-          <span>
-            {mind2.name.split(' ')[1]} ({score2}%)
-          </span>
-        </div>
-        <Progress value={score1} className="h-1" />
-      </div>
-    </CardContent>
-  </Card>
-);
 
 // --- MAIN COMPONENT ---
 

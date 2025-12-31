@@ -77,6 +77,7 @@ export const SECTION_ROUTES: Record<Section, string> = {
 
     // Learn App
     [Section.APP_LEARN_GROUPS]: '/learn/groups',
+    [Section.APP_LMS_HOME]: '/lms',
 
     // Community Templates
     [Section.TEMPLATE_COMMUNITY_CAPTURE]: '/community/capture',
@@ -105,7 +106,13 @@ export const SECTION_ROUTES: Record<Section, string> = {
     [Section.STUDIO_OPS_DB]: '/studio/ops/db',
     [Section.STUDIO_OPS_VIEWS]: '/studio/ops/views',
     [Section.STUDIO_OPS_SCHEMA]: '/studio/ops/schema',
-    [Section.STUDIO_OPS_TOOL_STACKS]: '/studio/ops/tool-stacks'
+    [Section.STUDIO_OPS_TOOL_STACKS]: '/studio/ops/tool-stacks',
+
+    // Books Library
+    [Section.APP_BOOKS_LIBRARY]: '/books',
+    [Section.APP_BOOKS_DETAIL]: '/books/:slug',
+    [Section.APP_BOOKS_READER]: '/books/:slug/read',
+    [Section.APP_BOOKS_COLLECTION]: '/books/collections/:slug'
 };
 
 export const getSectionFromPath = (path: string): Section | null => {
@@ -132,6 +139,25 @@ export const getSectionFromPath = (path: string): Section | null => {
     // Handle Creator routes (both /creator/courses and /creator/cursos)
     if (path.startsWith('/creator/courses') || path.startsWith('/creator/cursos')) {
         return Section.APP_CREATOR_COURSES;
+    }
+
+    // Handle Books routes
+    if (path.startsWith('/books/')) {
+        const subPath = path.replace('/books/', '');
+        if (subPath.startsWith('collections/')) return Section.APP_BOOKS_COLLECTION;
+        if (subPath.includes('/read')) return Section.APP_BOOKS_READER;
+        // Any other /books/slug is a book detail
+        return Section.APP_BOOKS_DETAIL;
+    }
+
+    // Handle /books root
+    if (path === '/books' || path === '/books/') {
+        return Section.APP_BOOKS_LIBRARY;
+    }
+
+    // Handle LMS routes
+    if (path.startsWith('/lms')) {
+        return Section.APP_LMS_HOME;
     }
 
     // Partial match for nested routes (e.g., /prd/my-project)

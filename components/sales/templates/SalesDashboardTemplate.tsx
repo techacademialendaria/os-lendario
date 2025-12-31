@@ -287,7 +287,7 @@ const SalesDashboardTemplate: React.FC<Props> = ({ setSection }) => {
                     <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
                       Objeções (Semana)
                     </span>
-                    <Icon name="shield-exclamation" className="text-destructive" size="size-4" />
+                    <Icon name="shield" className="text-destructive" size="size-4" />
                   </div>
                   <div className="flex flex-col items-start gap-1">
                     <span className="text-3xl font-bold text-foreground">34</span>
@@ -316,7 +316,7 @@ const SalesDashboardTemplate: React.FC<Props> = ({ setSection }) => {
           <Card className="flex h-[400px] flex-col border-border">
             <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border px-6 py-4">
               <CardTitle className="flex items-center gap-2 text-base font-bold uppercase tracking-widest">
-                <Icon name="phone-call" className="text-primary" /> Calls Recentes
+                <Icon name="headset" className="text-primary" /> Calls Recentes
               </CardTitle>
               <Button
                 variant="ghost"

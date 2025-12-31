@@ -7,6 +7,7 @@ interface AccordionProps {
   collapsible?: boolean;
   children: React.ReactNode;
   className?: string;
+  defaultValue?: string | string[];
 }
 
 interface AccordionItemProps {
@@ -38,8 +39,12 @@ const Accordion: React.FC<AccordionProps> = ({
   collapsible = true,
   children,
   className,
+  defaultValue,
 }) => {
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  const [openItems, setOpenItems] = useState<string[]>(() => {
+    if (!defaultValue) return [];
+    return Array.isArray(defaultValue) ? defaultValue : [defaultValue];
+  });
 
   const toggleItem = (value: string) => {
     if (type === 'single') {

@@ -198,7 +198,7 @@ const MindComparisonTemplate: React.FC<MindComparisonProps> = ({ setSection }) =
       <div className="bg-studio-card space-y-8 rounded-3xl border border-white/5 p-8">
         <div className="mb-6 flex items-center gap-3">
           <div className="rounded bg-white/5 p-2">
-            <Icon name="pie-chart" className="text-white" />
+            <Icon name="chart-pie" className="text-white" />
           </div>
           <h3 className="text-lg font-bold text-white">DISC - Comportamento Observável</h3>
         </div>
@@ -255,7 +255,7 @@ const MindComparisonTemplate: React.FC<MindComparisonProps> = ({ setSection }) =
       <div className="bg-studio-card space-y-8 rounded-3xl border border-white/5 p-8">
         <div className="mb-6 flex items-center gap-3">
           <div className="rounded bg-white/5 p-2">
-            <Icon name="bar-chart-alt" className="text-white" />
+            <Icon name="chart-histogram" className="text-white" />
           </div>
           <h3 className="text-lg font-bold text-white">Big Five (OCEAN)</h3>
         </div>
@@ -308,7 +308,7 @@ const MindComparisonTemplate: React.FC<MindComparisonProps> = ({ setSection }) =
       {/* --- 4. DARK TRIAD (Footer Alert) --- */}
       <div className="mt-8 rounded-2xl border border-red-500/10 bg-red-500/5 p-6">
         <h3 className="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-red-500">
-          <Icon name="shield-check" className="text-red-500" /> Dark Triad Profile
+          <Icon name="shield" className="text-red-500" /> Dark Triad Profile
         </h3>
         <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-3 md:text-left">
           {mindsData.map((mind) => (
@@ -378,7 +378,7 @@ const MindComparisonTemplate: React.FC<MindComparisonProps> = ({ setSection }) =
           <div className="grid grid-cols-4 gap-4 border-b border-white/5 py-6 transition-colors hover:bg-white/[0.01]">
             <div className="flex items-center px-6">
               <div className="flex items-center gap-2 text-studio-primary">
-                <Icon name="lightning" size="size-4" />
+                <Icon name="bolt" size="size-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">Superpoder</span>
               </div>
             </div>
@@ -396,7 +396,7 @@ const MindComparisonTemplate: React.FC<MindComparisonProps> = ({ setSection }) =
           <div className="grid grid-cols-4 gap-4 border-b border-white/5 py-6 transition-colors hover:bg-white/[0.01]">
             <div className="flex items-center px-6">
               <div className="flex items-center gap-2 text-red-400">
-                <Icon name="shield-check" size="size-4" />
+                <Icon name="shield" size="size-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">Kryptonita</span>
               </div>
             </div>
@@ -411,7 +411,7 @@ const MindComparisonTemplate: React.FC<MindComparisonProps> = ({ setSection }) =
           <div className="grid grid-cols-4 gap-4 border-b border-white/5 py-6 transition-colors hover:bg-white/[0.01]">
             <div className="flex items-center px-6">
               <div className="flex items-center gap-2 text-blue-400">
-                <Icon name="layout" size="size-4" />
+                <Icon name="grid" size="size-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">Arquétipos</span>
               </div>
             </div>

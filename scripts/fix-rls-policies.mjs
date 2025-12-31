@@ -20,6 +20,7 @@ const policies = [
    USING (true)`,
 
   // mind_values - allow public read
+  `CREATE POLICY IF NOT EXISTS "Allow public read mind_values"
    ON mind_values FOR SELECT
    USING (true)`,
 

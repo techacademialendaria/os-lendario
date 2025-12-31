@@ -116,7 +116,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
       <div className="flex min-h-screen flex-col bg-[#0A0A0F] font-sans">
         <CreatorTopbar currentSection={Section.APP_CREATOR_COURSES} setSection={setSection} />
         <main className="flex flex-1 flex-col items-center justify-center">
-          <Icon name="exclamation-circle" className="mb-4 text-destructive" size="size-12" />
+          <Icon name="exclamation" className="mb-4 text-destructive" size="size-12" />
           <h2 className="mb-2 text-2xl font-bold">Curso não encontrado</h2>
           <Button onClick={() => navigate('/creator/cursos')}>Voltar para Cursos</Button>
         </main>
@@ -236,7 +236,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
                 <div className="flex items-center gap-3 border-b border-border/30 bg-card/50 px-4 py-3">
                   {/* Drag Handle */}
                   <div className="cursor-grab text-muted-foreground/40 transition-colors hover:text-muted-foreground">
-                    <Icon name="grip-dots-vertical" size="size-4" />
+                    <Icon name="menu-dots-vertical" size="size-4" />
                   </div>
 
                   {/* Module Badge */}
@@ -322,7 +322,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
                     >
                       {/* Drag Handle */}
                       <div className="cursor-grab pl-4 text-muted-foreground/30 transition-colors hover:text-muted-foreground">
-                        <Icon name="grip-dots-vertical" size="size-3" />
+                        <Icon name="menu-dots-vertical" size="size-3" />
                       </div>
 
                       {/* Lesson Number */}
@@ -440,7 +440,7 @@ const CourseCurriculum: React.FC<CourseCurriculumProps> = ({ setSection }) => {
         <div className="sticky bottom-0 border-t border-border/50 bg-[#0A0A0F]/95 backdrop-blur-sm">
           <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-3 md:px-12">
             <div className="flex items-center gap-2 text-sm text-amber-500">
-              <Icon name="exclamation-circle" size="size-4" />
+              <Icon name="exclamation" size="size-4" />
               <span>Você tem alterações não salvas</span>
             </div>
             <div className="flex items-center gap-3">

@@ -83,7 +83,7 @@ const CourseLessons: React.FC<CourseLessonsProps> = ({ setSection }) => {
         <CreatorTopbar currentSection={Section.APP_CREATOR_COURSES} setSection={setSection} />
         <main className="mx-auto w-full max-w-[1400px] p-6 md:p-12">
           <div className="flex min-h-[40vh] animate-fade-in flex-col items-center justify-center">
-            <Icon name="exclamation-circle" className="mb-4 text-destructive" size="size-12" />
+            <Icon name="exclamation" className="mb-4 text-destructive" size="size-12" />
             <h2 className="mb-2 text-2xl font-bold">Curso não encontrado</h2>
             <Button onClick={() => navigate('/creator/cursos')}>Voltar para Cursos</Button>
           </div>

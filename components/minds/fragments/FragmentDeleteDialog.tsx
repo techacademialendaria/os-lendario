@@ -92,7 +92,7 @@ export const FragmentDeleteDialog: React.FC<FragmentDeleteDialogProps> = ({
         {/* Warning about relationships */}
         <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs">
           <div className="flex items-start gap-2">
-            <Icon name="info-circle" size="size-4" className="text-amber-400 mt-0.5" />
+            <Icon name="info" size="size-4" className="text-amber-400 mt-0.5" />
             <div className="text-amber-200/80">
               <p>Se este fragmento tiver relações com outros fragmentos, essas conexões também serão removidas.</p>
             </div>

@@ -145,7 +145,7 @@ const DataTable = React.forwardRef<HTMLDivElement, TableProps>(
             )}
           </div>
         ) : null;
-      case 'progress':
+      case 'progress': {
         const val = Math.max(-1, Math.min(1, Number(value) || 0));
         const isPositive = val > 0;
         const absVal = Math.abs(val);
@@ -163,6 +163,7 @@ const DataTable = React.forwardRef<HTMLDivElement, TableProps>(
             <span className="text-[10px] font-mono w-10">{val.toFixed(2)}</span>
           </div>
         );
+      }
       default:
         return value;
     }

@@ -327,7 +327,7 @@ export const PRDAudioUpload: React.FC<PRDAudioUploadProps> = ({
         {/* Loading state */}
         {isUploading && (
           <div className="flex items-center gap-2 text-muted-foreground">
-            <Icon name="spinner" className="size-4 animate-spin" />
+            <Icon name="refresh" className="size-4 animate-spin" />
             <span className="text-sm">Fazendo upload...</span>
           </div>
         )}

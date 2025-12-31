@@ -26,7 +26,7 @@ export interface MindView extends Mind {
 export interface ContentView extends Content {
   created_by?: string;
   word_count?: number;
-  file_path?: string;
+  // Note: file_path is already defined in Content as string | null
 }
 
 /**
@@ -278,7 +278,7 @@ export interface UseViewFiltersReturn {
   activeFilters: Record<string, string[]>;
   setFilter: (key: string, values: string[]) => void;
   clearFilters: () => void;
-  applyFilters: <T extends any>(data: T[], filters: FilterConfig[]) => T[];
+  applyFilters: <T>(data: T[], filters: FilterConfig[]) => T[];
 }
 
 /**
@@ -287,7 +287,7 @@ export interface UseViewFiltersReturn {
 export interface UseTableSearchReturn {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  searchResults: <T extends any>(data: T[], field: string) => T[];
+  searchResults: <T>(data: T[], field: string) => T[];
 }
 
 /**
@@ -298,7 +298,7 @@ export interface UseTableSortReturn {
   sortDirection: 'asc' | 'desc';
   setSortKey: (key: string) => void;
   toggleSortDirection: () => void;
-  sortData: <T extends any>(data: T[], key: string) => T[];
+  sortData: <T>(data: T[], key: string) => T[];
 }
 
 /**
@@ -311,5 +311,5 @@ export interface UseTablePaginationReturn {
   goToPage: (page: number) => void;
   nextPage: () => void;
   previousPage: () => void;
-  getPaginatedData: <T extends any>(data: T[]) => T[];
+  getPaginatedData: <T>(data: T[]) => T[];
 }

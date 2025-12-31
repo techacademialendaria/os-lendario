@@ -152,7 +152,7 @@ const SalesCallDetailsTemplate: React.FC<{ setSection: (s: Section) => void }> =
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <Icon name="sparkles" className="text-primary" /> Resumo da IA
+                    <Icon name="magic-wand" className="text-primary" /> Resumo da IA
                   </CardTitle>
                   <Badge variant="success" className="font-mono text-[10px]">
                     Confiança: Alta
@@ -271,7 +271,7 @@ const SalesCallDetailsTemplate: React.FC<{ setSection: (s: Section) => void }> =
             <Card>
               <CardHeader className="border-b border-border py-4">
                 <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                  <Icon name="shield-exclamation" className="text-destructive" /> Objeções
+                  <Icon name="shield" className="text-destructive" /> Objeções
                   Identificadas
                 </CardTitle>
               </CardHeader>
@@ -352,7 +352,7 @@ const SalesCallDetailsTemplate: React.FC<{ setSection: (s: Section) => void }> =
             <Card>
               <CardHeader className="border-b border-border py-4">
                 <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                  <Icon name="list-check" className="text-brand-green" /> Próximos Passos
+                  <Icon name="check-square" className="text-brand-green" /> Próximos Passos
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">

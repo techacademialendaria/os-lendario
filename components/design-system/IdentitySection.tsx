@@ -109,11 +109,11 @@ const IdentitySection: React.FC = () => {
           </Card>
           <Card className="relative overflow-hidden">
             <div className="absolute -bottom-4 -right-4 rotate-12 opacity-5">
-              <Icon name="marker" className="text-9xl" />
+              <Icon name="map-marker" className="text-9xl" />
             </div>
             <CardHeader>
               <CardTitle className="relative z-10 flex items-center gap-2 text-lg">
-                <Icon name="marker" /> Posicionamento
+                <Icon name="map-marker" /> Posicionamento
               </CardTitle>
             </CardHeader>
             <CardContent className="relative z-10">
@@ -424,8 +424,8 @@ const IdentitySection: React.FC = () => {
                 { title: 'Bom Senso Visionário', icon: 'bulb' },
                 { title: 'Sinceridade Radical', icon: 'comment-alt' },
                 { title: 'Criatividade Disruptiva', icon: 'rocket' },
-                { title: 'Coragem Épica', icon: 'sword' },
-                { title: 'Autonomia Responsável', icon: 'user-check' },
+                { title: 'Coragem Épica', icon: 'shield-check' },
+                { title: 'Autonomia Responsável', icon: 'badge-check' },
               ].map((virtue, i) => (
                 <div
                   key={i}
@@ -466,7 +466,7 @@ const IdentitySection: React.FC = () => {
       {/* 4. VOCABULARY & EXPRESSION */}
       <section className="space-y-8">
         <h3 className="flex items-center gap-2 border-b border-border pb-2 font-sans text-2xl font-semibold">
-          <Icon name="comment-quote" /> 4. Expressão & Vocabulário
+          <Icon name="quote-left" /> 4. Expressão & Vocabulário
         </h3>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -497,7 +497,7 @@ const IdentitySection: React.FC = () => {
                 </div>
                 <div>
                   <p className="mb-2 flex items-center gap-2 text-sm font-bold">
-                    <Icon name="lightning" size="size-3" /> Informal-Intenso (Chat)
+                    <Icon name="bolt" size="size-3" /> Informal-Intenso (Chat)
                   </p>
                   <p className="border-l-2 border-primary pl-3 font-serif text-xs italic text-muted-foreground">
                     "Usa IA, porra! Antes de contratar, pergunta: dá pra automatizar isso?"

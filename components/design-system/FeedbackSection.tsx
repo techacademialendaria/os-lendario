@@ -294,7 +294,7 @@ const FeedbackSection: React.FC = () => {
             variant="outline"
             className="flex h-24 flex-col gap-2"
           >
-            <Icon name="picture" size="size-6" />
+            <Icon name="image" size="size-6" />
             <span>Image Top</span>
           </Button>
           <Button

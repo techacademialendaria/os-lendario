@@ -2,27 +2,33 @@ import React from 'react';
 import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
 import { cn } from '../../../lib/utils';
+import { getSimpleGradient } from '../../shared/MediaCover';
 import type { BookData } from '../../../hooks/useBooks';
 
 interface BookCardProps {
   book: BookData;
   onClick?: () => void;
+  onBookmark?: (book: BookData) => void;
+  isBookmarked?: boolean;
   variant?: 'grid' | 'horizontal' | 'compact';
   className?: string;
 }
 
-const BookCard: React.FC<BookCardProps> = ({ book, onClick, variant = 'grid', className }) => {
-  // Fallback cover with gradient
-  const coverGradients = [
-    'from-amber-600 to-orange-800',
-    'from-blue-600 to-indigo-800',
-    'from-emerald-600 to-teal-800',
-    'from-purple-600 to-violet-800',
-    'from-rose-600 to-pink-800',
-    'from-cyan-600 to-sky-800',
-  ];
-  const gradientIndex = book.slug.charCodeAt(0) % coverGradients.length;
-  const fallbackGradient = coverGradients[gradientIndex];
+const BookCard: React.FC<BookCardProps> = ({
+  book,
+  onClick,
+  onBookmark,
+  isBookmarked = false,
+  variant = 'grid',
+  className,
+}) => {
+  // Fallback gradient from shared MediaCover
+  const fallbackGradient = getSimpleGradient(book.slug);
+
+  const handleBookmark = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onBookmark?.(book);
+  };
 
   if (variant === 'horizontal') {
     return (
@@ -63,7 +69,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onClick, variant = 'grid', cl
           <div className="mt-2 flex items-center gap-3 text-[10px] text-muted-foreground">
             {book.hasAudio && (
               <span className="flex items-center gap-1">
-                <Icon name="headphones" size="size-3" /> Audio
+                <Icon name="headset" size="size-3" /> Audio
               </span>
             )}
             {book.duration && (
@@ -132,7 +138,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onClick, variant = 'grid', cl
       <div className="mb-4 flex items-start justify-between">
         {book.hasAudio && (
           <div className="rounded-full bg-muted/50 p-1.5 text-muted-foreground">
-            <Icon name="headphones" size="size-3" />
+            <Icon name="headset" size="size-3" />
           </div>
         )}
         {book.rating && (
@@ -182,10 +188,20 @@ const BookCard: React.FC<BookCardProps> = ({ book, onClick, variant = 'grid', cl
             <Icon name="clock" size="size-3" /> {book.duration}
           </span>
         )}
-        <Icon
-          name="bookmark"
-          className="ml-auto text-muted-foreground transition-colors hover:text-brand-gold"
-        />
+        <button
+          onClick={handleBookmark}
+          className="ml-auto rounded p-1 transition-colors hover:bg-muted"
+          aria-label={isBookmarked ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+        >
+          <Icon
+            name="star"
+            type={isBookmarked ? 'solid' : 'regular'}
+            className={cn(
+              'transition-colors',
+              isBookmarked ? 'text-brand-gold' : 'text-muted-foreground hover:text-brand-gold'
+            )}
+          />
+        </button>
       </div>
     </div>
   );

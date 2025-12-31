@@ -107,7 +107,7 @@ const SalesProductTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ 
             <CardHeader className="pb-2">
               <CardTitle className="flex justify-between text-sm font-bold uppercase tracking-widest text-muted-foreground">
                 Frustrações
-                <Icon name="angry" className="text-destructive" />
+                <Icon name="thumbs-down" className="text-destructive" />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -123,7 +123,7 @@ const SalesProductTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ 
             <CardHeader className="pb-2">
               <CardTitle className="flex justify-between text-sm font-bold uppercase tracking-widest text-muted-foreground">
                 NPS Implícito (IA)
-                <Icon name="smile" className="text-brand-green" />
+                <Icon name="thumbs-up" className="text-brand-green" />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -136,7 +136,7 @@ const SalesProductTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ 
             <CardHeader className="pb-2">
               <CardTitle className="flex justify-between text-sm font-bold uppercase tracking-widest text-muted-foreground">
                 Gaps de Funcionalidade
-                <Icon name="puzzle-piece" className="text-brand-blue" />
+                <Icon name="cube" className="text-brand-blue" />
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -151,7 +151,7 @@ const SalesProductTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ 
           <CardHeader className="flex flex-row items-center justify-between border-b border-border px-6 py-4">
             <div className="space-y-1">
               <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-foreground">
-                <Icon name="sparkles" className="text-primary" /> Backlog Sugerido pela IA
+                <Icon name="magic-wand" className="text-primary" /> Backlog Sugerido pela IA
               </CardTitle>
               <p className="text-[10px] text-muted-foreground">
                 Priorização baseada em volume de pedidos × impacto na receita.
@@ -232,7 +232,7 @@ const SalesProductTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ 
           <Card className="flex h-[500px] flex-col">
             <CardHeader className="border-b border-border px-6 py-4">
               <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                <Icon name="frown" className="text-destructive" /> Frustrações e Atritos
+                <Icon name="thumbs-down" className="text-destructive" /> Frustrações e Atritos
               </CardTitle>
             </CardHeader>
             <div className="custom-scrollbar flex-1 overflow-y-auto p-4">
@@ -313,7 +313,7 @@ const SalesProductTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ 
           <Card className="flex h-[500px] flex-col">
             <CardHeader className="border-b border-border px-6 py-4">
               <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-                <Icon name="sword" className="text-brand-orange" /> Menções a Concorrentes
+                <Icon name="bolt" className="text-brand-orange" /> Menções a Concorrentes
               </CardTitle>
             </CardHeader>
             <div className="flex-1 overflow-hidden p-0">

@@ -155,7 +155,7 @@ export const FragmentCreateSheet: React.FC<FragmentCreateSheetProps> = ({
             {error && (
               <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400">
                 <div className="flex items-center gap-2">
-                  <Icon name="exclamation-circle" size="size-4" />
+                  <Icon name="exclamation" size="size-4" />
                   {error}
                 </div>
               </div>

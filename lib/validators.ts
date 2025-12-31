@@ -124,7 +124,7 @@ export function passwordStrength(message?: string): Validator {
     const hasUpperCase = /[A-Z]/.test(value);
     const hasLowerCase = /[a-z]/.test(value);
     const hasNumber = /\d/.test(value);
-    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};:'",.<>?/\\|`~]/.test(value);
+    const hasSpecial = /[!@#$%^&*()_+\-=[\]{};:'",.<>?/\\|`~]/.test(value);
 
     const strength = [hasUpperCase, hasLowerCase, hasNumber, hasSpecial].filter(
       Boolean,

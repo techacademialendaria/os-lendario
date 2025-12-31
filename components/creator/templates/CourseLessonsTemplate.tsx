@@ -394,9 +394,9 @@ const CourseLessonsTemplate: React.FC<CourseLessonsTemplateProps> = ({
                   disabled={isGenerating}
                 >
                   {isGenerating ? (
-                    <Icon name="spinner" className="mr-2 size-4 animate-spin" />
+                    <Icon name="refresh" className="mr-2 size-4 animate-spin" />
                   ) : (
-                    <Icon name="sparkles" className="mr-2 size-4" />
+                    <Icon name="magic-wand" className="mr-2 size-4" />
                   )}
                   Gerar {selectedLessons.length} Selecionadas
                 </Button>

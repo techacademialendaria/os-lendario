@@ -74,7 +74,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
         <Card className="bg-studio-card border-white/10 lg:col-span-8">
           <CardHeader className="border-b border-white/5 pb-4">
             <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-400">
-              <Icon name="waveform" className="text-brand-cyan" /> DNA Cirúrgico
+              <Icon name="chart-line" className="text-brand-cyan" /> DNA Cirúrgico
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-8 p-8 md:grid-cols-2">
@@ -184,7 +184,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
       {/* SECTION: BEHAVIORAL OS */}
       <div>
         <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-white">
-          <Icon name="activity" className="text-blue-400" /> Sistema Operacional Comportamental
+          <Icon name="graph-up" className="text-blue-400" /> Sistema Operacional Comportamental
         </h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {behavioralOS.traits?.map((trait: any, i: number) => (
@@ -227,7 +227,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
       {/* SECTION: THE ARSENAL (Rhetorical Devices) */}
       <div>
         <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-white">
-          <Icon name="swords" className="text-red-400" /> Arsenal Retórico
+          <Icon name="flash" className="text-red-400" /> Arsenal Retórico
         </h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {arsenal.map((item: any, i: number) => (
@@ -259,7 +259,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="flex items-center gap-3 text-2xl font-bold text-white">
-            <Icon name="book-alt" className="text-studio-primary" /> Campo Semântico
+            <Icon name="book-open-cover" className="text-studio-primary" /> Campo Semântico
           </h3>
           <p className="mt-1 text-zinc-500">
             O vocabulário cirúrgico dividido por intenção de impacto.
@@ -273,7 +273,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
         <Card className="bg-studio-card border-studio-primary/20">
           <CardHeader className="border-b border-white/5 pb-3">
             <CardTitle className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-studio-primary">
-              <Icon name="flame" size="size-3" /> {semantics.tier1?.label || 'Tier 1: Mantras'}
+              <Icon name="flash" size="size-3" /> {semantics.tier1?.label || 'Tier 1: Mantras'}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 p-4">
@@ -313,7 +313,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
         <Card className="bg-studio-card border-blue-600/20">
           <CardHeader className="border-b border-white/5 pb-3">
             <CardTitle className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-blue-500">
-              <Icon name="git-merge" size="size-3" />{' '}
+              <Icon name="sitemap" size="size-3" />{' '}
               {semantics.tier3?.label || 'Tier 3: Contextual'}
             </CardTitle>
           </CardHeader>
@@ -335,7 +335,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
       {linguistics.antiPatterns?.length > 0 && (
         <div className="mt-8">
           <h4 className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-red-500">
-            <Icon name="ban" size="size-3" /> Anti-Patterns (Nunca Dizer)
+            <Icon name="cross-circle" size="size-3" /> Anti-Patterns (Nunca Dizer)
           </h4>
           <div className="flex flex-wrap gap-3">
             {linguistics.antiPatterns.map((phrase: string, i: number) => (
@@ -354,7 +354,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
       <Card className="bg-studio-card border-white/10">
         <CardHeader className="border-b border-white/5 pb-4">
           <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-400">
-            <Icon name="comment-quote" className="text-brand-cyan" /> Aplicação em Contexto
+            <Icon name="quote" className="text-brand-cyan" /> Aplicação em Contexto
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6 p-6">
@@ -373,7 +373,7 @@ export const WritingStylesTab: React.FC<WritingStylesTabProps> = ({ profile }) =
           </div>
 
           <div className="flex justify-center">
-            <Icon name="arrow-down" className="text-zinc-700" />
+            <Icon name="arrow-small-down" className="text-zinc-700" />
           </div>
 
           <div className="space-y-2">

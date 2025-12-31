@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../ui/button';
-import { MarkdownRenderer } from '../../shared/MarkdownRenderer';
+import { MarkdownRenderer, FavoriteButton } from '../../shared';
 import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../ui/tabs';
@@ -12,6 +12,7 @@ import { Card, CardContent } from '../../ui/card';
 import { Skeleton } from '../../ui/skeleton';
 import { useBook } from '../../../hooks/useBooks';
 import { usePageTitle } from '../../../hooks/usePageTitle';
+import { useBookInteractions } from '../../../hooks/useMyBooks';
 
 interface BookReaderTemplateProps {
   setSection: (section: Section) => void;
@@ -87,7 +88,46 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
   const { book, loading, error } = useBook(bookSlug || '');
   const contentRef = React.useRef<HTMLDivElement>(null);
 
+  // Book interactions (favorites, reading status)
+  const {
+    interactions,
+    isLoading: interactionsLoading,
+    toggleFavorite,
+    setReadingStatus,
+  } = useBookInteractions(book?.id || '');
+
+  // Local state for UI feedback
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const [isMarkingRead, setIsMarkingRead] = useState(false);
+
   usePageTitle(book?.title ? `Lendo: ${book.title}` : 'Carregando...');
+
+  // Handlers
+  const handleToggleFavorite = async () => {
+    if (!book?.id || isTogglingFavorite) return;
+    setIsTogglingFavorite(true);
+    try {
+      await toggleFavorite();
+    } catch (err) {
+      console.error('Failed to toggle favorite:', err);
+    } finally {
+      setIsTogglingFavorite(false);
+    }
+  };
+
+  const handleMarkAsRead = async () => {
+    if (!book?.id || isMarkingRead) return;
+    setIsMarkingRead(true);
+    try {
+      // Toggle between 'read' and 'reading' status
+      const newStatus = interactions?.readingStatus === 'read' ? 'reading' : 'read';
+      await setReadingStatus(newStatus);
+    } catch (err) {
+      console.error('Failed to mark as read:', err);
+    } finally {
+      setIsMarkingRead(false);
+    }
+  };
 
   const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>(() => {
     const saved = localStorage.getItem('book-reader-font-size');
@@ -174,7 +214,7 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
     return (
       <div className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="space-y-4 text-center">
-          <Icon name="exclamation-circle" className="mx-auto text-destructive" size="size-12" />
+          <Icon name="exclamation" className="mx-auto text-destructive" size="size-12" />
           <h2 className="text-xl font-bold">Livro não encontrado</h2>
           <p className="text-muted-foreground">{error.message}</p>
           <Button onClick={() => navigate('/books')}>Voltar à Biblioteca</Button>
@@ -248,7 +288,7 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
                 <Icon name="document" className="mx-auto mb-4" size="size-12" />
                 <p>O conteúdo deste livro ainda não foi gerado.</p>
                 <Button className="mt-4" variant="outline">
-                  <Icon name="sparkles" className="mr-2" /> Gerar Resumo com IA
+                  <Icon name="magic-wand" className="mr-2" /> Gerar Resumo com IA
                 </Button>
               </div>
             )}
@@ -263,8 +303,24 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
             >
               <Icon name="arrow-left" /> Voltar aos Detalhes
             </Button>
-            <Button className="h-12 gap-2 rounded-full bg-brand-gold px-8 text-black shadow-lg transition-all hover:bg-brand-gold/90 hover:shadow-xl">
-              <Icon name="check" /> Marcar como Lido
+            <Button
+              className={cn(
+                'h-12 gap-2 rounded-full px-8 shadow-lg transition-all hover:shadow-xl',
+                interactions?.readingStatus === 'read'
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-brand-gold text-black hover:bg-brand-gold/90'
+              )}
+              onClick={handleMarkAsRead}
+              disabled={isMarkingRead || interactionsLoading}
+            >
+              {isMarkingRead ? (
+                <Icon name="refresh" className="animate-spin" />
+              ) : interactions?.readingStatus === 'read' ? (
+                <Icon name="check-circle" type="solid" />
+              ) : (
+                <Icon name="check" />
+              )}
+              {interactions?.readingStatus === 'read' ? 'Lido ✓' : 'Marcar como Lido'}
             </Button>
           </div>
         </div>
@@ -282,15 +338,36 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
           >
             {/* Book Info Header + Font Controls */}
             <div className="relative shrink-0 border-b border-border bg-muted/10 p-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSidebarOpen(false)}
-                className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-              >
-                <Icon name="arrow-right" size="size-4" />
-              </Button>
-              <div className="mb-3 flex items-start gap-3 pr-8">
+              {/* Top Actions */}
+              <div className="absolute right-3 top-3 flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleToggleFavorite}
+                  disabled={isTogglingFavorite || interactionsLoading}
+                  className={cn(
+                    'h-8 w-8 transition-colors',
+                    interactions?.isFavorite && 'text-red-500 hover:text-red-600'
+                  )}
+                  title={interactions?.isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                >
+                  <Icon
+                    name="heart"
+                    type={interactions?.isFavorite ? 'solid' : 'regular'}
+                    size="size-4"
+                    className={cn(isTogglingFavorite && 'animate-pulse')}
+                  />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSidebarOpen(false)}
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                >
+                  <Icon name="arrow-right" size="size-4" />
+                </Button>
+              </div>
+              <div className="mb-3 flex items-start gap-3 pr-20">
                 <div className="h-18 w-12 shrink-0 overflow-hidden rounded border border-white/10 shadow-md">
                   {book.coverUrl ? (
                     <img src={book.coverUrl} alt="Cover" className="h-full w-full object-cover" />
@@ -301,7 +378,7 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
                         fallbackGradient
                       )}
                     >
-                      <Icon name="book-open" className="text-white/50" size="size-4" />
+                      <Icon name="book-open-cover" className="text-white/50" size="size-4" />
                     </div>
                   )}
                 </div>
@@ -428,6 +505,48 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
                 </TabsContent>
 
                 <TabsContent value="insights" className="m-0 space-y-4 p-6">
+                  {/* Reading Status Card */}
+                  <Card className="border-border bg-background shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                          Status de Leitura
+                        </span>
+                        {interactions?.readingStatus === 'read' && (
+                          <Badge className="bg-green-500/20 text-green-600">Concluído</Badge>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant={interactions?.readingStatus === 'reading' ? 'default' : 'outline'}
+                          size="sm"
+                          className={cn(
+                            'flex-1 text-xs',
+                            interactions?.readingStatus === 'reading' && 'bg-blue-600 hover:bg-blue-700'
+                          )}
+                          onClick={() => !interactionsLoading && setReadingStatus('reading')}
+                          disabled={interactionsLoading}
+                        >
+                          <Icon name="book-open-cover" size="size-3" className="mr-1" />
+                          Lendo
+                        </Button>
+                        <Button
+                          variant={interactions?.readingStatus === 'read' ? 'default' : 'outline'}
+                          size="sm"
+                          className={cn(
+                            'flex-1 text-xs',
+                            interactions?.readingStatus === 'read' && 'bg-green-600 hover:bg-green-700'
+                          )}
+                          onClick={handleMarkAsRead}
+                          disabled={isMarkingRead || interactionsLoading}
+                        >
+                          <Icon name="check" size="size-3" className="mr-1" />
+                          Lido
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {keyQuotes.length > 0 ? (
                     keyQuotes.map((quote, idx) => (
                       <Card key={idx} className="border-border bg-background shadow-sm">
@@ -458,7 +577,7 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
                       <CardContent className="p-4">
                         <div className="mb-2 flex items-center gap-2">
                           <Icon
-                            name="bookmark"
+                            name="star"
                             type="solid"
                             className="text-brand-gold"
                             size="size-3"

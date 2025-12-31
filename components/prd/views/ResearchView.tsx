@@ -222,7 +222,7 @@ export const ResearchView: React.FC<ResearchViewProps> = ({ project, onUpdate, o
           onClick={() => setShowSkipWarning(true)}
         >
           Pular
-          <Icon name="exclamation-circle" className="ml-2 size-4 text-amber-500" />
+          <Icon name="exclamation" className="ml-2 size-4 text-amber-500" />
         </Button>
       </div>
 
@@ -238,7 +238,7 @@ export const ResearchView: React.FC<ResearchViewProps> = ({ project, onUpdate, o
             projeto
           </p>
           <Button onClick={handleGenerate} className="bg-studio-primary hover:bg-studio-primary/90">
-            <Icon name="sparkles" className="mr-2 size-4" />
+            <Icon name="magic-wand" className="mr-2 size-4" />
             Gerar Pesquisa
           </Button>
         </Card>
@@ -247,7 +247,7 @@ export const ResearchView: React.FC<ResearchViewProps> = ({ project, onUpdate, o
       {/* Loading State */}
       {isGenerating && (
         <Card className="p-12 text-center">
-          <Icon name="spinner" className="mx-auto mb-4 size-12 animate-spin text-studio-primary" />
+          <Icon name="refresh" className="mx-auto mb-4 size-12 animate-spin text-studio-primary" />
           <h3 className="mb-2 text-lg font-bold">Pesquisando...</h3>
           <p className="text-muted-foreground">Buscando informações relevantes para seu projeto</p>
           {progress > 0 && (
@@ -265,7 +265,7 @@ export const ResearchView: React.FC<ResearchViewProps> = ({ project, onUpdate, o
       {error && (
         <Card className="border-destructive/50 bg-destructive/5 p-6">
           <div className="flex items-center gap-3 text-destructive">
-            <Icon name="exclamation-circle" size="size-5" />
+            <Icon name="exclamation" size="size-5" />
             <div>
               <p className="font-medium">Erro ao gerar pesquisa</p>
               <p className="text-sm opacity-80">{error.message}</p>
@@ -335,7 +335,7 @@ export const ResearchView: React.FC<ResearchViewProps> = ({ project, onUpdate, o
         <DialogContent onClose={() => setShowSkipWarning(false)}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Icon name="exclamation-circle" className="text-amber-500" />
+              <Icon name="exclamation" className="text-amber-500" />
               Pular Pesquisa?
             </DialogTitle>
             <DialogDescription>

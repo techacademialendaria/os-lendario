@@ -235,7 +235,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
             }}
             className="gap-2 bg-studio-primary text-white shadow-lg shadow-studio-primary/20 transition-all hover:scale-105"
           >
-            <Icon name="sparkles" size="size-4" /> Gerar com IA
+            <Icon name="magic-wand" size="size-4" /> Gerar com IA
           </Button>
         </div>
 
@@ -472,7 +472,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                 onClick={() => setView('input')}
                 className="gap-2 bg-studio-primary text-white shadow-lg shadow-studio-primary/20"
               >
-                <Icon name="sparkles" size="size-4" /> Criar Primeira Persona
+                <Icon name="magic-wand" size="size-4" /> Criar Primeira Persona
               </Button>
             </CardContent>
           </Card>
@@ -703,7 +703,7 @@ const PersonasTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ setS
                   disabled={!inputText.trim()}
                   className="bg-studio-primary text-white shadow-lg shadow-studio-primary/20 transition-all hover:scale-105"
                 >
-                  <Icon name="sparkles" className="mr-2 size-4" /> Gerar Persona
+                  <Icon name="magic-wand" className="mr-2 size-4" /> Gerar Persona
                 </Button>
               </div>
             </div>

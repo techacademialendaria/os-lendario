@@ -174,7 +174,7 @@ export const MindEditDialog: React.FC<MindEditDialogProps> = ({
               disabled={loading}
             >
               {loading ? (
-                <Icon name="spinner" className="mr-2 animate-spin" />
+                <Icon name="refresh" className="mr-2 animate-spin" />
               ) : (
                 <Icon name="save" className="mr-2" />
               )}

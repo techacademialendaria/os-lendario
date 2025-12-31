@@ -143,7 +143,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
         <MindsTopbar currentSection={Section.APP_MINDS_PROFILE} setSection={setSection} />
         <div className="flex items-center justify-center flex-1">
           <div className="flex flex-col items-center gap-4 text-center">
-            <Icon name="warning" size="size-12" className="text-destructive" />
+            <Icon name="exclamation-triangle" size="size-12" className="text-destructive" />
             <h2 className="text-xl font-bold">Mente não encontrada</h2>
             <p className="text-muted-foreground">{error?.message || 'A mente solicitada não existe ou foi removida.'}</p>
             <Button onClick={() => setSection(Section.APP_MINDS_GALLERY)}>
@@ -194,13 +194,13 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
               <Icon name="document" size="size-4" className="mr-1.5" /> Conteúdos
             </TabsTrigger>
             <TabsTrigger value="fragments" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
-              <Icon name="puzzle-piece" size="size-4" className="mr-1.5" /> Fragmentos {fragmentsData?.total ? `(${fragmentsData.total})` : ''}
+              <Icon name="box" size="size-4" className="mr-1.5" /> Fragmentos {fragmentsData?.total ? `(${fragmentsData.total})` : ''}
             </TabsTrigger>
             <TabsTrigger value="prompts" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
               <Icon name="terminal" size="size-4" className="mr-1.5" /> Prompts {artifactsData?.prompts.length ? `(${artifactsData.prompts.length})` : ''}
             </TabsTrigger>
             <TabsTrigger value="recommended-tools" className="rounded-md data-[state=active]:bg-studio-primary/10 data-[state=active]:text-studio-primary px-4 py-2 font-medium bg-muted/30">
-              <Icon name="toolbox" size="size-4" className="mr-1.5" /> Ferramentas
+              <Icon name="box" size="size-4" className="mr-1.5" /> Ferramentas
             </TabsTrigger>
           </TabsList>
 
@@ -431,7 +431,7 @@ const MindProfileTemplate: React.FC<MindProfileProps> = ({ setSection, mindSlug:
             >
               {isDeleting ? (
                 <>
-                  <Icon name="spinner" className="animate-spin mr-2" size="size-4" />
+                  <Icon name="refresh" className="animate-spin mr-2" size="size-4" />
                   Deletando...
                 </>
               ) : (

@@ -117,7 +117,7 @@ export const FragmentBulkDeleteDialog: React.FC<FragmentBulkDeleteDialogProps> =
         {/* Soft delete notice */}
         <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs mt-4">
           <div className="flex items-start gap-2">
-            <Icon name="info-circle" size="size-4" className="text-blue-400 mt-0.5" />
+            <Icon name="info" size="size-4" className="text-blue-400 mt-0.5" />
             <div className="text-blue-200/80">
               <p className="font-medium">Soft Delete</p>
               <p className="mt-1 opacity-70">

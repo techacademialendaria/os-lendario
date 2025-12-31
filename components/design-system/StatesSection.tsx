@@ -148,7 +148,7 @@ const StatesSection: React.FC = () => {
       {/* --- EMPTY STATES --- */}
       <section className="space-y-8 border-t border-border pt-8">
         <h3 className="flex items-center gap-2 border-b border-border pb-2 font-sans text-xl font-semibold">
-          <Icon name="box-open" /> Empty States (Vazios)
+          <Icon name="box" /> Empty States (Vazios)
         </h3>
         <p className="font-serif text-sm text-muted-foreground">
           Momentos em que não há dados para mostrar. Use para educar e incentivar a primeira ação.

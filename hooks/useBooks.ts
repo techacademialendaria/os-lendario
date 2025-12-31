@@ -22,6 +22,8 @@ export interface BookData {
   rating: number | null;
   status: 'draft' | 'published';
   createdAt: string;
+  readingTime: number | null;
+  wordCount: number | null;
 }
 
 // Database content record for books
@@ -44,6 +46,8 @@ interface DbBookContent {
     averageRating?: number;
     duration?: string;
     hasAudio?: boolean;
+    word_count?: number;
+    reading_time_minutes?: number;
   } | null;
   created_at: string;
   updated_at: string;
@@ -103,6 +107,8 @@ const transformToBookData = (dbBook: DbBookContent): BookData => {
     rating: metadata.averageRating || null,
     status: dbBook.status === 'published' ? 'published' : 'draft',
     createdAt: dbBook.created_at,
+    readingTime: metadata.reading_time_minutes || null,
+    wordCount: metadata.word_count || null,
   };
 };
 

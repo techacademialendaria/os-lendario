@@ -64,6 +64,7 @@ export enum Section {
   APP_CREATOR_PERFORMANCE = 'app_creator_performance',
   APP_CREATOR_SETTINGS = 'app_creator_settings',
   APP_LEARN_GROUPS = 'app_learn_groups',
+  APP_LMS_HOME = 'app_lms_home',
   TEMPLATE_SALES_DASHBOARD = 'template_sales_dashboard',
   TEMPLATE_SALES_CALLS = 'template_sales_calls',
   TEMPLATE_SALES_CALL_DETAILS = 'template_sales_call_details',
@@ -107,7 +108,13 @@ export enum Section {
   STUDIO_OPS_DB = 'studio_ops_db',
   STUDIO_OPS_SCHEMA = 'studio_ops_schema',
   STUDIO_OPS_VIEWS = 'studio_ops_views',
-  STUDIO_OPS_TOOL_STACKS = 'studio_ops_tool_stacks'
+  STUDIO_OPS_TOOL_STACKS = 'studio_ops_tool_stacks',
+
+  // Books Library
+  APP_BOOKS_LIBRARY = 'app_books_library',
+  APP_BOOKS_DETAIL = 'app_books_detail',
+  APP_BOOKS_READER = 'app_books_reader',
+  APP_BOOKS_COLLECTION = 'app_books_collection'
 }
 
 export interface TypeScale {

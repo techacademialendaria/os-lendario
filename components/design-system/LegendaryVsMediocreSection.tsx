@@ -181,7 +181,7 @@ const LegendaryVsMediocreSection: React.FC = () => {
           <Card className="border-brand-blue/20 bg-brand-blue/5 transition-all hover:border-brand-blue/50">
             <CardHeader>
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue/20 text-brand-blue">
-                <Icon name="microchip" size="size-6" />
+                <Icon name="microchip-ai" size="size-6" />
               </div>
               <CardTitle className="text-xl">Inteligência Artificial (AI First)</CardTitle>
             </CardHeader>
@@ -260,7 +260,7 @@ const LegendaryVsMediocreSection: React.FC = () => {
       <section className="space-y-12 pb-8 pt-16">
         <div className="relative overflow-hidden rounded-3xl bg-foreground p-8 text-background md:p-16">
           <div className="pointer-events-none absolute right-0 top-0 p-12 opacity-10">
-            <Icon name="skull" className="text-9xl" />
+            <Icon name="exclamation-triangle" className="text-9xl" />
           </div>
 
           <div className="relative z-10 grid grid-cols-1 items-center gap-12 xl:grid-cols-2">

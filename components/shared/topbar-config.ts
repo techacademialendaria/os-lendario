@@ -33,6 +33,16 @@ export const SALES_TOKENS = {
   accent: '#FF3B30',
 } as const;
 
+export const BOOKS_TOKENS = {
+  primary: 'hsl(var(--brand-gold))', // Gold
+  accent: 'hsl(var(--brand-gold))',
+} as const;
+
+export const LMS_TOKENS = {
+  primary: 'hsl(var(--primary-color))',
+  accent: 'hsl(var(--accent-color))',
+} as const;
+
 // ============================================================================
 // TOPBAR CONFIGS (Single source of truth)
 // ============================================================================
@@ -66,7 +76,7 @@ export const TOPBAR_CONFIGS = {
       },
       {
         label: 'Frameworks',
-        icon: 'layer-group',
+        icon: 'layers',
         section: Section.APP_CREATOR_FRAMEWORKS,
         path: '/creator/frameworks',
       },
@@ -116,12 +126,12 @@ export const TOPBAR_CONFIGS = {
       },
       {
         label: 'Pipeline',
-        icon: 'process',
+        icon: 'sitemap',
         section: Section.APP_MINDS_PROFILE,
       },
       {
         label: 'DNA Mental',
-        icon: 'scale',
+        icon: 'diamond',
         section: Section.APP_MINDS_MATRIX,
       },
     ] as ModuleTopbarNavItem[],
@@ -147,7 +157,7 @@ export const TOPBAR_CONFIGS = {
       },
       {
         label: 'Objeções',
-        icon: 'shield-exclamation',
+        icon: 'shield',
         section: Section.TEMPLATE_SALES_OBJECTIONS,
       },
       {
@@ -164,6 +174,58 @@ export const TOPBAR_CONFIGS = {
         label: 'Configurações',
         icon: 'settings',
         section: Section.TEMPLATE_SALES_SETTINGS,
+      },
+    ] as ModuleTopbarNavItem[],
+  } as const,
+
+  books: {
+    title: 'Biblioteca',
+    subtitle: 'Lendária',
+    icon: 'book-open-cover',
+    primaryColor: BOOKS_TOKENS.primary,
+    accentColor: BOOKS_TOKENS.accent,
+    variant: 'left' as const,
+    navItems: [
+      {
+        label: 'Explorar',
+        icon: 'globe',
+        section: Section.APP_BOOKS_LIBRARY,
+        path: '/books',
+      },
+      {
+        label: 'Meus Livros',
+        icon: 'star',
+        section: Section.APP_BOOKS_LIBRARY,
+        path: '/books?filter=saved',
+      },
+      {
+        label: 'Audiobooks',
+        icon: 'headset',
+        section: Section.APP_BOOKS_LIBRARY,
+        path: '/books?filter=audio',
+      },
+    ] as ModuleTopbarNavItem[],
+  } as const,
+
+  lms: {
+    title: 'Academia',
+    subtitle: 'Lendár[IA]',
+    icon: 'graduation-cap',
+    primaryColor: LMS_TOKENS.primary,
+    accentColor: LMS_TOKENS.accent,
+    variant: 'left' as const,
+    navItems: [
+      {
+        label: 'Início',
+        icon: 'home',
+        section: Section.APP_LMS_HOME,
+        path: '/lms',
+      },
+      {
+        label: 'Minha Lista',
+        icon: 'list',
+        section: Section.APP_LMS_HOME,
+        path: '/lms?filter=saved',
       },
     ] as ModuleTopbarNavItem[],
   } as const,

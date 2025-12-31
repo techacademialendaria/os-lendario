@@ -166,7 +166,7 @@ const ArtifactEditorTemplate: React.FC<ArtifactEditorProps> = ({ setSection }) =
       <div className="flex h-screen flex-col bg-background font-sans">
         <MindsTopbar currentSection={Section.APP_MINDS_PROFILE} setSection={setSection} />
         <main className="flex flex-1 flex-col items-center justify-center">
-          <Icon name="exclamation-circle" className="mb-4 text-destructive" size="size-10" />
+          <Icon name="exclamation" className="mb-4 text-destructive" size="size-10" />
           <h2 className="mb-2 text-xl font-bold">Mente nao encontrada</h2>
           <Button size="sm" onClick={() => navigate('/minds')}>
             Voltar para Galeria
@@ -214,7 +214,7 @@ const ArtifactEditorTemplate: React.FC<ArtifactEditorProps> = ({ setSection }) =
             className="gap-2"
           >
             {isSaving ? (
-              <Icon name="spinner" className="animate-spin" size="size-4" />
+              <Icon name="refresh" className="animate-spin" size="size-4" />
             ) : (
               <Icon name="check" size="size-4" />
             )}
@@ -248,7 +248,7 @@ const ArtifactEditorTemplate: React.FC<ArtifactEditorProps> = ({ setSection }) =
               {/* Error */}
               {error && (
                 <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                  <Icon name="exclamation-circle" size="size-4" />
+                  <Icon name="exclamation" size="size-4" />
                   {error}
                 </div>
               )}
@@ -281,7 +281,7 @@ const ArtifactEditorTemplate: React.FC<ArtifactEditorProps> = ({ setSection }) =
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <Icon name="info-circle" size="size-3" />
+              <Icon name="info" size="size-3" />
               Info
             </button>
           </div>

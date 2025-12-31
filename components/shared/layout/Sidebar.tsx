@@ -28,6 +28,7 @@ interface SidebarProps {
     setLanguage: (l: Language) => void;
     isMobileOpen: boolean;
     closeMobileMenu: () => void;
+    isHidden?: boolean; // Full hide for focus/reader modes
 }
 
 interface NavItem {
@@ -51,7 +52,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     currentLanguage,
     setLanguage,
     isMobileOpen,
-    closeMobileMenu
+    closeMobileMenu,
+    isHidden = false
 }) => {
     // Default expanded menus
     const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
@@ -73,6 +75,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             // Learn Studio Products
             'learn_courses': 'Criador de Cursos',
+            'learn_lms': 'Área do Aluno',
+            'learn_books': 'Biblioteca',
             'learn_challenges': 'Desafios',
             'learn_programs': 'Programas',
             'learn_journey': 'Jornada do Aluno',
@@ -191,6 +195,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             // Studio Products
             'learn_courses': 'Course Builder',
+            'learn_lms': 'Student Area',
+            'learn_books': 'Library',
             'learn_challenges': 'Challenge Hub',
             'learn_programs': 'Program Manager',
             'learn_journey': 'Student Journey',
@@ -293,6 +299,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 
             // Studio Products
             'learn_courses': 'Creador de Cursos',
+            'learn_lms': 'Área del Alumno',
+            'learn_books': 'Biblioteca',
             'learn_challenges': 'Challenge Hub',
             'learn_programs': 'Program Manager',
             'learn_journey': 'Student Journey',
@@ -398,6 +406,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             status: 'active',
             children: [
                 { key: 'learn_courses', icon: 'book-open-cover', section: Section.APP_CREATOR_COURSES, status: 'active' },
+                { key: 'learn_lms', icon: 'play-circle', section: Section.APP_LMS_HOME, status: 'active' },
+                { key: 'learn_books', icon: 'book-open', section: Section.APP_BOOKS_LIBRARY, status: 'active' },
                 { key: 'learn_challenges', icon: 'trophy', section: Section.EXTERNAL_CHALLENGES, status: 'active' },
                 { key: 'learn_groups', icon: 'chat-bubble', section: Section.APP_LEARN_GROUPS, status: 'active' },
                 { key: 'learn_programs', icon: 'sitemap', section: Section.STUDIO_LEARN, status: 'soon' },
@@ -561,7 +571,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         // Studio-level checks for section prefixes
         if (item.key === 'studio_sales' && currentSection.startsWith('template_sales')) return true;
         if (item.key === 'studio_clone' && currentSection.startsWith('app_minds')) return true;
-        if (item.key === 'studio_learn' && currentSection.startsWith('app_creator')) return true;
+        if (item.key === 'studio_learn' && (currentSection.startsWith('app_creator') || currentSection.startsWith('app_lms'))) return true;
         if (item.key === 'studio_ops' && currentSection.startsWith('studio_prd')) return true;
         if (item.key === 'studio_brand' && (currentSection.startsWith('template_') || ['concept', 'identity', 'colors', 'typography', 'spacing', 'icons', 'motion', 'buttons', 'components', 'cards', 'forms', 'tables', 'lists', 'states', 'feedback', 'advanced', 'graphs', 'charts', 'tokens', 'docs', 'ai_manual', 'legendary_vs_mediocre', 'marketing_guide'].includes(currentSection))) return true;
         if (item.children) {
@@ -750,7 +760,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                     "fixed left-0 top-0 h-full md:h-screen border-r border-border bg-card z-50 transition-all duration-300 flex flex-col shadow-2xl md:shadow-none overflow-visible md:sticky md:top-0 shrink-0",
                     isCollapsed ? "md:w-20" : "md:w-64",
                     "w-64",
-                    isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+                    isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+                    isHidden && "md:hidden" // Full hide for focus mode
                 )}
             >
                 {/* Header */}

@@ -25,6 +25,7 @@ export interface Database {
           persona_mind_id: string | null;
           default_frameworks: Json | null;
           project_metadata: Json;
+          image_url: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -40,6 +41,7 @@ export interface Database {
           persona_mind_id?: string | null;
           default_frameworks?: Json | null;
           project_metadata?: Json;
+          image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -55,6 +57,7 @@ export interface Database {
           persona_mind_id?: string | null;
           default_frameworks?: Json | null;
           project_metadata?: Json;
+          image_url?: string | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -90,7 +90,7 @@ export const FrameworksLibrary: React.FC<FrameworksLibraryProps> = ({
   if (loading) {
     return (
       <div className="flex h-96 items-center justify-center">
-        <Icon name="spinner" className="h-8 w-8 animate-spin text-primary" />
+        <Icon name="refresh" className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }

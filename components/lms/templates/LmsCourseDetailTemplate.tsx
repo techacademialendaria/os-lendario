@@ -11,77 +11,8 @@ import { Input } from '../../ui/input';
 import { cn } from '../../../lib/utils';
 import { Separator } from '../../ui/separator';
 import { Skeleton } from '../../ui/skeleton';
+import { MediaCover, StarRating } from '../../shared';
 import { useLmsCourse } from '../../../hooks/lms';
-
-// Color palettes for organic liquid backgrounds (Academia Lendária brand)
-const liquidPalettes = [
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-indigo', 'bg-brand-teal', 'bg-brand-gold'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-pink', 'bg-brand-orange', 'bg-brand-gold'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-teal', 'bg-brand-mint', 'bg-brand-blue'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-gold', 'bg-brand-brown', 'bg-brand-orange'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-blue', 'bg-brand-cyan', 'bg-brand-indigo'] },
-  { bg: 'bg-zinc-950', blobs: ['bg-brand-pink', 'bg-brand-indigo', 'bg-brand-teal'] },
-];
-
-// Get palette based on string hash for consistency
-const getPalette = (str: string) => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return liquidPalettes[Math.abs(hash) % liquidPalettes.length];
-};
-
-// Course cover component - shows image or liquid organic fallback
-const CourseCover = ({
-  image,
-  title,
-  className = '',
-  showTitle = true,
-}: {
-  image?: string | null;
-  title: string;
-  className?: string;
-  showTitle?: boolean;
-}) => {
-  if (image) {
-    return <img src={image} alt={title} className={cn('h-full w-full object-cover', className)} />;
-  }
-
-  const palette = getPalette(title);
-
-  return (
-    <div className={cn('relative h-full w-full overflow-hidden', palette.bg, className)}>
-      {/* Organic liquid blobs */}
-      <div
-        className={cn(
-          'absolute -left-1/4 -top-1/4 h-3/4 w-3/4 rounded-full opacity-60 blur-3xl',
-          palette.blobs[0]
-        )}
-      />
-      <div
-        className={cn(
-          'absolute -bottom-1/4 -right-1/4 h-2/3 w-2/3 rounded-full opacity-50 blur-3xl',
-          palette.blobs[1]
-        )}
-      />
-      <div
-        className={cn(
-          'absolute left-1/3 top-1/2 h-1/2 w-1/2 rounded-full opacity-40 blur-2xl',
-          palette.blobs[2]
-        )}
-      />
-      {/* Title overlay */}
-      {showTitle && (
-        <div className="absolute inset-0 flex items-center justify-center p-4">
-          <h3 className="line-clamp-3 text-center font-serif text-xl font-bold leading-tight text-white drop-shadow-lg">
-            {title}
-          </h3>
-        </div>
-      )}
-    </div>
-  );
-};
 
 // Fallback Mock Data - Course
 const fallbackCourse = {
@@ -654,7 +585,7 @@ export default function LmsCourseDetailTemplate() {
             {/* Cover Image Card */}
             <div className="group relative overflow-hidden rounded-2xl border border-border shadow-2xl">
               <div className="relative aspect-[4/3]">
-                <CourseCover image={course.cover} title={course.title} showTitle={!course.cover} />
+                <MediaCover image={course.cover} title={course.title} showTitle={!course.cover} />
                 {course.cover && (
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                 )}
@@ -733,11 +664,7 @@ export default function LmsCourseDetailTemplate() {
                     "O módulo de banco de dados finalmente fez a ficha cair. Já estou aplicando no
                     meu projeto."
                   </p>
-                  <div className="flex gap-0.5 text-yellow-500">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Icon key={i} name="star" size="size-3" />
-                    ))}
-                  </div>
+                  <StarRating value={5} size="sm" />
                 </div>
 
                 <Separator className="bg-border" />
@@ -757,11 +684,7 @@ export default function LmsCourseDetailTemplate() {
                     "A didática é direto ao ponto. Sem enrolação. O melhor investimento que fiz este
                     ano."
                   </p>
-                  <div className="flex gap-0.5 text-yellow-500">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Icon key={i} name="star" size="size-3" />
-                    ))}
-                  </div>
+                  <StarRating value={5} size="sm" />
                 </div>
               </div>
 

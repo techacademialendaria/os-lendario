@@ -250,7 +250,7 @@ const SalesObjectionsTemplate: React.FC<{ setSection: (s: Section) => void }> = 
                 <span className="truncate text-lg font-bold text-foreground">Preço muito alto</span>
                 <div className="mt-1 flex items-center gap-2">
                   <span className="font-mono text-xs text-muted-foreground">245 calls</span>
-                  <Icon name="arrow-trend-up" className="size-3 text-destructive" />
+                  <Icon name="trend-up" className="size-3 text-destructive" />
                 </div>
               </div>
             </CardContent>
@@ -276,7 +276,7 @@ const SalesObjectionsTemplate: React.FC<{ setSection: (s: Section) => void }> = 
         <Card className="overflow-hidden border-border">
           <CardHeader className="flex flex-row items-center justify-between border-b border-border px-6 py-4">
             <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
-              <Icon name="chart-area" className="text-primary" /> Evolução ao Longo do Tempo
+              <Icon name="chart-line" className="text-primary" /> Evolução ao Longo do Tempo
             </CardTitle>
             <div className="flex gap-2">
               <Badge variant="outline" className="cursor-pointer bg-muted hover:bg-muted/80">

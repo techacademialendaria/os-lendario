@@ -284,12 +284,13 @@ async function upsertValues(mindId, values) {
 
   const { error } = await supabase
     .from("mind_drivers")
-    .insert( // TODO: map values to drivers
-  // values.map(v => ({
-      mind_id: mindId,
-      name: v.name,
-      importance_10: v.importance_10
-    })));
+    .insert(
+      values.map(v => ({
+        mind_id: mindId,
+        name: v.name,
+        importance_10: v.importance_10
+      }))
+    );
 
   return error ? 0 : values.length;
 }

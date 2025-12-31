@@ -355,7 +355,7 @@ export const DesignDecisionsSection: React.FC<DesignDecisionsSectionProps> = ({
             A IA vai sugerir decisões baseadas na solução
           </p>
           <Button onClick={handleGenerate} className="bg-studio-primary hover:bg-studio-primary/90">
-            <Icon name="sparkles" className="mr-2 size-4" />
+            <Icon name="magic-wand" className="mr-2 size-4" />
             Gerar Decisões
           </Button>
         </Card>
@@ -363,7 +363,7 @@ export const DesignDecisionsSection: React.FC<DesignDecisionsSectionProps> = ({
 
       {isGenerating && !hasContent && (
         <Card className="p-8 text-center">
-          <Icon name="spinner" className="mx-auto mb-3 size-8 animate-spin text-studio-primary" />
+          <Icon name="refresh" className="mx-auto mb-3 size-8 animate-spin text-studio-primary" />
           <p className="text-sm text-muted-foreground">Gerando decisões...</p>
         </Card>
       )}

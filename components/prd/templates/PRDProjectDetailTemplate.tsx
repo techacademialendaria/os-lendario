@@ -171,7 +171,7 @@ const PRDProjectDetailTemplate: React.FC<PRDProjectDetailTemplateProps> = ({ set
             Projetos
           </span>
           <Icon name="angle-small-right" size="size-3" />
-          <span className="truncate font-medium text-foreground">{project.title}</span>
+          <span className="truncate font-medium text-foreground">{project.name}</span>
         </div>
 
         {/* Hero Header */}
@@ -189,7 +189,7 @@ const PRDProjectDetailTemplate: React.FC<PRDProjectDetailTemplateProps> = ({ set
                   </Badge>
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                  {project.title}
+                  {project.name}
                 </h1>
                 <p className="max-w-2xl font-serif text-muted-foreground">
                   {project.project_metadata?.brief?.solution ||

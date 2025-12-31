@@ -325,14 +325,14 @@ Gerado pelo PRD Studio em ${new Date().toLocaleDateString('pt-BR')}`;
               >
                 Projetos
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span
                 className="cursor-pointer hover:text-foreground"
                 onClick={() => navigate(`/prd/${slug}/stories`)}
               >
                 Stories
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span className="font-medium text-foreground">Exportação</span>
             </div>
             <Badge

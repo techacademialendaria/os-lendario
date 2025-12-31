@@ -607,7 +607,7 @@ const ColorSection: React.FC<{ isDark: boolean; currentTheme: ThemeName }> = ({
       <section className="space-y-8">
         <div className="flex items-end justify-between border-b border-border pb-4">
           <h3 className="flex items-center gap-3 font-sans text-2xl font-bold">
-            <Icon name="traffic-light" /> Cores do Sistema
+            <Icon name="palette" /> Cores do Sistema
           </h3>
           <span className="font-serif text-sm text-muted-foreground">
             Alertas, Avisos, Sucesso & Informação

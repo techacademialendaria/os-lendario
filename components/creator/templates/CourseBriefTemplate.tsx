@@ -260,7 +260,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
               onChange={(e) => handleInputChange('dreamOutcome', e.target.value)}
             />
             <Alert>
-              <Icon name="lightbulb-on" className="size-4" />
+              <Icon name="lightbulb" className="size-4" />
               <AlertDescription className="text-xs">
                 <strong>Dica GPS:</strong> Use a fórmula "Conseguir [resultado específico] em [tempo
                 definido] sem [objeção comum]"
@@ -420,7 +420,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
                   <strong>Destino:</strong> Onde o aluno quer chegar
                 </li>
                 <li className="flex items-center gap-2">
-                  <Icon name="location-arrow" size="size-3" className="text-studio-primary" />
+                  <Icon name="map-marker" size="size-3" className="text-studio-primary" />
                   <strong>Origem:</strong> Onde o aluno está hoje
                 </li>
                 <li className="flex items-center gap-2">
@@ -516,7 +516,7 @@ const CourseBriefTemplate: React.FC<CourseBriefTemplateProps> = ({
               </div>
               <Button variant="outline" size="sm" onClick={handleSave} disabled={isSaving}>
                 {isSaving ? (
-                  <Icon name="spinner" className="mr-2 size-4 animate-spin" />
+                  <Icon name="refresh" className="mr-2 size-4 animate-spin" />
                 ) : (
                   <Icon name="disk" className="mr-2 size-4" />
                 )}

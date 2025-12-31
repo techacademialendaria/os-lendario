@@ -201,7 +201,7 @@ const CourseBrief: React.FC<CourseBriefProps> = ({ setSection }) => {
                 className="hover:border-studio-primary/50 hover:text-studio-primary"
               >
                 {isSaving ? (
-                  <Icon name="spinner" className="mr-2 animate-spin" size="size-4" />
+                  <Icon name="refresh" className="mr-2 animate-spin" size="size-4" />
                 ) : (
                   <Icon name="check" className="mr-2" size="size-4" />
                 )}

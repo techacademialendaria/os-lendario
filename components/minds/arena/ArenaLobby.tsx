@@ -55,7 +55,7 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({ onCreateClick, onViewFra
               className="h-14 bg-primary px-10 text-lg font-bold text-primary-foreground shadow-lg hover:bg-primary/90"
               onClick={onCreateClick}
             >
-              <Icon name="sword" className="mr-2" /> Criar Debate
+              <Icon name="flash" className="mr-2" /> Criar Debate
             </Button>
             {onViewFrameworks && (
               <Button
@@ -76,7 +76,7 @@ export const ArenaLobby: React.FC<ArenaLobbyProps> = ({ onCreateClick, onViewFra
         <div className="space-y-6 lg:col-span-2">
           <div className="flex items-center justify-between">
             <h3 className="flex items-center gap-2 text-xl font-bold text-foreground">
-              <Icon name="flame" className="text-destructive" /> Ao Vivo Agora
+              <Icon name="flash" className="text-destructive" /> Ao Vivo Agora
             </h3>
             <Button variant="link" className="text-muted-foreground">
               Ver Todos

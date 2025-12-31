@@ -217,7 +217,7 @@ const FrameworksTemplate: React.FC<{ setSection: (s: Section) => void }> = ({ se
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center p-12 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted/30">
-              <Icon name="layer-group" size="size-8" className="text-muted-foreground" />
+              <Icon name="layers" size="size-8" className="text-muted-foreground" />
             </div>
             <h3 className="mb-2 text-lg font-semibold">Nenhum framework encontrado</h3>
             <p className="mb-6 max-w-md text-sm text-muted-foreground">

@@ -113,7 +113,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
         {showSave && onSave && (
           <Button variant="outline" size="sm" onClick={onSave} disabled={isSaving}>
             {isSaving ? (
-              <Icon name="spinner" className="mr-2 size-4 animate-spin" />
+              <Icon name="refresh" className="mr-2 size-4 animate-spin" />
             ) : (
               <Icon name="disk" className="mr-2 size-4" />
             )}

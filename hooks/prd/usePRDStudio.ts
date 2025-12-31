@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import type { Database } from '../../types/database';
 import {
   PRDProject,
   PRDProjectMetadata,
@@ -423,7 +424,7 @@ export function usePRDStudio(slug: string, options: UsePRDStudioOptions = {}): U
         .select('*')
         .eq('slug', slug)
         .eq('project_type', 'prd')
-        .single();
+        .single() as { data: Database['public']['Tables']['content_projects']['Row'] | null; error: any };
 
       if (projectError) {
         if (projectError.code === 'PGRST116') {
@@ -435,7 +436,14 @@ export function usePRDStudio(slug: string, options: UsePRDStudioOptions = {}): U
         return;
       }
 
-      const metadata = (projectData.project_metadata || {}) as PRDProjectMetadata;
+      // Ensure projectData is not null (TypeScript guard)
+      if (!projectData) {
+        setProject(null);
+        setLoading(false);
+        return;
+      }
+
+      const metadata = (projectData.project_metadata || {}) as unknown as PRDProjectMetadata;
 
       // Fetch epics and stories from contents table
       const { data: contentsData } = await supabase
@@ -486,7 +494,7 @@ export function usePRDStudio(slug: string, options: UsePRDStudioOptions = {}): U
         projectData.id,
         projectData.slug,
         projectData.name,
-        projectData.status,
+        projectData.status || 'planning',
         metadata,
         projectData.created_at,
         projectData.updated_at
@@ -530,8 +538,8 @@ export function usePRDStudio(slug: string, options: UsePRDStudioOptions = {}): U
       const metadata = projectToMetadata(project);
 
       // Update project
-      const { error: updateError } = await supabase
-        .from('content_projects')
+      const { error: updateError } = await (supabase
+        .from('content_projects') as any)
         .update({
           project_metadata: metadata,
           status: project.status,
@@ -544,7 +552,7 @@ export function usePRDStudio(slug: string, options: UsePRDStudioOptions = {}): U
       // Save epics and stories to contents table
       for (const epic of project.epics) {
         // Upsert epic
-        const { error: epicError } = await supabase.from('contents').upsert({
+        const { error: epicError } = await (supabase.from('contents') as any).upsert({
           id: epic.id,
           project_id: project.id,
           slug: epic.title.toLowerCase().replace(/\s+/g, '-'),
@@ -560,7 +568,7 @@ export function usePRDStudio(slug: string, options: UsePRDStudioOptions = {}): U
 
         // Upsert stories
         for (const story of epic.stories) {
-          const { error: storyError } = await supabase.from('contents').upsert({
+          const { error: storyError } = await (supabase.from('contents') as any).upsert({
             id: story.id,
             project_id: project.id,
             parent_content_id: epic.id,
@@ -1005,4 +1013,4 @@ export function usePRDStudio(slug: string, options: UsePRDStudioOptions = {}): U
   };
 }
 
-export default usePRDProject;
+export default usePRDStudio;

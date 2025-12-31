@@ -324,12 +324,12 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
               >
                 {isRunningAI ? (
                   <>
-                    <Icon name="spinner" className="mr-2 size-4 animate-spin" />
+                    <Icon name="refresh" className="mr-2 size-4 animate-spin" />
                     Analisando...
                   </>
                 ) : (
                   <>
-                    <Icon name="sparkles" className="mr-2 size-4" />
+                    <Icon name="magic-wand" className="mr-2 size-4" />
                     Rodar IA Research
                   </>
                 )}
@@ -349,7 +349,7 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
             <div className="mx-auto max-w-6xl space-y-6">
               {/* AI Insights Alert */}
               <Alert className="border-primary/20 bg-studio-primary/5">
-                <Icon name="lightbulb-on" className="size-4 text-studio-primary" />
+                <Icon name="lightbulb" className="size-4 text-studio-primary" />
                 <AlertTitle>Insight Principal da IA</AlertTitle>
                 <AlertDescription>
                   90% dos cursos de didática focam em teoria. A maior reclamação dos alunos é{' '}
@@ -371,7 +371,7 @@ const CourseResearchTemplate: React.FC<CourseResearchTemplateProps> = ({
                     Gaps de Mercado ({gaps.length})
                   </TabsTrigger>
                   <TabsTrigger value="sources">
-                    <Icon name="book-open" className="mr-2 size-4" />
+                    <Icon name="book-open-cover" className="mr-2 size-4" />
                     Fontes ({sources.length})
                   </TabsTrigger>
                 </TabsList>

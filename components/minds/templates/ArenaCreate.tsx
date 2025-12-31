@@ -339,7 +339,7 @@ export const ArenaCreate: React.FC<ArenaCreateProps> = ({ minds, frameworks, onB
             )}
             onClick={handleStart}
           >
-            <Icon name="swords" className="mr-2" /> Iniciar Combate
+            <Icon name="flash" className="mr-2" /> Iniciar Combate
           </Button>
         </div>
 

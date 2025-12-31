@@ -1,4 +1,3 @@
-export { default as CoursesList } from './CoursesList';
 export { default as CourseOverview } from './CourseOverview';
 export { default as CourseBrief } from './CourseBrief';
 export { default as CourseResearch } from './CourseResearch';

@@ -154,7 +154,7 @@ export const PsychometricsTab: React.FC<PsychometricsTabProps> = ({ psychometric
           <Card className="bg-studio-card rounded-xl border-border">
             <CardHeader className="border-b border-border pb-3">
               <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-muted-foreground">
-                <Icon name="chart-mixed" className="text-indigo-400" /> Big Five (OCEAN)
+                <Icon name="chart-histogram" className="text-indigo-400" /> Big Five (OCEAN)
               </CardTitle>
             </CardHeader>
             <CardContent className="flex min-h-[280px] items-center justify-center pt-6">
@@ -184,7 +184,7 @@ export const PsychometricsTab: React.FC<PsychometricsTabProps> = ({ psychometric
         <Card className="bg-studio-card rounded-xl border-border">
           <CardHeader className="border-b border-border pb-3">
             <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-muted-foreground">
-              <Icon name="pie-chart" className="text-white" /> DISC - Comportamento Observável
+              <Icon name="chart-pie" className="text-white" /> DISC - Comportamento Observável
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
@@ -257,7 +257,7 @@ export const PsychometricsTab: React.FC<PsychometricsTabProps> = ({ psychometric
           <Card className="rounded-xl border-border">
             <CardHeader className="border-b border-border pb-3">
               <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-muted-foreground">
-                <Icon name="bar-chart-alt" /> Big Five - Detalhamento
+                <Icon name="chart-histogram" /> Big Five - Detalhamento
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
@@ -318,7 +318,7 @@ export const PsychometricsTab: React.FC<PsychometricsTabProps> = ({ psychometric
             <Card className="rounded-xl border-border bg-gradient-to-br from-card to-studio-primary/5">
               <CardHeader className="border-b border-border pb-3">
                 <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-studio-primary">
-                  <Icon name="lightning" /> Superpoderes
+                  <Icon name="bolt" /> Superpoderes
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
@@ -341,7 +341,7 @@ export const PsychometricsTab: React.FC<PsychometricsTabProps> = ({ psychometric
             <Card className="rounded-xl border-red-500/20 bg-red-500/5">
               <CardHeader className="border-b border-red-500/10 pb-3">
                 <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-red-400">
-                  <Icon name="shield-check" /> Kryptonita
+                  <Icon name="shield" /> Kryptonita
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-4">
@@ -364,7 +364,7 @@ export const PsychometricsTab: React.FC<PsychometricsTabProps> = ({ psychometric
               <Card className="rounded-xl border-primary/20 bg-primary/5">
                 <CardHeader className="border-b border-primary/10 pb-3">
                   <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-primary">
-                    <Icon name="bullseye" /> Motivação Central
+                    <Icon name="target" /> Motivação Central
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 pt-4">
@@ -402,7 +402,7 @@ export const PsychometricsTab: React.FC<PsychometricsTabProps> = ({ psychometric
           <Card className="rounded-xl border-red-500/10 bg-red-500/5">
             <CardHeader className="border-b border-red-500/10 pb-3">
               <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-red-400">
-                <Icon name="shield-check" /> Dark Triad Profile
+                <Icon name="shield" /> Dark Triad Profile
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
@@ -481,7 +481,7 @@ export const PsychometricsTab: React.FC<PsychometricsTabProps> = ({ psychometric
                 <Card className="rounded-xl border-border">
                   <CardHeader className="border-b border-border pb-3">
                     <CardTitle className="flex items-center gap-2 text-base uppercase tracking-widest text-amber-400">
-                      <Icon name="arrows-cross" /> Tensões Produtivas
+                      <Icon name="link" /> Tensões Produtivas
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-6">

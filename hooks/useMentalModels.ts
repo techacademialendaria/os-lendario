@@ -147,7 +147,7 @@ function groupByDomain(tools: any[]): MentalModelCategory[] {
     return acc;
   }, {} as Record<string, MentalModelCategory>);
 
-  return Object.values(grouped).sort((a, b) => a.name.localeCompare(b.name));
+  return (Object.values(grouped) as MentalModelCategory[]).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /**

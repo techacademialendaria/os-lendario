@@ -72,7 +72,7 @@ function handleMetric(name: string, metric: Metric): void {
   const logLevel = rating === 'good' ? 'info' : rating === 'needs-improvement' ? 'warn' : 'error';
   const logFn = console[logLevel as keyof typeof console] || console.log;
 
-  (logFn as Function)(`[Web Vitals] ${name}: ${value}ms (${rating})`);
+  (logFn as (...args: unknown[]) => void)(`[Web Vitals] ${name}: ${value}ms (${rating})`);
 
   // Call all registered callbacks
   callbacks.forEach((callback) => callback(metric));

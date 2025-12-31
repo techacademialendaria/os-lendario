@@ -50,7 +50,14 @@ interface DetailedStory {
   criteria: number;
 }
 
-interface EpicWithStories extends EpicData {
+interface EpicWithStories {
+  id: string;
+  sequence_order: number;
+  title: string;
+  description?: string;
+  storiesCount: number;
+  status: string;
+  stories: string[];
   detailedStories?: DetailedStory[];
 }
 
@@ -346,7 +353,7 @@ export const PRDEpicsTemplate: React.FC<PRDEpicsTemplateProps> = ({ setSection }
               >
                 Projetos
               </span>
-              <Icon name="nav-arrow-right" size="size-3" />
+              <Icon name="angle-small-right" size="size-3" />
               <span className="font-medium text-foreground">Plano de Execução</span>
             </div>
             <Badge
@@ -392,7 +399,7 @@ export const PRDEpicsTemplate: React.FC<PRDEpicsTemplateProps> = ({ setSection }
               className="gap-2 text-white shadow-lg"
               style={{ backgroundColor: STUDIO_TEAL }}
             >
-              <Icon name="sparkles" /> Gerar Épicos e Stories
+              <Icon name="magic-wand" /> Gerar Épicos e Stories
             </Button>
           </Card>
         )}
@@ -478,7 +485,7 @@ export const PRDEpicsTemplate: React.FC<PRDEpicsTemplateProps> = ({ setSection }
                           </div>
                           <div className="w-8 opacity-0 group-hover:opacity-100">
                             <Button variant="ghost" size="icon" className="size-6">
-                              <Icon name="edit-pencil" size="size-3" />
+                              <Icon name="edit" size="size-3" />
                             </Button>
                           </div>
                         </div>

@@ -18,6 +18,12 @@ const isCreatorApp = (section: Section) =>
 const isLearnApp = (section: Section) =>
   section.startsWith('app_learn');
 
+const isLmsApp = (section: Section) =>
+  section.startsWith('app_lms');
+
+const isBooksApp = (section: Section) =>
+  section.startsWith('app_books');
+
 const isExternal = (section: Section) =>
   section === Section.EXTERNAL_CHALLENGES ||
   section === Section.EXTERNAL_PROMPT_OPS ||
@@ -121,6 +127,8 @@ export function useAppSection(options: UseAppSectionOptions = {}) {
     isMindsApp(section) ||
     isCreatorApp(section) ||
     isLearnApp(section) ||
+    isLmsApp(section) ||
+    isBooksApp(section) ||
     isPRDApp(section) ||
     isExternal(section) ||
     isDesignSystemApp(section) ||
@@ -148,6 +156,8 @@ export function useAppSection(options: UseAppSectionOptions = {}) {
     isMindsApp: isMindsApp(currentSection),
     isCreatorApp: isCreatorApp(currentSection),
     isLearnApp: isLearnApp(currentSection),
+    isLmsApp: isLmsApp(currentSection),
+    isBooksApp: isBooksApp(currentSection),
     isPRDApp: isPRDApp(currentSection),
     isExternal: isExternal(currentSection),
     isOpsApp: isOpsApp(currentSection),

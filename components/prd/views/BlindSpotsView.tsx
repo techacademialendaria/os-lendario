@@ -217,7 +217,7 @@ export const BlindSpotsView: React.FC<BlindSpotsViewProps> = ({ project, onUpdat
             A IA vai analisar sua ideia e sugerir aspectos que você pode ter esquecido de considerar
           </p>
           <Button onClick={handleGenerate} className="bg-studio-primary hover:bg-studio-primary/90">
-            <Icon name="sparkles" className="mr-2 size-4" />
+            <Icon name="magic-wand" className="mr-2 size-4" />
             Analisar Pontos Cegos
           </Button>
         </Card>
@@ -226,7 +226,7 @@ export const BlindSpotsView: React.FC<BlindSpotsViewProps> = ({ project, onUpdat
       {/* Loading State */}
       {isGenerating && (
         <Card className="p-12 text-center">
-          <Icon name="spinner" className="mx-auto mb-4 size-12 animate-spin text-studio-primary" />
+          <Icon name="refresh" className="mx-auto mb-4 size-12 animate-spin text-studio-primary" />
           <h3 className="mb-2 text-lg font-bold">Analisando sua ideia...</h3>
           <p className="text-muted-foreground">
             Identificando pontos cegos e áreas não consideradas
@@ -246,7 +246,7 @@ export const BlindSpotsView: React.FC<BlindSpotsViewProps> = ({ project, onUpdat
       {error && (
         <Card className="border-destructive/50 bg-destructive/5 p-6">
           <div className="flex items-center gap-3 text-destructive">
-            <Icon name="exclamation-circle" size="size-5" />
+            <Icon name="exclamation" size="size-5" />
             <div>
               <p className="font-medium">Erro ao gerar pontos cegos</p>
               <p className="text-sm opacity-80">{error.message}</p>
