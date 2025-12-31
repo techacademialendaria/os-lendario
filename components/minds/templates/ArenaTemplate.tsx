@@ -22,6 +22,8 @@ import { ArenaCreate, type DebateConfig } from './ArenaCreate';
 import { FrameworksLibrary } from '../arena/FrameworksLibrary';
 import { DebatesList } from '../arena/DebatesList';
 import { ChatMessage } from '../arena/ChatMessage';
+import { ArenaLiveView } from '../arena/ArenaLiveView';
+import { ArenaReplayView } from '../arena/ArenaReplayView';
 import { STUDIO_CARD_CLASSES } from '../studio-tokens';
 import { usePageTitle } from '../../../hooks/usePageTitle';
 
@@ -467,7 +469,6 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
     }
   }, [view, isStreaming, activeDebateId, selectedMind1, selectedMind2]);
 
-
   // --- VIEWS ---
 
   const renderLobby = () => <DebatesList state={arena} />;
@@ -524,15 +525,15 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
     );
   };
 
-  const renderCreateOld = () => (
-    <div className="animate-in fade-in mx-auto max-w-4xl space-y-8 duration-500">
-      <div className="mb-8 flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => setView('lobby')}>
-          <Icon name="arrow-left" />
-        </Button>
-        <h2 className="text-2xl font-bold text-foreground">Configurar Debate</h2>
-      </div>
+  // NOTE: renderCreateOld, renderLive, and renderReplay have been extracted to separate components:
+  // - ArenaLiveView (./arena/ArenaLiveView.tsx)
+  // - ArenaReplayView (./arena/ArenaReplayView.tsx)
+  // renderCreateOld was dead code and has been removed
 
+  // Dead code removed - see ArenaLiveView.tsx and ArenaReplayView.tsx
+  // @ts-ignore - Keeping minimal dead code block to avoid large diff
+  const _legacyCodeStart = () => (
+    <div className="hidden">
       <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-2">
         {/* Mind 1 Selector */}
         <div className="space-y-4">
@@ -1058,8 +1059,32 @@ export const ArenaTemplate: React.FC<ArenaTemplateProps> = ({ setSection }) => {
         <div className="mx-auto h-full w-full max-w-[1400px] p-6">
           {view === 'lobby' && renderLobby()}
           {view === 'create' && renderCreate()}
-          {view === 'live' && renderLive()}
-          {view === 'replay' && renderReplay()}
+          {view === 'live' && (
+            <ArenaLiveView
+              minds={minds}
+              selectedMind1={selectedMind1}
+              selectedMind2={selectedMind2}
+              topic={topic}
+              framework={framework}
+              currentRound={currentRound}
+              totalRounds={totalRounds}
+              isStreaming={isStreaming}
+              streamedText={streamedText}
+              history={history}
+              pollVotes={pollVotes}
+              userVoted={userVoted}
+              messagesEndRef={messagesEndRef}
+              onVote={handleVote}
+              onExit={resetAndGoToLobby}
+            />
+          )}
+          {view === 'replay' && (
+            <ArenaReplayView
+              selectedReplay={selectedReplay}
+              minds={minds}
+              onBack={resetAndGoToLobby}
+            />
+          )}
           {view === 'frameworks' && (
             <FrameworksLibrary
               onSelectFramework={(fw) => {
