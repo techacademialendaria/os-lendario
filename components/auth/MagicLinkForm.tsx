@@ -29,6 +29,10 @@ export const MagicLinkForm: React.FC<MagicLinkFormProps> = ({ onError, onSuccess
 
     setIsLoading(true);
     try {
+      if (!signInWithMagicLink) {
+        onError?.('Login por link mágico não está configurado');
+        return;
+      }
       const { error } = await signInWithMagicLink(email);
       if (error) {
         onError?.(getAuthErrorMessage(error));

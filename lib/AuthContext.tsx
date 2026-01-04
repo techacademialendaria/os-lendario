@@ -2,7 +2,8 @@
  * AuthContext - Sistema de autenticação centralizado
  *
  * Segue o padrão do ThemeContext.tsx
- * Suporta: Email/Senha, Google OAuth, Magic Link
+ * Suporta: Email/Senha
+ * TODO: Google OAuth e Magic Link (desativados temporariamente)
  */
 
 import React, {
@@ -42,13 +43,15 @@ interface AuthContextType {
     password: string,
     fullName?: string
   ) => Promise<{ error: AuthError | null }>;
-  signInWithGoogle: () => Promise<{ error: AuthError | null }>;
-  signInWithMagicLink: (email: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
 
   // Utils
   refreshUser: () => Promise<void>;
+
+  // OAuth methods (optional - may not be configured)
+  signInWithGoogle?: () => Promise<{ error: AuthError | null }>;
+  signInWithMagicLink?: (email: string) => Promise<{ error: AuthError | null }>;
 }
 
 // ============================================================================
@@ -63,13 +66,36 @@ export const AUTH_ERROR_MESSAGES: Record<string, string> = {
   'Unable to validate email address: invalid format': 'Formato de email inválido',
   'Email rate limit exceeded': 'Muitas tentativas. Aguarde alguns minutos.',
   'Signup requires a valid password': 'Por favor, informe uma senha válida',
+  'Invalid email or password': 'Email ou senha incorretos',
+  'Auth session missing!': 'Sessão expirada. Faça login novamente.',
+  'User not found': 'Usuário não encontrado',
+  'Network request failed': 'Erro de conexão. Verifique sua internet.',
+  'Failed to fetch': 'Erro de conexão. Verifique sua internet.',
+  'Database error querying schema': 'Erro no banco de dados. Contate o administrador.',
+  'Database error': 'Erro no banco de dados. Contate o administrador.',
   default: 'Ocorreu um erro. Tente novamente.',
 };
 
 export function getAuthErrorMessage(error: AuthError | Error | null): string {
   if (!error) return '';
   const message = error.message || '';
-  return AUTH_ERROR_MESSAGES[message] || AUTH_ERROR_MESSAGES['default'];
+
+  // Direct match
+  if (AUTH_ERROR_MESSAGES[message]) {
+    return AUTH_ERROR_MESSAGES[message];
+  }
+
+  // Partial match (some Supabase errors have extra details)
+  for (const [key, value] of Object.entries(AUTH_ERROR_MESSAGES)) {
+    if (key !== 'default' && message.toLowerCase().includes(key.toLowerCase())) {
+      return value;
+    }
+  }
+
+  // Unknown error - return default message
+  // In development, you can uncomment the line below to see unmapped errors:
+  // console.warn('Unknown auth error message:', message);
+  return AUTH_ERROR_MESSAGES['default'];
 }
 
 // ============================================================================
@@ -88,71 +114,115 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isLoading, setIsLoading] = useState(true);
 
   // Transform Supabase User to our AuthUser type
+  // Fetches user_profiles to get mind_id, then fetches mind for avatar/name
   const transformUser = useCallback(async (supabaseUser: User | null): Promise<AuthUser | null> => {
     if (!supabaseUser) return null;
 
-    try {
-      // Fetch user_profile to get mind_id and other data
-      // Using type assertion since user_profiles may not be in generated types yet
-      const { data: profile } = (await supabase
-        .from('user_profiles' as 'minds') // Type workaround
-        .select('full_name, avatar_url, mind_id')
-        .eq('id', supabaseUser.id)
-        .single()) as {
-        data: { full_name?: string; avatar_url?: string; mind_id?: string } | null;
-      };
+    // Default user from auth metadata
+    const defaultUser: AuthUser = {
+      id: supabaseUser.id,
+      email: supabaseUser.email ?? null,
+      fullName: supabaseUser.user_metadata?.full_name ?? supabaseUser.email?.split('@')[0] ?? null,
+      avatarUrl: supabaseUser.user_metadata?.avatar_url ?? null,
+      mindId: null,
+    };
 
-      return {
-        id: supabaseUser.id,
-        email: supabaseUser.email ?? null,
-        fullName: profile?.full_name ?? supabaseUser.user_metadata?.full_name ?? null,
-        avatarUrl: profile?.avatar_url ?? supabaseUser.user_metadata?.avatar_url ?? null,
-        mindId: profile?.mind_id ?? null,
-      };
+    try {
+      // Query with timeout to prevent hanging
+      const timeoutPromise = new Promise<null>((_, reject) =>
+        setTimeout(() => reject(new Error('Query timeout')), 5000)
+      );
+
+      const queryPromise = (async () => {
+        // 1. Get user_profile to find mind_id
+        // Type cast needed as user_profiles is not in generated types yet
+        const { data: profile, error: profileError } = await (supabase
+          .from('user_profiles' as any)
+          .select('mind_id')
+          .eq('id', supabaseUser.id)
+          .maybeSingle() as unknown as Promise<{ data: { mind_id: string } | null; error: any }>);
+
+        if (profileError || !profile?.mind_id) {
+          return defaultUser;
+        }
+
+        // 2. Get mind data for avatar and name
+        // Type cast needed as minds table may not be in generated types
+        const { data: mind, error: mindError } = await (supabase
+          .from('minds')
+          .select('name, avatar_url')
+          .eq('id', profile.mind_id)
+          .maybeSingle() as unknown as Promise<{
+          data: { name: string | null; avatar_url: string | null } | null;
+          error: any;
+        }>);
+
+        if (mindError || !mind) {
+          return {
+            ...defaultUser,
+            mindId: profile.mind_id,
+          };
+        }
+
+        // 3. Return full user with mind data
+        return {
+          id: supabaseUser.id,
+          email: supabaseUser.email ?? null,
+          fullName: mind.name ?? defaultUser.fullName,
+          avatarUrl: mind.avatar_url ?? defaultUser.avatarUrl,
+          mindId: profile.mind_id,
+        };
+      })();
+
+      return (await Promise.race([queryPromise, timeoutPromise])) as AuthUser;
     } catch (error) {
-      // If profile doesn't exist yet (first login), use metadata
-      console.warn('Could not fetch user profile, using metadata:', error);
-      return {
-        id: supabaseUser.id,
-        email: supabaseUser.email ?? null,
-        fullName: supabaseUser.user_metadata?.full_name ?? null,
-        avatarUrl: supabaseUser.user_metadata?.avatar_url ?? null,
-        mindId: null,
-      };
+      // Timeout or any error - use default
+      console.warn('Error fetching user profile:', error);
+      return defaultUser;
     }
   }, []);
 
   // Initialize auth state on mount
   useEffect(() => {
     if (!isSupabaseConfigured()) {
-      console.warn('Supabase not configured. Auth disabled.');
       setIsLoading(false);
       return;
     }
 
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        const authUser = await transformUser(session.user);
-        setUser(authUser);
+    const initializeAuth = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error('Error getting session:', error);
+          setIsLoading(false);
+          return;
+        }
+
+        setSession(session);
+        if (session?.user) {
+          const authUser = await transformUser(session.user);
+          setUser(authUser);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    });
+    };
+
+    initializeAuth();
 
     // Listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event);
       setSession(session);
 
       if (session?.user) {
-        // Small delay to allow trigger to create user_profile/mind after signup
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // Wait a bit for the DB trigger to create user_profile
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
         const authUser = await transformUser(session.user);
         setUser(authUser);
       } else {
@@ -193,24 +263,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return { error };
   };
 
+  // OAuth methods - disabled until configured
   const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    return { error };
+    return {
+      error: {
+        message: 'Google login not configured',
+        name: 'AuthError',
+        status: 500,
+      } as AuthError,
+    };
   };
 
-  const signInWithMagicLink = async (email: string) => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    return { error };
+  const signInWithMagicLink = async (_email: string) => {
+    return {
+      error: {
+        message: 'Magic link login not configured',
+        name: 'AuthError',
+        status: 500,
+      } as AuthError,
+    };
   };
 
   const signOut = async () => {

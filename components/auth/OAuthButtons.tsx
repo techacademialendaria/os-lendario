@@ -19,6 +19,10 @@ export const OAuthButtons: React.FC<OAuthButtonsProps> = ({ onError, disabled })
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
+      if (!signInWithGoogle) {
+        onError?.('Login com Google não está configurado');
+        return;
+      }
       const { error } = await signInWithGoogle();
       if (error) {
         onError?.(getAuthErrorMessage(error));
