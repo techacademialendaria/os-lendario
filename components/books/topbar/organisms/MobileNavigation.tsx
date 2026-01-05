@@ -45,7 +45,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-xl md:hidden">
-      <div className="flex h-16 items-center justify-around px-2">
+      <div className="flex h-14 items-center justify-around px-4">
         {NAV_ITEMS.map((item) => {
           const isActive =
             currentSection === item.section ||
@@ -55,14 +55,13 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
               key={item.section}
               onClick={() => onNavigate(item)}
               className={cn(
-                'relative flex flex-col items-center justify-center gap-1 px-4 py-2 transition-all active:scale-95',
-                isActive ? 'text-primary' : 'text-muted-foreground'
+                'flex h-10 w-10 items-center justify-center rounded-full transition-all active:scale-95',
+                isActive
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Icon name={getNavIcon(item.section)} size="size-5" />
-              <span className="text-[8px] font-black uppercase tracking-[0.15em]">
-                {item.label}
-              </span>
             </button>
           );
         })}
@@ -70,26 +69,24 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
         {/* Search button */}
         <button
           onClick={onSearchOpen}
-          className="relative flex flex-col items-center justify-center gap-1 px-4 py-2 text-muted-foreground transition-all active:scale-95"
+          className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-all hover:text-foreground active:scale-95"
         >
           <Icon name="search" size="size-5" />
-          <span className="text-[8px] font-black uppercase tracking-[0.15em]">Buscar</span>
         </button>
 
         {/* User/Profile button */}
         {isAuthenticated && user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="relative flex flex-col items-center justify-center gap-1 px-4 py-2 text-muted-foreground transition-all active:scale-95">
-                <Avatar className="h-6 w-6">
+              <button className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-all active:scale-95">
+                <Avatar className="h-7 w-7">
                   {user.avatarUrl && (
                     <AvatarImage src={user.avatarUrl} alt={user.email || ''} />
                   )}
-                  <AvatarFallback className="bg-muted text-[8px] font-bold text-foreground">
+                  <AvatarFallback className="bg-muted text-[9px] font-bold text-foreground">
                     {(user.email || 'U').substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-[8px] font-black uppercase tracking-[0.15em]">Perfil</span>
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 rounded-xl border-border mb-2">
@@ -119,10 +116,9 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
         ) : (
           <button
             onClick={() => navigate('/auth/login')}
-            className="relative flex flex-col items-center justify-center gap-1 px-4 py-2 text-muted-foreground transition-all active:scale-95"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-all hover:text-foreground active:scale-95"
           >
             <Icon name="user" size="size-5" />
-            <span className="text-[8px] font-black uppercase tracking-[0.15em]">Entrar</span>
           </button>
         )}
       </div>

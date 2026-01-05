@@ -4,6 +4,7 @@
 
 export { HeroSection } from './HeroSection';
 export { CategoriesBar } from './CategoriesBar';
+export { CategoriesSection } from './CategoriesSection';
 export { RecentBooksSection } from './RecentBooksSection';
 export { PopularBooksSection } from './PopularBooksSection';
 export { CollectionsSection } from './CollectionsSection';

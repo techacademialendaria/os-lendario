@@ -9,7 +9,7 @@ import type { BookData } from '@/hooks/useBooks';
 import BooksTopbar from '../topbar';
 import BookDetailSheet from '../ui/BookDetailSheet';
 import { useBooksLibraryData, useLocalFavorites, useInfiniteScroll } from './hooks';
-import { HeroSection, CategoriesBar, RecentBooksSection, PopularBooksSection, CollectionsSection, AudiobooksSection, AllBooksSection, ErrorState } from './organisms';
+import { HeroSection, CategoriesSection, RecentBooksSection, PopularBooksSection, CollectionsSection, AudiobooksSection, AllBooksSection, ErrorState } from './organisms';
 import type { BooksLibraryProps } from './types';
 
 const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelectBook }) => {
@@ -54,10 +54,10 @@ const BooksLibraryTemplate: React.FC<BooksLibraryProps> = ({ setSection, onSelec
           onExploreLibrary={() => { const book = data.recentBooks[0] || data.popularBooks[0]; if (book) handleBookClick(book); }}
           isLoading={data.featuredLoading}
         />
-        <CategoriesBar categories={data.categories} onCategoryClick={(slug) => navigate(`/books/category/${slug}`)} onAllClick={() => navigate('/books')} isLoading={data.categoriesLoading} />
         <RecentBooksSection books={data.recentBooks} onBookClick={handleBookClick} isLoading={data.featuredLoading} />
         <PopularBooksSection books={data.popularBooks} localFavorites={localFavorites} readingStatusMap={readingStatusMap} onBookClick={handleBookClick} onToggleFavorite={handleToggleFavorite} isLoading={data.featuredLoading} />
         <CollectionsSection collections={data.collections} onCollectionClick={(slug) => navigate(`/books/collections/${slug}`)} onViewAll={() => navigate('/books/collections')} isLoading={data.collectionsLoading} />
+        <CategoriesSection categories={data.categories} onCategoryClick={(slug) => navigate(`/books/category/${slug}`)} onViewAll={() => navigate('/books')} isLoading={data.categoriesLoading} />
         <AudiobooksSection books={data.audiobookBooks} localFavorites={localFavorites} readingStatusMap={readingStatusMap} onBookClick={handleBookClick} onToggleFavorite={handleToggleFavorite} />
         <AllBooksSection
           books={data.books}

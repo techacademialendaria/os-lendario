@@ -60,6 +60,17 @@ export interface CollectionsSectionProps {
   isLoading: boolean;
 }
 
+export interface CategoriesSectionProps {
+  categories: Array<{
+    slug: string;
+    name: string;
+    count: number;
+  }>;
+  onCategoryClick: (slug: string) => void;
+  onViewAll: () => void;
+  isLoading: boolean;
+}
+
 export interface AllBooksSectionProps {
   books: BookData[];
   totalBookCount: number;
@@ -105,7 +116,7 @@ export interface BooksLibraryData {
 
   // Metadata
   totalBookCount: number;
-  categories: Array<{ slug: string; name: string }>;
+  categories: Array<{ slug: string; name: string; count: number }>;
   categoriesLoading: boolean;
   collections: Array<{ id: string; slug: string; name: string; bookCount: number }>;
   collectionsLoading: boolean;

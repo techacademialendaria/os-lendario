@@ -18,7 +18,7 @@ import { usePageTitle } from '../../../hooks/usePageTitle';
 import { useMetaTags } from '../../../hooks/useMetaTags';
 import BookCard from '../ui/BookCard';
 import BooksTopbar from '../topbar';
-import { getCategoryStyle, type SortOption, SORT_OPTIONS } from '../constants';
+import { getCategoryStyle, getCategoryName, getCategoryDescription, type SortOption, SORT_OPTIONS } from '../constants';
 
 interface BooksCategoryProps {
   setSection: (s: Section) => void;
@@ -39,12 +39,16 @@ const BooksCategoryTemplate: React.FC<BooksCategoryProps> = ({ setSection }) => 
   const { books, category, loading, error } = useBooksByCategory(categorySlug || '');
   const { books: allBooks } = useBooks();
 
-  usePageTitle(category?.name || 'Categoria');
+  // Use Portuguese names from constants (fallback to DB value)
+  const categoryName = getCategoryName(categorySlug || '') || category?.name || 'Categoria';
+  const categoryDescription = getCategoryDescription(categorySlug || '') || category?.description;
+
+  usePageTitle(categoryName);
   useMetaTags(
-    category
+    categorySlug
       ? {
-          title: category.name,
-          description: category.description || `Explore os ${books.length} livros de ${category.name} disponíveis na Academia Lendária.`,
+          title: categoryName,
+          description: categoryDescription || `Explore os ${books.length} livros de ${categoryName} disponíveis na Academia Lendária.`,
           type: 'website',
         }
       : null
@@ -149,11 +153,11 @@ const BooksCategoryTemplate: React.FC<BooksCategoryProps> = ({ setSection }) => 
                   Categoria
                 </Badge>
                 <h1 className="text-5xl font-bold leading-[0.95] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
-                  {category?.name || categorySlug}
+                  {categoryName}
                 </h1>
-                {category?.description && (
+                {categoryDescription && (
                   <p className="max-w-2xl font-serif text-xl italic leading-relaxed text-muted-foreground">
-                    {category.description}
+                    {categoryDescription}
                   </p>
                 )}
                 <div className="flex items-center gap-8 pt-4">
