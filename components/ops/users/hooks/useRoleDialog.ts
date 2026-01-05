@@ -84,9 +84,16 @@ export function useRoleDialog(onSuccess: () => void): UseRoleDialogReturn {
       onSuccess();
       close();
       return true;
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error saving role:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Erro ao salvar role';
+      let errorMessage = 'Erro ao salvar role';
+      if (err && typeof err === 'object') {
+        if ('message' in err && typeof err.message === 'string') {
+          errorMessage = err.message;
+        } else if ('details' in err && typeof err.details === 'string') {
+          errorMessage = err.details;
+        }
+      }
       setError(errorMessage);
       return false;
     } finally {

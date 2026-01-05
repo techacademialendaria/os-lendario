@@ -1,14 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Section } from '../../../types';
 import OpsTopbar from '../OpsTopbar';
 
 // Hooks
-import {
-  useUsersData,
-  useLinkMindDialog,
-  useCreateUserDialog,
-  useRoleDialog,
-} from './hooks';
+import { useUsersData, useLinkMindDialog, useCreateUserDialog, useRoleDialog } from './hooks';
 
 // Molecules
 import { SearchInput, AlertMessage } from './molecules';
@@ -24,6 +19,9 @@ import {
   PendingInvitesSection,
 } from './organisms';
 
+// Types
+import type { UserSortKey, SortOrder, UserManagementView } from './types';
+
 interface OpsUsersTemplateProps {
   setSection: (s: Section) => void;
 }
@@ -34,6 +32,10 @@ const OpsUsersTemplate: React.FC<OpsUsersTemplateProps> = ({ setSection }) => {
 
   // Search
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Sorting
+  const [sortBy, setSortBy] = useState<UserSortKey>('user');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   // Success message
   const [success, setSuccess] = useState<string | null>(null);
@@ -55,17 +57,63 @@ const OpsUsersTemplate: React.FC<OpsUsersTemplateProps> = ({ setSection }) => {
     setSuccess('Role atualizado com sucesso!');
   });
 
-  // Filtered users
+  // Sort handler
+  const handleSort = useCallback(
+    (key: UserSortKey) => {
+      if (sortBy === key) {
+        setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      } else {
+        setSortBy(key);
+        setSortOrder('asc');
+      }
+    },
+    [sortBy]
+  );
+
+  // Filtered and sorted users
   const filteredUsers = useMemo(() => {
     const search = searchTerm.toLowerCase();
-    return users.filter(
+
+    // Filter
+    const filtered = users.filter(
       (user) =>
         user.email?.toLowerCase().includes(search) ||
         user.full_name?.toLowerCase().includes(search) ||
         user.mind_name?.toLowerCase().includes(search) ||
         user.role_display_name?.toLowerCase().includes(search)
     );
-  }, [users, searchTerm]);
+
+    // Sort
+    const sorted = [...filtered].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case 'user': {
+          const nameA = (a.full_name || a.email || '').toLowerCase();
+          const nameB = (b.full_name || b.email || '').toLowerCase();
+          comparison = nameA.localeCompare(nameB);
+          break;
+        }
+        case 'role': {
+          // Sort by hierarchy_level (higher = more important)
+          const levelA = a.hierarchy_level ?? 0;
+          const levelB = b.hierarchy_level ?? 0;
+          comparison = levelB - levelA;
+          break;
+        }
+        case 'last_login': {
+          const dateA = a.last_sign_in_at ? new Date(a.last_sign_in_at).getTime() : 0;
+          const dateB = b.last_sign_in_at ? new Date(b.last_sign_in_at).getTime() : 0;
+          comparison = dateB - dateA;
+          break;
+        }
+      }
+
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return sorted;
+  }, [users, searchTerm, sortBy, sortOrder]);
 
   // Stats
   const stats = useMemo(() => {
@@ -99,10 +147,7 @@ const OpsUsersTemplate: React.FC<OpsUsersTemplateProps> = ({ setSection }) => {
         <main className="flex-1 overflow-y-auto bg-background/50">
           <div className="mx-auto max-w-[1400px] animate-fade-in space-y-6 p-6 md:p-10">
             {/* Header */}
-            <UsersPageHeader
-              onRefresh={refetch}
-              onCreateUser={createDialog.open}
-            />
+            <UsersPageHeader onRefresh={refetch} onCreateUser={createDialog.open} />
 
             {/* Success/Error Messages */}
             {success && (
@@ -137,6 +182,9 @@ const OpsUsersTemplate: React.FC<OpsUsersTemplateProps> = ({ setSection }) => {
               users={filteredUsers}
               loading={loading}
               searchTerm={searchTerm}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSort={handleSort}
               onLinkClick={linkDialog.open}
               onRoleClick={roleDialog.open}
               onCreateUser={createDialog.open}

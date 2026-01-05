@@ -26,15 +26,18 @@ export interface CategoryInfo {
 export const CATEGORY_INFO: Record<string, CategoryInfo> = {
   negocios: {
     name: 'Negócios',
-    description: 'Estratégias, liderança e insights para empreendedores e executivos que querem transformar ideias em resultados.',
+    description:
+      'Estratégias, liderança e insights para empreendedores e executivos que querem transformar ideias em resultados.',
   },
   psicologia: {
     name: 'Psicologia',
-    description: 'Compreenda a mente humana, comportamentos e emoções para viver com mais consciência e equilíbrio.',
+    description:
+      'Compreenda a mente humana, comportamentos e emoções para viver com mais consciência e equilíbrio.',
   },
   filosofia: {
     name: 'Filosofia',
-    description: 'Questões fundamentais sobre existência, ética e conhecimento que moldaram o pensamento humano.',
+    description:
+      'Questões fundamentais sobre existência, ética e conhecimento que moldaram o pensamento humano.',
   },
   tecnologia: {
     name: 'Tecnologia',
@@ -99,9 +102,9 @@ export const CATEGORY_STYLES: Record<string, StyleConfig> = {
   produtividade: { icon: 'clock', color: 'bg-cyan-500' },
   lideranca: { icon: 'crown', color: 'bg-orange-500' },
   financas: { icon: 'coins', color: 'bg-green-500' },
-  criatividade: { icon: 'spark', color: 'bg-fuchsia-500' },
-  comunicacao: { icon: 'comments', color: 'bg-indigo-500' },
-  espiritualidade: { icon: 'peace', color: 'bg-violet-500' },
+  criatividade: { icon: 'sparkles', color: 'bg-fuchsia-500' },
+  comunicacao: { icon: 'chat-bubble', color: 'bg-indigo-500' },
+  espiritualidade: { icon: 'infinity', color: 'bg-violet-500' },
   default: { icon: 'book', color: 'bg-brand-gold' },
 };
 
@@ -111,7 +114,8 @@ export const CATEGORY_STYLES: Record<string, StyleConfig> = {
 export const COLLECTION_INFO: Record<string, CategoryInfo> = {
   mente_alta_performance: {
     name: 'Mente de Alta Performance',
-    description: 'Desenvolva foco, disciplina e mentalidade vencedora para alcançar resultados extraordinários.',
+    description:
+      'Desenvolva foco, disciplina e mentalidade vencedora para alcançar resultados extraordinários.',
   },
   visoes_do_futuro: {
     name: 'Visões do Futuro',
@@ -143,7 +147,11 @@ export const COLLECTION_INFO: Record<string, CategoryInfo> = {
  * Get collection name in Portuguese (falls back to formatted slug)
  */
 export const getCollectionName = (slug: string): string =>
-  COLLECTION_INFO[slug]?.name || slug.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  COLLECTION_INFO[slug]?.name ||
+  slug
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
 
 /**
  * Get collection description in Portuguese

@@ -2,22 +2,65 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card';
 import { Button } from '../../../ui/button';
 import { Icon } from '../../../ui/icon';
+import { cn } from '../../../../lib/utils';
 import { UserTableRow } from './UserTableRow';
-import type { UserManagementView } from '../types';
+import type { UserManagementView, UserSortKey, SortOrder } from '../types';
 
 interface UsersTableProps {
   users: UserManagementView[];
   loading: boolean;
   searchTerm: string;
+  sortBy: UserSortKey;
+  sortOrder: SortOrder;
+  onSort: (key: UserSortKey) => void;
   onLinkClick: (user: UserManagementView) => void;
   onRoleClick: (user: UserManagementView) => void;
   onCreateUser: () => void;
 }
 
+interface SortableHeaderProps {
+  label: string;
+  sortKey: UserSortKey;
+  currentSortBy: UserSortKey;
+  sortOrder: SortOrder;
+  onSort: (key: UserSortKey) => void;
+}
+
+const SortableHeader: React.FC<SortableHeaderProps> = ({
+  label,
+  sortKey,
+  currentSortBy,
+  sortOrder,
+  onSort,
+}) => {
+  const isActive = currentSortBy === sortKey;
+
+  return (
+    <th
+      className={cn(
+        'cursor-pointer select-none pb-3 pr-4 transition-colors hover:text-foreground',
+        isActive && 'text-foreground'
+      )}
+      onClick={() => onSort(sortKey)}
+    >
+      <div className="flex items-center gap-1.5">
+        {label}
+        <Icon
+          name={isActive ? (sortOrder === 'asc' ? 'arrow-up' : 'arrow-down') : 'sort-alt'}
+          className={cn('size-3', isActive ? 'opacity-100' : 'opacity-40')}
+        />
+      </div>
+    </th>
+  );
+};
+
 export const UsersTable: React.FC<UsersTableProps> = ({
   users,
   loading,
   searchTerm,
+  sortBy,
+  sortOrder,
+  onSort,
   onLinkClick,
   onRoleClick,
   onCreateUser,
@@ -42,12 +85,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({
               {searchTerm ? 'Nenhum usuário encontrado' : 'Nenhum usuário cadastrado'}
             </p>
             {!searchTerm && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-4"
-                onClick={onCreateUser}
-              >
+              <Button variant="outline" size="sm" className="mt-4" onClick={onCreateUser}>
                 <Icon name="user-add" className="mr-2 size-4" />
                 Convidar primeiro usuário
               </Button>
@@ -58,11 +96,29 @@ export const UsersTable: React.FC<UsersTableProps> = ({
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border/50 text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="pb-3 pr-4">Usuário</th>
-                  <th className="pb-3 pr-4">Role</th>
+                  <SortableHeader
+                    label="Usuário"
+                    sortKey="user"
+                    currentSortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={onSort}
+                  />
+                  <SortableHeader
+                    label="Role"
+                    sortKey="role"
+                    currentSortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={onSort}
+                  />
                   <th className="pb-3 pr-4">Áreas</th>
                   <th className="pb-3 pr-4">Mind</th>
-                  <th className="pb-3 pr-4">Último Login</th>
+                  <SortableHeader
+                    label="Último Login"
+                    sortKey="last_login"
+                    currentSortBy={sortBy}
+                    sortOrder={sortOrder}
+                    onSort={onSort}
+                  />
                   <th className="pb-3 text-right">Ações</th>
                 </tr>
               </thead>

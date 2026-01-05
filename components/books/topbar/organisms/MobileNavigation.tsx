@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '@/components/ui/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Section } from '@/types';
 import { useAuth } from '@/lib/AuthContext';
+import { useRBAC } from '@/hooks/useRBAC';
 import { NAV_ITEMS, type NavItem } from '../types';
 
 interface MobileNavigationProps {
@@ -28,6 +29,8 @@ const getNavIcon = (section: Section): string => {
       return 'globe';
     case Section.APP_BOOKS_AUTHORS:
       return 'users';
+    case Section.APP_BOOKS_ADMIN:
+      return 'edit';
     default:
       return 'star';
   }
@@ -42,11 +45,25 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { isCollaboratorOrAbove } = useRBAC();
+
+  // Add "Editar" for users with edit permissions (admin, owner, collaborator)
+  const navItems = useMemo(() => {
+    const items = [...NAV_ITEMS];
+    if (isCollaboratorOrAbove) {
+      items.push({
+        label: 'Editar',
+        section: Section.APP_BOOKS_ADMIN,
+        path: '/books/admin',
+      });
+    }
+    return items;
+  }, [isCollaboratorOrAbove]);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-xl md:hidden">
       <div className="flex h-14 items-center justify-around px-4">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const isActive =
             currentSection === item.section ||
             (isHighlightsPage && item.section === Section.APP_BOOKS_MY_LIBRARY);
@@ -80,26 +97,19 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
             <DropdownMenuTrigger asChild>
               <button className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-all active:scale-95">
                 <Avatar className="h-7 w-7">
-                  {user.avatarUrl && (
-                    <AvatarImage src={user.avatarUrl} alt={user.email || ''} />
-                  )}
+                  {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.email || ''} />}
                   <AvatarFallback className="bg-muted text-[9px] font-bold text-foreground">
                     {(user.email || 'U').substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-xl border-border mb-2">
+            <DropdownMenuContent align="end" className="mb-2 w-56 rounded-xl border-border">
               <div className="px-3 py-2">
-                <p className="truncate text-sm font-medium text-foreground">
-                  {user.email}
-                </p>
+                <p className="truncate text-sm font-medium text-foreground">{user.email}</p>
               </div>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => navigate('/books/admin')}
-                className="cursor-pointer"
-              >
+              <DropdownMenuItem onClick={() => navigate('/books/admin')} className="cursor-pointer">
                 <Icon name="settings" size="size-4" className="mr-2" />
                 Admin
               </DropdownMenuItem>

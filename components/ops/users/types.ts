@@ -83,22 +83,58 @@ export interface SelectOption {
 // ============================================================================
 
 export const ROLE_CONFIG: Record<RoleId, { color: string; bgColor: string; label: string }> = {
-  owner: { color: 'text-purple-600 dark:text-purple-400', bgColor: 'bg-purple-500/10', label: 'Proprietário' },
+  owner: {
+    color: 'text-purple-600 dark:text-purple-400',
+    bgColor: 'bg-purple-500/10',
+    label: 'Proprietário',
+  },
   admin: { color: 'text-blue-600 dark:text-blue-400', bgColor: 'bg-blue-500/10', label: 'Admin' },
-  collaborator: { color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-500/10', label: 'Colaborador' },
-  student: { color: 'text-amber-600 dark:text-amber-400', bgColor: 'bg-amber-500/10', label: 'Aluno' },
-  free_user: { color: 'text-gray-600 dark:text-gray-400', bgColor: 'bg-gray-500/10', label: 'Free' },
+  collaborator: {
+    color: 'text-green-600 dark:text-green-400',
+    bgColor: 'bg-green-500/10',
+    label: 'Colaborador',
+  },
+  student: {
+    color: 'text-amber-600 dark:text-amber-400',
+    bgColor: 'bg-amber-500/10',
+    label: 'Aluno',
+  },
+  free_user: {
+    color: 'text-gray-600 dark:text-gray-400',
+    bgColor: 'bg-gray-500/10',
+    label: 'Free',
+  },
 };
 
 export const AREA_CONFIG: Record<AreaType, { color: string; label: string }> = {
   mkt: { color: 'bg-pink-500/20 text-pink-700 dark:text-pink-300', label: 'MKT' },
-  pedagogico: { color: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300', label: 'Pedagógico' },
-  financeiro: { color: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300', label: 'Financeiro' },
+  pedagogico: {
+    color: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300',
+    label: 'Pedagógico',
+  },
+  financeiro: {
+    color: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300',
+    label: 'Financeiro',
+  },
   conteudo: { color: 'bg-orange-500/20 text-orange-700 dark:text-orange-300', label: 'Conteúdo' },
   suporte: { color: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300', label: 'Suporte' },
   tech: { color: 'bg-violet-500/20 text-violet-700 dark:text-violet-300', label: 'Tech' },
 };
 
-export const ALL_AREAS: AreaType[] = ['mkt', 'pedagogico', 'financeiro', 'conteudo', 'suporte', 'tech'];
+export const ALL_AREAS: AreaType[] = [
+  'mkt',
+  'pedagogico',
+  'financeiro',
+  'conteudo',
+  'suporte',
+  'tech',
+];
 
 export const ALL_ROLES: RoleId[] = ['owner', 'admin', 'collaborator', 'student', 'free_user'];
+
+// ============================================================================
+// Sorting Types
+// ============================================================================
+
+export type UserSortKey = 'user' | 'role' | 'last_login';
+export type SortOrder = 'asc' | 'desc';

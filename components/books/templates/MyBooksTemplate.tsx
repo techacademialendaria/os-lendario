@@ -52,10 +52,10 @@ const LuxuryButton = ({
   <button
     onClick={onClick}
     className={cn(
-      'h-16 px-12 rounded-[2rem] font-black uppercase tracking-[0.25em] text-[11px] transition-all duration-300 active:scale-[0.98]',
+      'h-16 rounded-[2rem] px-12 text-[11px] font-black uppercase tracking-[0.25em] transition-all duration-300 active:scale-[0.98]',
       variant === 'primary'
-        ? 'bg-[#FAFAFA] text-[#050505] hover:bg-white shadow-[0_20px_60px_rgba(0,0,0,0.3)]'
-        : 'bg-transparent text-[#FAFAFA] border border-white/20 hover:border-white/40 hover:bg-white/5',
+        ? 'bg-[#FAFAFA] text-[#050505] shadow-[0_20px_60px_rgba(0,0,0,0.3)] hover:bg-white'
+        : 'border border-white/20 bg-transparent text-[#FAFAFA] hover:border-white/40 hover:bg-white/5',
       className
     )}
   >
@@ -88,7 +88,12 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
   const isNotesTab = selectedFilter === 'notes';
 
   // For notes tab, use useAllHighlights; for others use useMyBooks
-  const { books: myBooks, stats, isLoading: myBooksLoading, error: myBooksError } = useMyBooks(
+  const {
+    books: myBooks,
+    stats,
+    isLoading: myBooksLoading,
+    error: myBooksError,
+  } = useMyBooks(
     isNotesTab ? undefined : (selectedFilter as 'read' | 'reading' | 'want_to_read' | 'favorite')
   );
 
@@ -150,7 +155,7 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
   const fullName = user?.fullName || 'Leitor Lendário';
 
   // Inspirational quote
-  const quote = "O conhecimento é o único ativo que não pode ser confiscado.";
+  const quote = 'O conhecimento é o único ativo que não pode ser confiscado.';
 
   if (error) {
     return (
@@ -159,7 +164,11 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
           <Icon name="exclamation" className="mx-auto text-red-500" size="size-12" />
           <h2 className="text-xl font-bold text-[#FAFAFA]">Erro ao carregar biblioteca</h2>
           <p className="text-[#666666]">{error.message}</p>
-          <Button onClick={() => window.location.reload()} variant="outline" className="border-white/20 text-[#FAFAFA] hover:bg-white/5">
+          <Button
+            onClick={() => window.location.reload()}
+            variant="outline"
+            className="border-white/20 text-[#FAFAFA] hover:bg-white/5"
+          >
             Tentar novamente
           </Button>
         </div>
@@ -172,10 +181,9 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
       <BooksTopbar currentSection={Section.APP_BOOKS_MY_LIBRARY} setSection={setSection} />
 
       {/* Hero Section - Luxury Minimal */}
-      <section className="pt-16 pb-20 md:pt-24 md:pb-28">
+      <section className="pb-20 pt-16 md:pb-28 md:pt-24">
         <div className="mx-auto max-w-7xl px-8">
           <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12">
-
             {/* Welcome Message - Left */}
             <div className="space-y-8 lg:col-span-7">
               {/* Main Heading */}
@@ -183,18 +191,16 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
                 <h1 className="text-5xl font-bold tracking-tight text-[#FAFAFA] md:text-7xl">
                   Bem-vindo,
                 </h1>
-                <p className="font-serif text-5xl italic text-[#E8DCC4] md:text-7xl">
-                  {fullName}.
-                </p>
+                <p className="font-serif text-5xl italic text-[#E8DCC4] md:text-7xl">{fullName}.</p>
               </div>
 
               {/* Quote */}
-              <p className="font-serif text-lg italic text-[#666666] md:text-xl max-w-lg leading-relaxed">
+              <p className="max-w-lg font-serif text-lg italic leading-relaxed text-[#666666] md:text-xl">
                 "{quote}"
               </p>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-5 pt-6">
+              {/* Action Buttons - Hidden on mobile */}
+              <div className="hidden flex-wrap gap-5 pt-6 md:flex">
                 <LuxuryButton variant="primary" onClick={() => navigate('/books')}>
                   Continuar Lendo
                 </LuxuryButton>
@@ -204,9 +210,60 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
               </div>
             </div>
 
-            {/* Streak Card - Luxo 2.0 */}
-            <div className="lg:col-span-5">
+            {/* Streak Card - Desktop only */}
+            <div className="hidden lg:col-span-5 lg:block">
               <LmsStreakCard count={currentStreak} days={streakDays} />
+            </div>
+          </div>
+
+          {/* Mobile Streak Card - Full width */}
+          <div className="mt-8 md:hidden">
+            <div className="rounded-3xl border border-white/10 bg-[#0A0A0A] p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#5C4A1F]">
+                    <Icon name="flame" type="solid" size="size-7" className="text-[#FF9500]" />
+                  </div>
+                  <div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-black text-white">{currentStreak}</span>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#FF9500]">
+                        dias de ofensiva
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Week Progress - Full width */}
+              <div className="flex items-center justify-between">
+                {streakDays.map((day, i) => (
+                  <div key={i} className="flex flex-col items-center gap-2">
+                    <div
+                      className={cn(
+                        'flex h-10 w-10 items-center justify-center rounded-full transition-all',
+                        day.isActive && 'bg-[#FF9500] shadow-[0_0_12px_rgba(255,149,0,0.5)]',
+                        !day.isActive && !day.isToday && 'bg-[#1A1A1A]',
+                        day.isToday && !day.isActive && 'bg-transparent ring-2 ring-[#FF9500]'
+                      )}
+                    >
+                      {day.isActive ? (
+                        <Icon name="check" size="size-4" className="text-white" strokeWidth={3} />
+                      ) : (
+                        <div className="h-1.5 w-1.5 rounded-full bg-white/20" />
+                      )}
+                    </div>
+                    <span
+                      className={cn(
+                        'text-[10px] font-bold uppercase',
+                        day.isToday ? 'text-[#FF9500]' : 'text-[#3A3A3A]'
+                      )}
+                    >
+                      {day.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -226,7 +283,7 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
               key={tab.value}
               onClick={() => setSelectedFilter(tab.value)}
               className={cn(
-                'relative pb-4 text-[11px] font-black uppercase tracking-[0.3em] transition-colors duration-300 whitespace-nowrap',
+                'relative whitespace-nowrap pb-4 text-[11px] font-black uppercase tracking-[0.3em] transition-colors duration-300',
                 selectedFilter === tab.value
                   ? 'text-[#FAFAFA]'
                   : 'text-[#555555] hover:text-[#888888]'
@@ -254,10 +311,10 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
               <Icon name="book-open" className="text-[#555555]" size="size-8" />
             </div>
             <div className="space-y-3">
-              <h3 className="text-xl font-bold text-[#FAFAFA] tracking-tight">
+              <h3 className="text-xl font-bold tracking-tight text-[#FAFAFA]">
                 Nenhum livro aqui ainda
               </h3>
-              <p className="mx-auto max-w-sm text-sm text-[#666666] leading-relaxed">
+              <p className="mx-auto max-w-sm text-sm leading-relaxed text-[#666666]">
                 Comece uma nova leitura na nossa biblioteca curada de conhecimento lendário.
               </p>
             </div>
