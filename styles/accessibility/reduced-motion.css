@@ -1,0 +1,24 @@
+/* ============================================================================
+   ACCESSIBILITY: Respect user's motion preference (WCAG 2.1 2.3.3)
+
+   Users with vestibular disorders, epilepsy, or motion sensitivity can disable
+   animations through their OS settings. This media query ensures animations
+   complete instantly, preventing seizures and motion-related discomfort.
+
+   Testing:
+   - Chrome DevTools → Rendering → Emulate CSS media feature → prefers-reduced-motion
+   - macOS: System Preferences → Accessibility → Display → Reduce motion
+   - iOS: Settings → Accessibility → Motion → Reduce Motion
+   - Windows: Settings → Ease of Access → Display → Show animations OFF
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

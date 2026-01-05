@@ -6,28 +6,28 @@ import { useTheme } from '../../lib/ThemeContext';
 import DesignSystemTopbar from './DesignSystemTopbar';
 
 // Lazy load all sections for code splitting
-const IdentitySection = React.lazy(() => import('./IdentitySection'));
-const ColorSection = React.lazy(() => import('./ColorSection'));
+const IdentitySection = React.lazy(() => import('./identity-section').then(m => ({ default: m.IdentitySection })));
+const ColorSection = React.lazy(() => import('./color-section').then(m => ({ default: m.ColorSection })));
 const TypographySection = React.lazy(() => import('./TypographySection'));
 const SpacingSection = React.lazy(() => import('./SpacingSection'));
-const IconSection = React.lazy(() => import('./IconSection'));
-const ListSection = React.lazy(() => import('./ListSection'));
+const IconSection = React.lazy(() => import('./icon-section').then(m => ({ default: m.IconSection })));
+const ListSection = React.lazy(() => import('./list-section').then(m => ({ default: m.ListSection })));
 const MotionSection = React.lazy(() => import('./MotionSection'));
 const GraphSection = React.lazy(() => import('./GraphSection'));
 const ChartsSection = React.lazy(() => import('./ChartsSection'));
-const ComponentSection = React.lazy(() => import('./ComponentSection'));
+const ComponentSection = React.lazy(() => import('./component-section').then(m => ({ default: m.ComponentSection })));
 const ButtonSection = React.lazy(() => import('./ButtonSection'));
 const AdvancedUISection = React.lazy(() => import('./AdvancedUISection'));
-const FeedbackSection = React.lazy(() => import('./FeedbackSection'));
+const FeedbackSection = React.lazy(() => import('./feedback-section').then(m => ({ default: m.FeedbackSection })));
 const StatesSection = React.lazy(() => import('./StatesSection'));
-const CardsSection = React.lazy(() => import('./CardsSection'));
-const FormSection = React.lazy(() => import('./FormSection'));
-const TableSection = React.lazy(() => import('./TableSection'));
-const TokensSection = React.lazy(() => import('./TokensSection'));
+const CardsSection = React.lazy(() => import('./cards-section').then(m => ({ default: m.CardsSection })));
+const FormSection = React.lazy(() => import('./form-section').then(m => ({ default: m.FormSection })));
+const TableSection = React.lazy(() => import('./tables').then(m => ({ default: m.TableSection })));
+const TokensSection = React.lazy(() => import('./tokens').then(m => ({ default: m.TokensSection })));
 const DocsSection = React.lazy(() => import('./DocsSection'));
 const AiManualSection = React.lazy(() => import('./AiManualSection'));
 const LegendaryVsMediocreSection = React.lazy(() => import('./LegendaryVsMediocreSection'));
-const SidebarLegacy = React.lazy(() => import('./SidebarLegacy'));
+const LendarioLuxeSection = React.lazy(() => import('./lendario-luxe').then(m => ({ default: m.LendarioLuxeSection })));
 
 // Lazy load shared templates
 const CmsTemplate = React.lazy(() => import('../shared/templates/CmsTemplate'));
@@ -50,42 +50,6 @@ const SectionLoading: React.FC = () => (
   </div>
 );
 
-// Wrapper for sidebar legacy (needs special handling)
-const SidebarLegacyWrapper: React.FC<{
-  isDark: boolean;
-  currentTheme: string;
-  language: string;
-}> = ({ isDark, currentTheme, language }) => (
-  <div className="relative flex h-[800px] w-full overflow-hidden rounded-xl border border-border bg-background shadow-2xl">
-    <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-muted/20">
-      <div className="rounded-lg border border-primary/50 bg-background/80 p-4 font-bold text-primary shadow-lg backdrop-blur-sm">
-        Modo de Visualização: Sidebar Histórica (v4.0)
-      </div>
-    </div>
-    <div className="relative z-0 h-full">
-      <Suspense fallback={<SectionLoading />}>
-        <SidebarLegacy
-          currentSection={Section.CONCEPT}
-          setSection={() => { }}
-          isDark={isDark}
-          toggleTheme={() => { }}
-          isCollapsed={false}
-          toggleCollapse={() => { }}
-          currentThemeName={currentTheme}
-          setThemeName={() => { }}
-          currentLanguage={language}
-          setLanguage={() => { }}
-          isMobileOpen={false}
-          closeMobileMenu={() => { }}
-          className="absolute relative h-full"
-        />
-      </Suspense>
-    </div>
-    <div className="flex-1 bg-card p-12">
-      <h2 className="text-3xl font-bold text-muted-foreground opacity-20">Conteúdo da Página</h2>
-    </div>
-  </div>
-);
 
 const DesignSystemRouter: React.FC<DesignSystemRouterProps> = ({
   setSection,
@@ -103,6 +67,7 @@ const DesignSystemRouter: React.FC<DesignSystemRouterProps> = ({
             <Route path="concept" element={<ComponentSection />} />
             <Route path="identity" element={<IdentitySection />} />
             <Route path="legendary-vs-mediocre" element={<LegendaryVsMediocreSection />} />
+            <Route path="lendario-luxe" element={<LendarioLuxeSection />} />
             <Route
               path="colors"
               element={<ColorSection isDark={isDark} currentTheme={currentTheme} />}
@@ -129,16 +94,6 @@ const DesignSystemRouter: React.FC<DesignSystemRouterProps> = ({
             <Route path="templates/cms" element={<CmsTemplate />} />
             <Route path="templates/kanban" element={<KanbanTemplate />} />
             <Route path="templates/settings" element={<SaasSettingsTemplate />} />
-            <Route
-              path="templates/sidebar-legacy"
-              element={
-                <SidebarLegacyWrapper
-                  isDark={isDark}
-                  currentTheme={currentTheme}
-                  language={language}
-                />
-              }
-            />
 
             {/* Default redirect */}
             <Route path="*" element={<Navigate to="/design/concept" replace />} />

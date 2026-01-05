@@ -1,0 +1,126 @@
+/* =============================================================================
+   PRINT STYLES - Optimized for printing articles
+
+   Based on research best practices:
+   - Remove navigation, progress bars, interactive elements
+   - Optimize typography for print (12pt body)
+   - Show link URLs after anchor text
+   - Proper page breaks
+   ============================================================================= */
+
+@media print {
+  /* Hide non-essential elements */
+  .reading-progress,
+  .reading-progress__bar,
+  .reading-time-badge,
+  header,
+  nav,
+  footer,
+  .sidebar,
+  button,
+  .btn,
+  [role="navigation"],
+  [role="banner"],
+  [role="contentinfo"],
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset backgrounds and colors */
+  body,
+  .reading-container,
+  .prose,
+  article {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Typography for print */
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  .reading-article,
+  .prose {
+    font-size: 12pt;
+    line-height: 1.5;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  h1 { font-size: 24pt; margin-top: 0; }
+  h2 { font-size: 18pt; margin-top: 24pt; }
+  h3 { font-size: 14pt; margin-top: 18pt; }
+  h4 { font-size: 12pt; margin-top: 12pt; }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Show URLs for links */
+  .prose a[href^="http"]::after,
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+    word-break: break-all;
+  }
+
+  /* Don't show URL for internal links */
+  a[href^="#"]::after,
+  a[href^="/"]::after {
+    content: none;
+  }
+
+  /* Page breaks */
+  h1, h2, h3, h4 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  img, figure, table, blockquote {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Blockquotes */
+  blockquote {
+    border-left: 3pt solid #ccc;
+    padding-left: 12pt;
+    margin-left: 0;
+    font-style: italic;
+  }
+
+  /* Code blocks */
+  pre, code {
+    font-size: 10pt;
+    background: #f5f5f5 !important;
+    border: 1pt solid #ddd;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1pt solid #ddd;
+    padding: 6pt;
+    text-align: left;
+  }
+
+  th {
+    background: #f5f5f5 !important;
+    font-weight: bold;
+  }
+}

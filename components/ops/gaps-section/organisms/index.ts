@@ -1,0 +1,11 @@
+export { GapsCriticalDiagram } from './GapsCriticalDiagram';
+export { GapsQuickStats } from './GapsQuickStats';
+export { GapsSummaryTable } from './GapsSummaryTable';
+export { DependencyChainView } from './DependencyChainView';
+export { GapImpactAnalysis } from './GapImpactAnalysis';
+export { CurrentDataStatus } from './CurrentDataStatus';
+export { ResolutionRoadmap } from './ResolutionRoadmap';
+export { QuickWinsView } from './QuickWinsView';
+export { ProposedTablesView } from './ProposedTablesView';
+export { FitScoreFormula } from './FitScoreFormula';
+export { ExecutiveSummary } from './ExecutiveSummary';

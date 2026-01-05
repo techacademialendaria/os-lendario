@@ -3,7 +3,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { MindData } from '../components/minds/ui/MindCard';
 import { MOCK_PSYCHOMETRICS } from '../services/psychometrics';
 
-// List of slugs that have real avatar images in /public/minds-profile-images/
+// List of slugs that have real avatar images in /public/minds/
 const MINDS_WITH_AVATAR = new Set([
   'aaron_beck',
   'abilio_diniz',
@@ -201,9 +201,9 @@ const generateAvatar = (slug: string, dbAvatarUrl?: string | null): string => {
     return dbAvatarUrl;
   }
 
-  // Use local image from /public/minds-profile-images/{slug}.jpg
+  // Use local image from /public/minds/{slug}.jpg
   // The slug format matches image filenames (e.g., carl_jung, albert_einstein)
-  return `/minds-profile-images/${slug}.jpg`;
+  return `/minds/${slug}.jpg`;
 };
 
 // DiceBear fallback URL for missing images

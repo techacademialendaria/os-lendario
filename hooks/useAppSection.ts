@@ -87,12 +87,20 @@ export function useAppSection(options: UseAppSectionOptions = {}) {
 
   // Get effective theme based on current section
   const getEffectiveTheme = useCallback((section: Section): ThemeName => {
+    // PRIORITY: Check URL path FIRST for special routes
+    // This must come before section checks because unmatched routes default to sales template
+    if (location.pathname.startsWith('/auth/')) return 'Gold';
+    if (location.pathname.startsWith('/design/')) return 'Gold';
+    if (location.pathname.startsWith('/books/')) return 'Gold';
+
+    // Section-based theme selection
     if (isSalesApp(section)) return 'SalesRed';
     if (isMindsApp(section)) return 'Teal';
     if (isCreatorApp(section)) return 'Creator';
     if (isPRDApp(section)) return 'PRDStudio';
+    if (isDesignSystemApp(section)) return 'Gold';
     return currentTheme;
-  }, [currentTheme]);
+  }, [currentTheme, location.pathname]);
 
   // Apply Theme & Dark Mode
   useEffect(() => {

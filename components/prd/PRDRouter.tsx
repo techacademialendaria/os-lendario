@@ -5,15 +5,15 @@ import { Section } from '../../types';
 import type { EpicData, StoryData, PRDEpic, PRDStory } from '../../types/prd';
 import { usePRDProject } from '../../hooks/prd/usePRDProject';
 import PRDTopbar from './PRDTopbar';
-import PRDDashboardTemplate from './templates/PRDDashboardTemplate';
+import PRDDashboardTemplate from './dashboard-template';
 import PRDNewTemplate from './templates/PRDNewTemplate';
 import PRDUploadTemplate from './templates/PRDUploadTemplate';
-import PRDBriefTemplate from './templates/PRDBriefTemplate';
-import PRDDocumentTemplate from './templates/PRDDocumentTemplate';
-import PRDEpicsTemplate from './templates/PRDEpicsTemplate';
-import PRDStoriesTemplate from './templates/PRDStoriesTemplate';
-import PRDExportTemplate from './templates/PRDExportTemplate';
-import PRDProjectDetailTemplate from './templates/PRDProjectDetailTemplate';
+import PRDBriefTemplate from './brief-template';
+import PRDDocumentTemplate from './document-template';
+import PRDEpicsTemplate from './epics-template';
+import PRDStoriesTemplate from './stories-template';
+import PRDExportTemplate from './export-template';
+import PRDProjectDetailTemplate from './project-detail';
 import { getSectionFromPath } from '../../routes';
 
 // =============================================================================
@@ -134,87 +134,8 @@ const PRDEpicsEditor: React.FC<{ setSection: (s: Section) => void }> = ({ setSec
   );
 };
 
-// Stories editor wrapper
-const PRDStoriesEditor: React.FC<{ setSection: (s: Section) => void }> = ({ setSection }) => {
-  const location = useLocation();
-  const { slug } = useParams<{ slug: string }>();
-  const { project, updateProject, epics, stories, loadContents, contentsLoading } = usePRDProject(
-    slug || ''
-  );
-  const currentSection = getSectionFromPath(location.pathname) || Section.STUDIO_PRD_EDITOR;
-
-  // ALL HOOKS MUST BE BEFORE ANY CONDITIONAL RETURNS
-
-  // Transform database data to template format
-  const epicDataList = React.useMemo(() => {
-    return epics.map(transformPRDEpicToEpicData);
-  }, [epics]);
-
-  const storyDataList = React.useMemo(() => {
-    return stories.map(transformPRDStoryToStoryData);
-  }, [stories]);
-
-  // Load epics and stories from database
-  React.useEffect(() => {
-    if (project) {
-      loadContents();
-    }
-  }, [project, loadContents]);
-
-  // Handlers
-  const handleUpdateStories = async (newStories: StoryData[]) => {
-    if (!project) return;
-    await updateProject({ stories: newStories });
-  };
-
-  const handleUpdateEpics = async (newEpics: EpicData[]) => {
-    if (!project) return;
-    await updateProject({ epics: newEpics });
-  };
-
-  const handleNext = () => {
-    window.location.href = `/prd/${slug}/exportar`;
-  };
-
-  // CONDITIONAL RETURNS AFTER ALL HOOKS
-  if (!project) {
-    return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <PRDTopbar currentSection={currentSection} setSection={setSection} />
-        <main className="flex flex-1 items-center justify-center">
-          <p className="text-muted-foreground">Carregando projeto...</p>
-        </main>
-      </div>
-    );
-  }
-
-  if (contentsLoading) {
-    return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <PRDTopbar currentSection={currentSection} setSection={setSection} />
-        <main className="flex flex-1 items-center justify-center">
-          <p className="text-muted-foreground">Carregando stories...</p>
-        </main>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <PRDTopbar currentSection={currentSection} setSection={setSection} />
-      <main className="flex-1">
-        <PRDStoriesTemplate
-          project={project}
-          initialEpics={epicDataList}
-          initialStories={storyDataList}
-          onUpdateStories={handleUpdateStories}
-          onUpdateEpics={handleUpdateEpics}
-          onNext={handleNext}
-        />
-      </main>
-    </div>
-  );
-};
+// Stories editor wrapper - now using atomic design pattern
+// The PRDStoriesTemplate handles its own data fetching internally
 
 // Export editor wrapper
 const PRDExportEditor: React.FC<{ setSection: (s: Section) => void }> = ({ setSection }) => {
@@ -272,8 +193,8 @@ const PRDRouter: React.FC<PRDRouterProps> = ({ setSection }) => {
       {/* Phase 4: Épicos */}
       <Route path="/:slug/epicos" element={<PRDEpicsEditor setSection={setSection} />} />
 
-      {/* Phase 5: Stories */}
-      <Route path="/:slug/stories" element={<PRDStoriesEditor setSection={setSection} />} />
+      {/* Phase 5: Stories (atomic design - handles own data) */}
+      <Route path="/:slug/stories" element={<PRDStoriesTemplate setSection={setSection} />} />
 
       {/* Phase 6: Exportar */}
       <Route path="/:slug/exportar" element={<PRDExportEditor setSection={setSection} />} />

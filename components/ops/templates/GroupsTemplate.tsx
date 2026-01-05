@@ -1,14 +1,23 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { Section } from '../../../types';
 import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
 import { cn } from '../../../lib/utils';
 import LearnTopbar from '../../learn/LearnTopbar';
-import { GroupsOverview } from '../groups/GroupsOverview';
-import { GroupsDashboard } from '../groups/GroupsDashboard';
-import { GroupsReports } from '../groups/GroupsReports';
 import { useGroups } from '../../../hooks/useGroups';
 import { ScrollArea } from '../../ui/scroll-area';
+
+// Lazy load heavy components
+const GroupsOverview = React.lazy(() => import('../groups/GroupsOverview').then(m => ({ default: m.GroupsOverview })));
+const GroupsDashboard = React.lazy(() => import('../groups-dashboard').then(m => ({ default: m.GroupsDashboard })));
+const GroupsReports = React.lazy(() => import('../groups-reports').then(m => ({ default: m.GroupsReports })));
+
+// Loading fallback
+const SectionLoader: React.FC = () => (
+  <div className="flex items-center justify-center min-h-[400px]">
+    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
+  </div>
+);
 
 interface GroupsTemplateProps {
   setSection: (s: Section) => void;
@@ -281,7 +290,9 @@ const GroupsTemplate: React.FC<GroupsTemplateProps> = ({ setSection }) => {
 
             {/* Render Active Section */}
             <div className="min-h-[500px]">
-              {renderContent()}
+              <Suspense fallback={<SectionLoader />}>
+                {renderContent()}
+              </Suspense>
             </div>
           </div>
         </main>

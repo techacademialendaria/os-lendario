@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import LmsCourseGridTemplate from './templates/LmsCourseGridTemplate';
-import LmsCourseDetailTemplate from './templates/LmsCourseDetailTemplate';
-import LmsStudentTemplate from './templates/LmsStudentTemplate';
+import { LmsCourseDetailTemplate } from './course-detail';
+import LmsStudentTemplate from './templates/lms-student';
 
 export default function LmsRouter() {
   return (

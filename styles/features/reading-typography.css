@@ -1,0 +1,97 @@
+/* =============================================================================
+   READING TYPOGRAPHY OPTIMIZATIONS
+
+   Baseado em estudos de legibilidade e retenção de leitura:
+   - Orphans/Widows: Evita linhas isoladas no topo/fim de parágrafos
+   - Hyphens: Melhora justificação e evita "rios" de espaço em branco
+   - Word spacing: Otimiza espaçamento entre palavras
+   ============================================================================ */
+
+/* Aplicar a todo conteúdo de leitura */
+.prose p,
+.reading-article p,
+.reading-text p {
+  orphans: 2;
+  widows: 2;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+}
+
+/* Blockquotes com estilo de citação premium */
+.prose blockquote::before {
+  content: '"';
+  position: absolute;
+  left: 1rem;
+  top: 0.5rem;
+  font-size: 3rem;
+  font-family: Georgia, serif;
+  color: hsl(var(--primary) / 0.2);
+  line-height: 1;
+}
+
+/* Lead paragraph (primeiro parágrafo destacado) */
+.lead-paragraph,
+.prose > p:first-of-type {
+  font-size: 1.125em;
+  line-height: 1.7;
+}
+
+/* Drop cap (primeira letra grande) - opcional via classe */
+.drop-cap::first-letter {
+  float: left;
+  font-size: 3.5em;
+  line-height: 0.8;
+  font-weight: bold;
+  margin-right: 0.1em;
+  color: hsl(var(--primary));
+}
+
+/* Section break ornament */
+.section-break {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 3rem 0;
+}
+
+.section-break::before,
+.section-break::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, hsl(var(--border)), transparent);
+}
+
+.section-break-dots {
+  display: flex;
+  gap: 0.375rem;
+}
+
+.section-break-dots span {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: hsl(var(--primary) / 0.5);
+}
+
+/* Nested lists spacing */
+.prose ul ul,
+.prose ol ol,
+.prose ul ol,
+.prose ol ul {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Better link underlines for reading */
+.prose a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.prose a:hover {
+  text-decoration-thickness: 2px;
+}

@@ -49,9 +49,9 @@ interface AuthContextType {
   // Utils
   refreshUser: () => Promise<void>;
 
-  // OAuth methods (optional - may not be configured)
-  signInWithGoogle?: () => Promise<{ error: AuthError | null }>;
-  signInWithMagicLink?: (email: string) => Promise<{ error: AuthError | null }>;
+  // OAuth methods (disabled - return error)
+  signInWithGoogle: () => Promise<{ error: AuthError | null }>;
+  signInWithMagicLink: (email: string) => Promise<{ error: AuthError | null }>;
 }
 
 // ============================================================================
@@ -165,11 +165,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
 
         // 3. Return full user with mind data
+        const mindData = mind as { name?: string; avatar_url?: string };
         return {
           id: supabaseUser.id,
           email: supabaseUser.email ?? null,
-          fullName: mind.name ?? defaultUser.fullName,
-          avatarUrl: mind.avatar_url ?? defaultUser.avatarUrl,
+          fullName: mindData.name ?? defaultUser.fullName,
+          avatarUrl: mindData.avatar_url ?? defaultUser.avatarUrl,
           mindId: profile.mind_id,
         };
       })();
@@ -263,13 +264,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return { error };
   };
 
-  // OAuth methods - disabled until configured
+  // OAuth methods - currently disabled, return error message
   const signInWithGoogle = async () => {
     return {
       error: {
-        message: 'Google login not configured',
+        message: 'Google OAuth is temporarily disabled',
         name: 'AuthError',
-        status: 500,
+        status: 501,
       } as AuthError,
     };
   };
@@ -277,9 +278,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const signInWithMagicLink = async (_email: string) => {
     return {
       error: {
-        message: 'Magic link login not configured',
+        message: 'Magic Link login is temporarily disabled',
         name: 'AuthError',
-        status: 500,
+        status: 501,
       } as AuthError,
     };
   };
@@ -317,11 +318,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isAuthenticated: !!user,
         signInWithEmail,
         signUpWithEmail,
-        signInWithGoogle,
-        signInWithMagicLink,
         signOut,
         resetPassword,
         refreshUser,
+        signInWithGoogle,
+        signInWithMagicLink,
       }}
     >
       {children}

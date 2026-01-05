@@ -191,6 +191,33 @@ import {
   Wrench,
 } from 'iconoir-react';
 
+// Custom StarSolid component (filled star - Iconoir only has outline)
+const StarSolid: React.FC<React.SVGProps<SVGSVGElement>> = (props) =>
+  React.createElement('svg', {
+    xmlns: 'http://www.w3.org/2000/svg',
+    viewBox: '0 0 24 24',
+    fill: 'currentColor',
+    ...props,
+  }, React.createElement('path', {
+    d: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+  }));
+
+// Custom ArrowUpRight component (diagonal arrow for external links)
+const ArrowUpRight: React.FC<React.SVGProps<SVGSVGElement>> = (props) =>
+  React.createElement('svg', {
+    xmlns: 'http://www.w3.org/2000/svg',
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: '2',
+    strokeLinecap: 'round',
+    strokeLinejoin: 'round',
+    ...props,
+  }, [
+    React.createElement('line', { key: '1', x1: '7', y1: '17', x2: '17', y2: '7' }),
+    React.createElement('polyline', { key: '2', points: '7 7 17 7 17 17' }),
+  ]);
+
 // All valid icon names - TypeScript will catch invalid icons at build time
 export const iconMap = {
   // Navegação
@@ -348,6 +375,7 @@ export const iconMap = {
   folder: Folder,
   document: Page,
   star: Star,
+  'star-solid': StarSolid,
   heart: Heart,
   'map-marker': MapPin,
   road: PathArrow,
@@ -436,6 +464,7 @@ export const iconMap = {
   'play-circle': Play,
   'trend-up': StatUp,
   'external-link': ShareAndroid,
+  'arrow-up-right': ArrowUpRight,
   discord: ChatBubble,
   'flower-tulip': Heart,
   gym: User,

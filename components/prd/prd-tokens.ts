@@ -27,6 +27,22 @@ export const PRD_ACCENT = '#C9B298';
 export const PRD_BACKGROUND = '#1A1F2C';
 
 // =============================================================================
+// CORES SEMÂNTICAS
+// =============================================================================
+
+/** Azul - In Progress / Secondary items */
+export const PRD_BLUE = '#3B82F6';
+
+/** Verde - Success / Completed */
+export const PRD_GREEN = '#10B981';
+
+/** Cinza - Inactive / Non-objectives */
+export const PRD_GRAY = '#6B7280';
+
+/** Teal - Studio theme color */
+export const PRD_TEAL = '#00C7BE';
+
+// =============================================================================
 // BACKGROUNDS
 // =============================================================================
 

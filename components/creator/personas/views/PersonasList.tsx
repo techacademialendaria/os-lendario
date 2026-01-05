@@ -6,7 +6,7 @@ import { Badge } from '../../../ui/badge';
 import { Skeleton } from '../../../ui/skeleton';
 import { cn } from '../../../../lib/utils';
 import { PersonaCard } from '../ui';
-import type { PersonasView } from './PersonasDashboard';
+import type { PersonasView } from '../personas-dashboard';
 import type { Persona } from '../../../../hooks/useAudienceProfiles';
 
 interface PersonasListProps {

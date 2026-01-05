@@ -1,0 +1,69 @@
+/* =============================================================================
+   RESPONSIVE TYPOGRAPHY - Automatic font-size adjustments by viewport
+
+   Based on research:
+   - Mobile: 16px base, 35-50ch width
+   - Tablet: 17px base, 55-70ch width
+   - Desktop: 18px base, 60-75ch width
+   - Large: 18-21px base, 65-80ch width
+   ============================================================================= */
+
+/* Mobile (< 640px) */
+@media (max-width: 639px) {
+  :root {
+    --reading-font-size-default: 17px;
+    --reading-line-height: 1.65;
+  }
+
+  .reading-article,
+  .prose {
+    font-size: 17px;
+    line-height: 1.65;
+  }
+
+  .prose h1 { font-size: 1.75rem; }
+  .prose h2 { font-size: 1.5rem; }
+  .prose h3 { font-size: 1.25rem; }
+  .prose h4 { font-size: 1.125rem; }
+}
+
+/* Tablet (640px - 1023px) */
+@media (min-width: 640px) and (max-width: 1023px) {
+  :root {
+    --reading-font-size-default: 18px;
+    --reading-line-height: 1.6;
+  }
+
+  .reading-article,
+  .prose {
+    font-size: 18px;
+  }
+
+  .prose h1 { font-size: 2rem; }
+  .prose h2 { font-size: 1.75rem; }
+  .prose h3 { font-size: 1.375rem; }
+}
+
+/* Desktop (>= 1024px) */
+@media (min-width: 1024px) {
+  :root {
+    --reading-font-size-default: 19px;
+  }
+
+  .reading-article,
+  .prose {
+    font-size: 19px;
+  }
+}
+
+/* Large Desktop (>= 1280px) */
+@media (min-width: 1280px) {
+  :root {
+    --reading-font-size-default: 21px;
+  }
+
+  .reading-article,
+  .prose {
+    font-size: 21px;
+  }
+}

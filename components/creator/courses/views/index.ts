@@ -4,8 +4,8 @@
  * Extracted view components from CoursesTemplate for better modularity.
  */
 
-// List View
-export { CoursesListView, type CoursesListViewProps } from './CoursesListView';
+// List View - re-exported from organisms
+export { CoursesListView } from '../organisms';
 export type { Course } from '../types';
 
 // Workflow Views
@@ -21,6 +21,5 @@ export type { ValidationViewProps } from './ValidationView';
 // Wizard Views
 export { default as NewCourseWizard } from './NewCourseWizard';
 export { default as BriefEditorView } from './BriefEditorView';
-export { default as ResearchLoadingView } from './ResearchLoadingView';
 export { default as ResearchResultsView } from './ResearchResultsView';
 export { default as ReformulationView } from './ReformulationView';

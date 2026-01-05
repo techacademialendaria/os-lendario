@@ -1,0 +1,14 @@
+/* ============================================================================
+   HIGH CONTRAST MODE SUPPORT
+
+   For users who need increased contrast for better visibility.
+   ============================================================================ */
+
+@media (prefers-contrast: high) {
+  :root {
+    --reading-paper-text: #000000;
+    --reading-paper-bg: #FFFFFF;
+    --reading-night-text: #FFFFFF;
+    --reading-night-bg: #000000;
+  }
+}

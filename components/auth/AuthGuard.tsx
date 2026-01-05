@@ -6,8 +6,7 @@
  *   ... rotas protegidas ...
  * </Route>
  *
- * NOTA: Em localhost, a autenticação é bypassada para facilitar desenvolvimento.
- * Em produção, todas as rotas protegidas requerem login.
+ * Todas as rotas protegidas requerem login (inclusive localhost).
  */
 
 import React from 'react';
@@ -18,23 +17,9 @@ interface AuthGuardProps {
   children: React.ReactNode;
 }
 
-// Bypass auth em localhost para desenvolvimento
-const isLocalhost = () => {
-  return (
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1' ||
-    window.location.hostname.startsWith('192.168.')
-  );
-};
-
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-
-  // Em localhost, permite acesso sem autenticação
-  if (isLocalhost()) {
-    return <>{children}</>;
-  }
 
   // Show loading state while checking auth
   if (isLoading) {

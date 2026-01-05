@@ -4,4 +4,5 @@ export { FragmentDetailPanel } from './FragmentDetailPanel';
 export { FragmentEditForm } from './FragmentEditForm';
 export { FragmentDeleteDialog } from './FragmentDeleteDialog';
 export { FragmentBulkDeleteDialog } from './FragmentBulkDeleteDialog';
-export { FragmentCreateSheet } from './FragmentCreateSheet';
+// FragmentCreateSheet moved to ../fragment-create-sheet
+export { FragmentCreateSheet } from '../fragment-create-sheet';

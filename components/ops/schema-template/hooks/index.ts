@@ -1,0 +1,1 @@
+export { useSchemaData } from './useSchemaData';

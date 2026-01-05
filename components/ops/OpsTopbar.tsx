@@ -24,6 +24,7 @@ const OpsTopbar: React.FC<OpsTopbarProps> = ({ currentSection, setSection }) => 
       path: '/studio/ops/schema',
     },
     { label: 'Users', icon: 'users', section: Section.STUDIO_OPS_USERS, path: '/studio/ops/users' },
+    { label: 'Emails', icon: 'envelope', section: Section.STUDIO_OPS_EMAILS, path: '/studio/ops/emails' },
   ];
 
   const handleNavClick = (item: (typeof navItems)[0]) => {

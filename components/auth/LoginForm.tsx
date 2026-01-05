@@ -41,19 +41,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onError }) => {
       const { error: authError } = await signInWithEmail(email, password);
 
       if (authError) {
+        // Error is displayed to user via setError - no console.error needed
         const msg = getAuthErrorMessage(authError);
         setError(msg);
-        onError?.(msg);
       } else {
         // Redirect to previous page or home
         const state = location.state as { from?: Location } | undefined;
-        const from = state?.from?.pathname || '/';
+        const from = state?.from?.pathname || '/books';
         navigate(from, { replace: true });
       }
     } catch (err) {
-      const msg = 'Erro inesperado. Tente novamente.';
+      // Network errors or unexpected failures - show to user
+      const msg = err instanceof Error ? getAuthErrorMessage(err) : 'Erro inesperado. Tente novamente.';
       setError(msg);
-      onError?.(msg);
     } finally {
       setIsLoading(false);
     }

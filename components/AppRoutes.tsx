@@ -2,11 +2,13 @@ import React, { Suspense } from 'react';
 import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import { Section } from '../types';
 import { AuthGuard } from './auth/AuthGuard';
+import { RBACGuard } from './auth/RBACGuard';
 
 // Auth Pages (public routes)
 const LoginPage = React.lazy(() => import('../pages/auth/LoginPage'));
 const SignupPage = React.lazy(() => import('../pages/auth/SignupPage'));
 const CallbackPage = React.lazy(() => import('../pages/auth/CallbackPage'));
+const AccessDeniedPage = React.lazy(() => import('../pages/auth/AccessDeniedPage'));
 
 // Lazy load all templates for better performance
 const DesignSystemRouter = React.lazy(() =>
@@ -21,7 +23,7 @@ const LmsRouter = React.lazy(() => import('./lms/LmsRouter'));
 
 // Creator Templates
 const PersonasTemplate = React.lazy(() => import('./creator/personas/PersonasTemplate'));
-const FrameworksTemplate = React.lazy(() => import('./creator/templates/FrameworksTemplate'));
+const FrameworksTemplate = React.lazy(() => import('./creator/frameworks'));
 const CreatorTopbar = React.lazy(() => import('./creator/CreatorTopbar'));
 const CmsTemplate = React.lazy(() => import('./shared/templates/CmsTemplate'));
 const SaasSettingsTemplate = React.lazy(() => import('./shared/templates/SaasSettingsTemplate'));
@@ -34,21 +36,21 @@ const SalesCallDetailsTemplate = React.lazy(
 );
 const SalesMarketingTemplate = React.lazy(() => import('./sales/templates/SalesMarketingTemplate'));
 const SalesProductTemplate = React.lazy(() => import('./sales/templates/SalesProductTemplate'));
-const SalesSettingsTemplate = React.lazy(() => import('./sales/templates/SalesSettingsTemplate'));
+const SalesSettingsTemplate = React.lazy(() => import('./sales/sales-settings/SalesSettingsTemplate'));
 const SalesObjectionsTemplate = React.lazy(
-  () => import('./sales/templates/SalesObjectionsTemplate')
+  () => import('./sales/sales-objections/SalesObjectionsTemplate')
 );
 
 // Minds Templates
-const MindsGalleryTemplate = React.lazy(() => import('./minds/templates/MindsGalleryTemplate'));
-const MindProfileTemplate = React.lazy(() => import('./minds/templates/MindProfileTemplate'));
-const MindComparisonTemplate = React.lazy(() => import('./minds/templates/MindComparisonTemplate'));
-const ArtifactEditorTemplate = React.lazy(() => import('./minds/templates/ArtifactEditorTemplate'));
+const MindsGalleryTemplate = React.lazy(() => import('./minds/templates/minds-gallery'));
+const MindProfileTemplate = React.lazy(() => import('./minds/templates/mind-profile'));
+const MindComparisonTemplate = React.lazy(() => import('./minds/mind-comparison/MindComparisonTemplate'));
+const ArtifactEditorTemplate = React.lazy(() => import('./minds/artifact-editor'));
 const ArenaTemplate = React.lazy(() => import('./minds/templates/ArenaTemplate'));
 
 // Marketing Templates
 const MarketingTemplatesPage = React.lazy(
-  () => import('./marketing/templates/MarketingTemplatesPage')
+  () => import('./marketing/templates-page/MarketingTemplatesPage')
 );
 const LandingPageTemplate = React.lazy(() => import('./marketing/templates/LandingPageTemplate'));
 const AdvertorialTemplate = React.lazy(() => import('./marketing/templates/AdvertorialTemplate'));
@@ -69,7 +71,7 @@ const CommunityAdvertorialTemplate = React.lazy(
   () => import('./marketing/templates/CommunityAdvertorialTemplate')
 );
 const CommunitySalesTemplate = React.lazy(
-  () => import('./marketing/templates/CommunitySalesTemplate')
+  () => import('./marketing/community-sales/CommunitySalesTemplate')
 );
 const CommunityVSLTemplate = React.lazy(() => import('./marketing/templates/CommunityVSLTemplate'));
 
@@ -77,19 +79,23 @@ const CommunityVSLTemplate = React.lazy(() => import('./marketing/templates/Comm
 const OpsDBTemplate = React.lazy(() => import('./ops/templates/OpsDBTemplate'));
 const GroupsTemplate = React.lazy(() => import('./ops/templates/GroupsTemplate'));
 const OpsViewsTemplate = React.lazy(() => import('./ops/templates/OpsViewsTemplate'));
-const OpsSchemaTemplate = React.lazy(() => import('./ops/templates/OpsSchemaTemplate'));
+const OpsSchemaTemplate = React.lazy(() => import('./ops/schema-template/OpsSchemaTemplate'));
 const OpsUsersTemplate = React.lazy(() => import('./ops/templates/OpsUsersTemplate'));
+const EmailPreviewPage = React.lazy(() => import('../pages/ops/EmailPreviewPage'));
 
 // Books Templates
-const BooksLibraryTemplate = React.lazy(() => import('./books/templates/BooksLibraryTemplate'));
-const BookDetailTemplate = React.lazy(() => import('./books/templates/BookDetailTemplate'));
-const BookReaderTemplate = React.lazy(() => import('./books/templates/BookReaderTemplate'));
+const BooksLibraryTemplate = React.lazy(() => import('./books/books-library/BooksLibraryTemplate'));
+const MyBooksTemplate = React.lazy(() => import('./books/templates/MyBooksTemplate'));
+const BookDetailTemplate = React.lazy(() => import('./books/book-detail/BookDetailTemplate'));
+const BookReaderTemplate = React.lazy(() => import('./books/book-reader/BookReaderTemplate'));
+const BookRatingTemplate = React.lazy(() => import('./books/templates/book-rating'));
 const BookCollectionTemplate = React.lazy(() => import('./books/templates/BookCollectionTemplate'));
 const AllCollectionsTemplate = React.lazy(() => import('./books/templates/AllCollectionsTemplate'));
 const BooksByAuthorTemplate = React.lazy(() => import('./books/templates/BooksByAuthorTemplate'));
 const BooksCategoryTemplate = React.lazy(() => import('./books/templates/BooksCategoryTemplate'));
 const BooksAuthorsTemplate = React.lazy(() => import('./books/templates/BooksAuthorsTemplate'));
-const BooksAdminTemplate = React.lazy(() => import('./books/templates/BooksAdminTemplate'));
+const BooksAdminTemplate = React.lazy(() => import('./books/books-admin/BooksAdminTemplate'));
+const BookHighlightsTemplate = React.lazy(() => import('./books/templates/BookHighlightsTemplate'));
 
 // Loading fallback
 const RouteLoader: React.FC = () => (
@@ -147,6 +153,54 @@ const AppRoutes: React.FC<AppRoutesProps> = ({
         <Route path="/auth/login" element={<LoginPage />} />
         <Route path="/auth/signup" element={<SignupPage />} />
         <Route path="/auth/callback" element={<CallbackPage />} />
+        <Route path="/access-denied" element={<AccessDeniedPage />} />
+
+        {/* Books Library - PUBLIC (no auth required for reading) */}
+        <Route
+          path="/books"
+          element={
+            <BooksLibraryTemplate
+              setSection={setSection}
+              onSelectBook={(slug) => navigate(`/books/${slug}`)}
+            />
+          }
+        />
+        <Route
+          path="/books/collections"
+          element={<AllCollectionsTemplate setSection={setSection} />}
+        />
+        <Route
+          path="/books/collections/:collectionSlug"
+          element={<BookCollectionTemplate setSection={setSection} />}
+        />
+        <Route
+          path="/books/author/:authorSlug"
+          element={<BooksByAuthorTemplate setSection={setSection} />}
+        />
+        <Route
+          path="/books/category/:categorySlug"
+          element={<BooksCategoryTemplate setSection={setSection} />}
+        />
+        <Route path="/books/authors" element={<BooksAuthorsTemplate setSection={setSection} />} />
+        <Route path="/books/:bookSlug" element={<BookDetailTemplate setSection={setSection} />} />
+        <Route
+          path="/books/:bookSlug/read"
+          element={
+            <BookReaderTemplate
+              setSection={setSection}
+              setSidebarCollapsed={setSidebarCollapsed}
+              setSidebarHidden={setSidebarHidden}
+            />
+          }
+        />
+        <Route
+          path="/books/my-library"
+          element={<MyBooksTemplate setSection={setSection} />}
+        />
+        <Route
+          path="/books/:bookSlug/highlights"
+          element={<BookHighlightsTemplate setSection={setSection} />}
+        />
 
         {/* ============================================= */}
         {/* PROTECTED ROUTES (Auth required) */}
@@ -317,62 +371,71 @@ const AppRoutes: React.FC<AppRoutesProps> = ({
             element={<ExternalFrame src="https://vault.academialendaria.com.br/" title="Vault" />}
           />
 
-          {/* Ops Studio */}
-          <Route path="/studio/ops/db" element={<OpsDBTemplate setSection={setSection} />} />
-          <Route path="/studio/ops/views" element={<OpsViewsTemplate setSection={setSection} />} />
+          {/* Ops Studio - Owner Only */}
+          <Route
+            path="/studio/ops/db"
+            element={
+              <RBACGuard minRole="owner">
+                <OpsDBTemplate setSection={setSection} />
+              </RBACGuard>
+            }
+          />
+          <Route
+            path="/studio/ops/views"
+            element={
+              <RBACGuard minRole="owner">
+                <OpsViewsTemplate setSection={setSection} />
+              </RBACGuard>
+            }
+          />
           <Route
             path="/studio/ops/schema"
-            element={<OpsSchemaTemplate setSection={setSection} />}
-          />
-          <Route path="/studio/ops/users" element={<OpsUsersTemplate setSection={setSection} />} />
-
-          {/* Books Library */}
-          <Route
-            path="/books"
             element={
-              <BooksLibraryTemplate
-                setSection={setSection}
-                onSelectBook={(slug) => navigate(`/books/${slug}`)}
-              />
+              <RBACGuard minRole="owner">
+                <OpsSchemaTemplate setSection={setSection} />
+              </RBACGuard>
             }
           />
           <Route
-            path="/books/collections"
-            element={<AllCollectionsTemplate setSection={setSection} />}
+            path="/studio/ops/users"
+            element={
+              <RBACGuard minRole="owner">
+                <OpsUsersTemplate setSection={setSection} />
+              </RBACGuard>
+            }
           />
           <Route
-            path="/books/collections/:collectionSlug"
-            element={<BookCollectionTemplate setSection={setSection} />}
+            path="/studio/ops/emails"
+            element={
+              <RBACGuard minRole="owner">
+                <EmailPreviewPage />
+              </RBACGuard>
+            }
           />
-          <Route
-            path="/books/author/:authorSlug"
-            element={<BooksByAuthorTemplate setSection={setSection} />}
-          />
-          <Route
-            path="/books/category/:categorySlug"
-            element={<BooksCategoryTemplate setSection={setSection} />}
-          />
-          <Route path="/books/authors" element={<BooksAuthorsTemplate setSection={setSection} />} />
+
+          {/* Books Library - Protected routes (rate, admin) */}
+          <Route path="/books/:slug/rate" element={<BookRatingTemplate setSection={setSection} />} />
           <Route
             path="/books/admin"
-            element={<BooksAdminTemplate onBack={() => navigate('/books')} />}
-          />
-          <Route path="/books/:bookSlug" element={<BookDetailTemplate setSection={setSection} />} />
-          <Route
-            path="/books/:bookSlug/read"
             element={
-              <BookReaderTemplate
-                setSection={setSection}
-                setSidebarCollapsed={setSidebarCollapsed}
-                setSidebarHidden={setSidebarHidden}
-              />
+              <RBACGuard minRole="admin">
+                <BooksAdminTemplate onBack={() => navigate('/books')} setSection={setSection} />
+              </RBACGuard>
             }
           />
-
-          {/* Default */}
-          <Route path="/" element={<SalesDashboardTemplate setSection={setSection} />} />
         </Route>
         {/* End of AuthGuard protected routes */}
+
+        {/* Default route - public */}
+        <Route
+          path="/"
+          element={
+            <BooksLibraryTemplate
+              setSection={setSection}
+              onSelectBook={(slug) => navigate(`/books/${slug}`)}
+            />
+          }
+        />
 
         {/* 404 (public - show login link) */}
         <Route

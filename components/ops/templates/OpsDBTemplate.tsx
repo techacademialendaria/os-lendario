@@ -1,26 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Section } from '../../../types';
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card';
 import { Badge } from '../../ui/badge';
 import { Icon } from '../../ui/icon';
 import { cn } from '../../../lib/utils';
 import OpsTopbar from '../OpsTopbar';
-import { PipelineSection } from '../sections/PipelineSection';
-import { MIUSection } from '../sections/MIUSection';
-import { DriversSection } from '../sections/DriversSection';
-import { MappingSection } from '../sections/MappingSection';
-import { ToolsSection } from '../sections/ToolsSection';
-import { ToolStackMappingSection } from '../sections/ToolStackMappingSection';
-import { ToolStacksGridSection } from '../sections/ToolStacksGridSection';
-import { GapsSection } from '../sections/GapsSection';
-import { ExampleSection } from '../sections/ExampleSection';
-import { MindsSection } from '../sections/MindsSection';
-import { ContentsSection } from '../sections/ContentsSection';
-import { JobsSection } from '../sections/JobsSection';
-import { RelationshipsSection, AssessmentSystemsSection, InferenceBridgeSection } from '../sections';
-import MentalModelsSection from '../sections/MentalModelsSection';
 import { useOpsStats } from '../../../hooks/useOpsStats';
 import { OPS_KPI_CLASSES, OPS_CARD_CLASSES } from '../ops-tokens';
+
+// Lazy load all sections for better code splitting
+const PipelineSection = React.lazy(() => import('../sections/PipelineSection').then(m => ({ default: m.PipelineSection })));
+const MIUSection = React.lazy(() => import('../miu-section').then(m => ({ default: m.MIUSection })));
+const DriversSection = React.lazy(() => import('../sections/DriversSection').then(m => ({ default: m.DriversSection })));
+const MappingSection = React.lazy(() => import('../mapping-section').then(m => ({ default: m.MappingSection })));
+const ToolsSection = React.lazy(() => import('../tools-section').then(m => ({ default: m.ToolsSection })));
+const ToolStackMappingSection = React.lazy(() => import('../sections/ToolStackMappingSection').then(m => ({ default: m.ToolStackMappingSection })));
+const ToolStacksGridSection = React.lazy(() => import('../sections/ToolStacksGridSection').then(m => ({ default: m.ToolStacksGridSection })));
+const GapsSection = React.lazy(() => import('../gaps-section').then(m => ({ default: m.GapsSection })));
+const ExampleSection = React.lazy(() => import('../sections/ExampleSection').then(m => ({ default: m.ExampleSection })));
+const MindsSection = React.lazy(() => import('../minds-section').then(m => ({ default: m.MindsSection })));
+const ContentsSection = React.lazy(() => import('../contents-section').then(m => ({ default: m.ContentsSection })));
+const JobsSection = React.lazy(() => import('../jobs-section').then(m => ({ default: m.JobsSection })));
+const RelationshipsSection = React.lazy(() => import('../sections').then(m => ({ default: m.RelationshipsSection })));
+const AssessmentSystemsSection = React.lazy(() => import('../sections').then(m => ({ default: m.AssessmentSystemsSection })));
+const InferenceBridgeSection = React.lazy(() => import('../sections').then(m => ({ default: m.InferenceBridgeSection })));
+const BookSummarySection = React.lazy(() => import('../sections').then(m => ({ default: m.BookSummarySection })));
+const MentalModelsSection = React.lazy(() => import('../mental-models-section').then(m => ({ default: m.MentalModelsSection })));
+
+// Loading fallback for sections
+const SectionLoader: React.FC = () => (
+  <div className="flex items-center justify-center min-h-[400px]">
+    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
+  </div>
+);
 
 interface OpsDBTemplateProps {
   setSection: (s: Section) => void;
@@ -62,6 +74,12 @@ const NAV_GROUPS = [
       { id: 'jobs', label: 'Jobs & Queue', icon: 'list-check', count: 'jobExecutions' },
       { id: 'gaps', label: 'Critical Gaps', icon: 'exclamation', count: null, critical: true },
       { id: 'example', label: 'Live Example', icon: 'eye', count: null },
+    ]
+  },
+  {
+    title: 'Book Summary',
+    items: [
+      { id: 'book-summary', label: 'Pipeline Overview', icon: 'book-open', count: null },
     ]
   }
 ];
@@ -117,6 +135,7 @@ const OpsDBTemplate: React.FC<OpsDBTemplateProps> = ({ setSection }) => {
       case 'gaps': return <GapsSection stats={stats} loading={loading} />;
       case 'example': return <ExampleSection />;
       case 'mental-models': return <MentalModelsSection />;
+      case 'book-summary': return <BookSummarySection />;
       default: return <PipelineSection />;
     }
   };
@@ -230,7 +249,9 @@ const OpsDBTemplate: React.FC<OpsDBTemplateProps> = ({ setSection }) => {
 
             {/* Render Active Section */}
             <div className="min-h-[500px]">
-              {renderContent()}
+              <Suspense fallback={<SectionLoader />}>
+                {renderContent()}
+              </Suspense>
             </div>
 
           </div>

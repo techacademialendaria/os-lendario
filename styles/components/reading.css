@@ -1,0 +1,67 @@
+/* ============================================================================
+   READING COMPONENTS - Tailwind component classes for reading experience
+   ============================================================================ */
+
+@layer components {
+  .reading-article {
+    font-size: var(--reading-font-size-default);
+    line-height: var(--reading-line-height);
+    letter-spacing: var(--reading-letter-spacing);
+    max-width: var(--reading-max-width);
+    font-feature-settings: 'liga' 1, 'kern' 1;
+  }
+
+  /* Highlight Color Classes */
+  .highlight-yellow {
+    background-color: var(--highlight-yellow);
+    padding: 2px 0;
+    border-radius: 2px;
+  }
+
+  .highlight-green {
+    background-color: var(--highlight-green);
+    padding: 2px 0;
+    border-radius: 2px;
+  }
+
+  .highlight-blue {
+    background-color: var(--highlight-blue);
+    padding: 2px 0;
+    border-radius: 2px;
+  }
+
+  .highlight-pink {
+    background-color: var(--highlight-pink);
+    padding: 2px 0;
+    border-radius: 2px;
+  }
+
+  .highlight-purple {
+    background-color: var(--highlight-purple);
+    padding: 2px 0;
+    border-radius: 2px;
+  }
+
+  /* TL;DR Summary Box */
+  .tldr-box {
+    @apply rounded-xl border border-primary/20 bg-primary/5 p-6;
+  }
+
+  .tldr-box-header {
+    @apply flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] text-primary mb-4;
+  }
+
+  .tldr-box-content {
+    @apply font-serif text-base leading-relaxed text-foreground/90;
+  }
+
+  /* Reading Time Badge */
+  .reading-time-badge {
+    @apply inline-flex items-center gap-2 rounded-full bg-muted/50 px-4 py-1.5 text-xs font-medium text-muted-foreground;
+  }
+
+  /* Progress Percentage */
+  .reading-progress-text {
+    @apply font-mono text-[10px] font-black tracking-wider text-muted-foreground;
+  }
+}

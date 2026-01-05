@@ -1,0 +1,9 @@
+export { CoursesListView } from './CoursesListView';
+export { NewCourseView } from './NewCourseView';
+export { BriefEditorView } from './BriefEditorView';
+export { ResearchLoadingView } from './ResearchLoadingView';
+export { ResearchResultsView } from './ResearchResultsView';
+export { ReformulationView } from './ReformulationView';
+export { CurriculumView } from './CurriculumView';
+export { GenerationView } from './GenerationView';
+export { ValidationView } from './ValidationView';

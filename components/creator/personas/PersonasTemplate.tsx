@@ -4,12 +4,12 @@ import CreatorTopbar from '../CreatorTopbar';
 import { useAudienceProfiles } from '../../../hooks/useAudienceProfiles';
 
 // Views
-import { PersonasDashboard, type PersonasView } from './views/PersonasDashboard';
+import { PersonasDashboard, type PersonasView } from './personas-dashboard';
 import { PersonasList } from './views/PersonasList';
 import { PersonaDetail, type PersonaDetailTab } from './views/PersonaDetail';
-import { PersonasAnalytics } from './views/PersonasAnalytics';
-import { PainPointEditor } from './views/PainPointEditor';
-import { CreatePersona } from './views/CreatePersona';
+import { PersonasAnalyticsTemplate } from '../personas-analytics';
+import { PainPointEditor } from './pain-point-editor';
+import { CreatePersona } from './create-persona';
 
 interface PersonasTemplateProps {
   setSection: (s: Section) => void;
@@ -100,7 +100,7 @@ const PersonasTemplate: React.FC<PersonasTemplateProps> = ({ setSection }) => {
         );
 
       case 'analytics':
-        return <PersonasAnalytics onViewChange={handleViewChange} personas={personas} />;
+        return <PersonasAnalyticsTemplate onViewChange={handleViewChange} personas={personas} />;
 
       case 'pain-editor':
         if (!selectedPersona) {

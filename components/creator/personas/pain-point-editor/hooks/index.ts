@@ -1,0 +1,1 @@
+export { usePainPointEditor } from './usePainPointEditor';

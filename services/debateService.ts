@@ -72,7 +72,7 @@ export const debateService = {
         id: m.id,
         name: (m.name || '').replace(/^["']|["']$/g, '') || m.slug,
         role: m.short_bio || 'Mente Sintética',
-        avatar: `/minds-profile-images/${normalizedSlug}.jpg`,
+        avatar: `/minds/${normalizedSlug}.jpg`,
         winRate: m.apex_score ? Math.round((m.apex_score || 0) * 100) : 0,
         debates: 0, // TODO: load from debates table when available
         fidelity: 85, // TODO: load from real metrics when available

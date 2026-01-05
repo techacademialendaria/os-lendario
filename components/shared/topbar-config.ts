@@ -201,8 +201,8 @@ export const TOPBAR_CONFIGS = {
       {
         label: 'Meus Livros',
         icon: 'star',
-        section: Section.APP_BOOKS_LIBRARY,
-        path: '/books?filter=saved',
+        section: Section.APP_BOOKS_MY_LIBRARY,
+        path: '/books/my-library',
       },
     ] as ModuleTopbarNavItem[],
   } as const,

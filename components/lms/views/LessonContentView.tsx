@@ -2,9 +2,8 @@ import React from 'react';
 import { Button } from '../../ui/button';
 import { Icon } from '../../ui/icon';
 import { Skeleton } from '../../ui/skeleton';
-import { MediaCover } from '../../shared';
-import { MarkdownRenderer } from '../../shared/MarkdownRenderer';
-import { VideoPlayer, isSupportedVideoUrl, type VideoProgress } from '../ui/VideoPlayer';
+import { MediaCover, MarkdownRenderer } from '../../shared';
+import { VideoPlayer, isSupportedVideoUrl, type VideoProgress } from '../video-player';
 
 /**
  * Parse duration string (e.g., "10:05" or "5 min") to seconds

@@ -1,2 +1,3 @@
-export { default as Sidebar } from './Sidebar';
+export { Sidebar } from './sidebar';
+export type { SidebarProps, SidebarNavItem, UserInfo } from './sidebar';
 export { default as Topbar } from './Topbar';

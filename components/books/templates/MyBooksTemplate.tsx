@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../../ui/button';
 import { Icon } from '../../ui/icon';
-import { Tabs, TabsList, TabsTrigger } from '../../ui/tabs';
+import { LmsStreakCard } from '../../ui/LmsStreakCard';
 import { cn } from '../../../lib/utils';
 import { Section } from '../../../types';
 import { useMyBooks } from '../../../hooks/useMyBooks';
@@ -10,7 +10,7 @@ import { useAllHighlights } from '../../../hooks/useHighlights';
 import { usePageTitle } from '../../../hooks/usePageTitle';
 import { useAuth } from '../../../lib/AuthContext';
 import { useReadingStreak } from '../../../hooks/useReadingStreak';
-import BooksTopbar from '../BooksTopbar';
+import BooksTopbar from '../topbar';
 import BookCard from '../ui/BookCard';
 import { BookCardSkeleton } from '../ui/BookSkeletons';
 
@@ -26,13 +26,42 @@ type FilterValue = 'reading' | 'want_to_read' | 'read' | 'favorite' | 'notes';
 
 const FILTERS = [
   { value: 'reading' as FilterValue, label: 'Lendo' },
-  { value: 'want_to_read' as FilterValue, label: 'Quero Ler' },
+  { value: 'want_to_read' as FilterValue, label: 'Próximos' },
   { value: 'read' as FilterValue, label: 'Lidos' },
   { value: 'favorite' as FilterValue, label: 'Favoritos' },
   { value: 'notes' as FilterValue, label: 'Notas' },
 ];
 
 const WEEK_DAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+
+// ============================================================================
+// Luxury Components
+// ============================================================================
+
+const LuxuryButton = ({
+  children,
+  variant = 'primary',
+  onClick,
+  className,
+}: {
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary';
+  onClick?: () => void;
+  className?: string;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      'h-16 px-12 rounded-[2rem] font-black uppercase tracking-[0.25em] text-[11px] transition-all duration-300 active:scale-[0.98]',
+      variant === 'primary'
+        ? 'bg-[#FAFAFA] text-[#050505] hover:bg-white shadow-[0_20px_60px_rgba(0,0,0,0.3)]'
+        : 'bg-transparent text-[#FAFAFA] border border-white/20 hover:border-white/40 hover:bg-white/5',
+      className
+    )}
+  >
+    {children}
+  </button>
+);
 
 // ============================================================================
 // Component
@@ -59,12 +88,7 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
   const isNotesTab = selectedFilter === 'notes';
 
   // For notes tab, use useAllHighlights; for others use useMyBooks
-  const {
-    books: myBooks,
-    stats,
-    isLoading: myBooksLoading,
-    error: myBooksError,
-  } = useMyBooks(
+  const { books: myBooks, stats, isLoading: myBooksLoading, error: myBooksError } = useMyBooks(
     isNotesTab ? undefined : (selectedFilter as 'read' | 'reading' | 'want_to_read' | 'favorite')
   );
 
@@ -74,10 +98,8 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
     error: highlightsError,
   } = useAllHighlights();
 
-  // Use the appropriate data based on selected tab
   const books = useMemo(() => {
     if (isNotesTab) {
-      // Transform highlight books to MyBook format
       return highlightBooks.map((hb) => ({
         contentId: hb.contentId,
         title: hb.title,
@@ -105,203 +127,147 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
 
   const showSkeletons = authLoading || isLoading;
 
-  // Streak data from hook (with fallback)
   const currentStreak = streak?.currentStreak ?? 0;
-  const streakData = useMemo(() => {
+  const streakDays = useMemo(() => {
     if (streak?.weekActivity && streak.weekActivity.length === 7) {
       return streak.weekActivity.map((day, i) => ({
         label: WEEK_DAYS[i],
-        completed: day.completed,
+        isActive: day.completed,
         isToday: day.isToday,
       }));
     }
-    // Fallback to default (no activity)
     const today = new Date().getDay();
     return WEEK_DAYS.map((day, i) => ({
       label: day,
-      completed: false,
+      isActive: false,
       isToday: i === today,
     }));
   }, [streak?.weekActivity]);
 
-  // Get greeting based on time of day
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Bom dia';
-    if (hour < 18) return 'Boa tarde';
-    return 'Boa noite';
-  };
-
-  // Get first name from user's full name (capitalized)
+  // Get first name from user's full name
   const rawName = user?.fullName?.split(' ')[0] || 'Leitor';
   const userName = rawName.charAt(0).toUpperCase() + rawName.slice(1).toLowerCase();
+  const fullName = user?.fullName || 'Leitor Lendário';
 
-  // Streak message based on current streak
-  const getStreakMessage = () => {
-    if (streakLoading) {
-      return 'Carregando...';
-    }
-    if (currentStreak === 0) {
-      return 'Leia hoje e comece sua ofensiva';
-    }
-    if (currentStreak === 1) {
-      return 'Ofensiva iniciada! Sua jornada lendária acaba de começar';
-    }
-    if (currentStreak < 7) {
-      return `${currentStreak} dias de ofensiva`;
-    }
-    if (currentStreak < 30) {
-      return `${currentStreak} dias de ofensiva. Impressionante!`;
-    }
-    return `${currentStreak} dias de ofensiva. Lendário!`;
-  };
+  // Inspirational quote
+  const quote = "O conhecimento é o único ativo que não pode ser confiscado.";
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-6">
+      <div className="flex min-h-screen items-center justify-center bg-[#050505] p-6">
         <div className="space-y-4 text-center">
-          <Icon name="exclamation" className="mx-auto text-destructive" size="size-12" />
-          <h2 className="text-xl font-bold">Erro ao carregar biblioteca</h2>
-          <p className="text-muted-foreground">{error.message}</p>
-          <Button onClick={() => window.location.reload()}>Tentar novamente</Button>
+          <Icon name="exclamation" className="mx-auto text-red-500" size="size-12" />
+          <h2 className="text-xl font-bold text-[#FAFAFA]">Erro ao carregar biblioteca</h2>
+          <p className="text-[#666666]">{error.message}</p>
+          <Button onClick={() => window.location.reload()} variant="outline" className="border-white/20 text-[#FAFAFA] hover:bg-white/5">
+            Tentar novamente
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-32 font-sans">
+    <div className="min-h-screen bg-[#050505] pb-32 font-sans selection:bg-primary/30">
       <BooksTopbar currentSection={Section.APP_BOOKS_MY_LIBRARY} setSection={setSection} />
 
-      {/* Hero Section with Welcome & Streak */}
-      <section className="pb-12 pt-12 md:pt-20">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
-            {/* Welcome Message */}
-            <div className="space-y-4 lg:col-span-7">
-              <h1 className="font-serif text-4xl font-bold italic tracking-tight md:text-6xl">
-                <span className="text-muted-foreground">{getGreeting()},</span>{' '}
-                <span className="text-foreground">{userName}!</span>
-              </h1>
-              <p className="font-serif text-lg italic text-muted-foreground md:text-xl">
-                "{getStreakMessage()}"
+      {/* Hero Section - Luxury Minimal */}
+      <section className="pt-16 pb-20 md:pt-24 md:pb-28">
+        <div className="mx-auto max-w-7xl px-8">
+          <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12">
+
+            {/* Welcome Message - Left */}
+            <div className="space-y-8 lg:col-span-7">
+              {/* Main Heading */}
+              <div className="space-y-1">
+                <h1 className="text-5xl font-bold tracking-tight text-[#FAFAFA] md:text-7xl">
+                  Bem-vindo,
+                </h1>
+                <p className="font-serif text-5xl italic text-[#E8DCC4] md:text-7xl">
+                  {fullName}.
+                </p>
+              </div>
+
+              {/* Quote */}
+              <p className="font-serif text-lg italic text-[#666666] md:text-xl max-w-lg leading-relaxed">
+                "{quote}"
               </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-5 pt-6">
+                <LuxuryButton variant="primary" onClick={() => navigate('/books')}>
+                  Continuar Lendo
+                </LuxuryButton>
+                <LuxuryButton variant="secondary" onClick={() => navigate('/books/library')}>
+                  Explorar Acervo
+                </LuxuryButton>
+              </div>
             </div>
 
-            {/* Streak Card */}
+            {/* Streak Card - Luxo 2.0 */}
             <div className="lg:col-span-5">
-              <div className="group relative overflow-hidden rounded-[2rem] border border-border/60 bg-card p-8 shadow-xl">
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent" />
-
-                <div className="relative z-10 flex flex-col gap-6">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <h3 className="font-sans text-3xl font-black leading-none text-foreground">
-                        {currentStreak} {currentStreak === 1 ? 'dia' : 'dias'}
-                      </h3>
-                      <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-                        de ofensiva
-                      </p>
-                    </div>
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500">
-                      <Icon name="flame" type="solid" size="size-8" />
-                    </div>
-                  </div>
-
-                  {/* Days Row */}
-                  <div className="pt-2">
-                    <div className="flex items-center justify-between rounded-2xl border border-border/40 bg-muted/20 p-4">
-                      {streakData.map((day, i) => (
-                        <div key={i} className="flex flex-col items-center gap-3">
-                          <span
-                            className={cn(
-                              'text-[10px] font-black uppercase transition-colors',
-                              day.isToday ? 'text-orange-500' : 'text-muted-foreground/60'
-                            )}
-                          >
-                            {day.label}
-                          </span>
-                          <div
-                            className={cn(
-                              'flex h-7 w-7 items-center justify-center rounded-full transition-all duration-500',
-                              day.completed
-                                ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(255,149,0,0.3)]'
-                                : 'bg-muted text-muted-foreground/30',
-                              day.isToday &&
-                                !day.completed &&
-                                'ring-2 ring-orange-500 ring-offset-4 ring-offset-card'
-                            )}
-                          >
-                            {day.completed ? (
-                              <Icon name="check" size="size-3" />
-                            ) : (
-                              <div className="h-1.5 w-1.5 rounded-full bg-current" />
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <LmsStreakCard count={currentStreak} days={streakDays} />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Content Workspace */}
-      <main className="mx-auto mt-8 max-w-6xl space-y-12 px-6">
-        {/* Simplified Tabs */}
-        <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-          <Tabs
-            value={selectedFilter}
-            onValueChange={(v) => setSelectedFilter(v as FilterValue)}
-            className="w-full"
-          >
-            <TabsList className="h-auto justify-start gap-10 bg-transparent p-0">
-              {FILTERS.map((tab) => (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className="rounded-none border-b-2 border-transparent bg-transparent px-0 pb-3 text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground transition-all data-[state=active]:border-primary data-[state=active]:text-foreground"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
+      {/* Divider Line */}
+      <div className="mx-auto max-w-7xl px-8">
+        <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      </div>
 
-        {/* Books Grid - Same pattern as Explorar */}
+      {/* Content Section */}
+      <main className="mx-auto mt-16 max-w-7xl space-y-12 px-8">
+        {/* Luxury Tab Navigation */}
+        <nav className="flex items-center gap-12 overflow-x-auto pb-2">
+          {FILTERS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setSelectedFilter(tab.value)}
+              className={cn(
+                'relative pb-4 text-[11px] font-black uppercase tracking-[0.3em] transition-colors duration-300 whitespace-nowrap',
+                selectedFilter === tab.value
+                  ? 'text-[#FAFAFA]'
+                  : 'text-[#555555] hover:text-[#888888]'
+              )}
+            >
+              {tab.label}
+              {/* Active indicator - hairline */}
+              {selectedFilter === tab.value && (
+                <div className="absolute bottom-0 left-0 h-[2px] w-8 bg-[#E59E3F]" />
+              )}
+            </button>
+          ))}
+        </nav>
+
+        {/* Books Grid */}
         {showSkeletons ? (
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {Array.from({ length: 10 }).map((_, i) => (
               <BookCardSkeleton key={i} variant="grid" />
             ))}
           </div>
         ) : books.length === 0 ? (
-          <div className="flex flex-col items-center justify-center space-y-6 py-20 text-center md:py-32">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-dashed border-border bg-muted/30 md:h-20 md:w-20">
-              <Icon name="book-open" className="text-muted-foreground/30" size="size-6" />
+          <div className="flex flex-col items-center justify-center space-y-8 py-24 text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border border-dashed border-white/10 bg-white/5">
+              <Icon name="book-open" className="text-[#555555]" size="size-8" />
             </div>
-            <div className="space-y-2">
-              <h3 className="text-lg font-bold md:text-xl">Nenhum livro aqui ainda</h3>
-              <p className="mx-auto max-w-xs text-sm text-muted-foreground md:text-base">
-                Comece uma nova leitura na nossa biblioteca curada.
+            <div className="space-y-3">
+              <h3 className="text-xl font-bold text-[#FAFAFA] tracking-tight">
+                Nenhum livro aqui ainda
+              </h3>
+              <p className="mx-auto max-w-sm text-sm text-[#666666] leading-relaxed">
+                Comece uma nova leitura na nossa biblioteca curada de conhecimento lendário.
               </p>
             </div>
-            <Button
-              variant="outline"
-              className="h-12 rounded-full px-8 font-bold"
-              onClick={() => navigate('/books')}
-            >
+            <LuxuryButton variant="secondary" onClick={() => navigate('/books')}>
               Explorar Biblioteca
-            </Button>
+            </LuxuryButton>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {books.map((book) => {
-              // Transform MyBook to BookCard format
               const bookData = {
                 id: book.contentId,
                 slug: book.slug,
@@ -326,7 +292,6 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
                 wordCount: null,
               };
 
-              // Navigate to highlights if on Notes tab, otherwise to book detail
               const handleBookClick = () => {
                 if (selectedFilter === 'notes') {
                   navigate(`/books/${book.slug}/highlights`);
@@ -339,7 +304,6 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
                 <BookCard
                   key={book.contentId}
                   book={bookData}
-                  variant="grid"
                   onClick={handleBookClick}
                   isBookmarked={book.isFavorite}
                   readingStatus={book.readingStatus}

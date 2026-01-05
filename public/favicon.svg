@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <defs>
+    <linearGradient id="brainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#30B0C7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1FB5C0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Brain icon centered -->
+  <g transform="translate(128, 128)">
+    <!-- Left hemisphere -->
+    <path d="M -35 -15 C -45 -8 -48 5 -45 18 C -42 28 -32 35 -20 35 C -15 35 -12 32 -12 28"
+          fill="none" stroke="url(#brainGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Right hemisphere -->
+    <path d="M 35 -15 C 45 -8 48 5 45 18 C 42 28 32 35 20 35 C 15 35 12 32 12 28"
+          fill="none" stroke="url(#brainGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Top connection -->
+    <path d="M -12 -18 Q 0 -25 12 -18"
+          fill="none" stroke="url(#brainGradient)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Brain ridges/convolutions -->
+    <path d="M -28 -5 Q -25 5 -28 15"
+          fill="none" stroke="url(#brainGradient)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <path d="M -12 -10 Q -10 5 -12 18"
+          fill="none" stroke="url(#brainGradient)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 12 -10 Q 10 5 12 18"
+          fill="none" stroke="url(#brainGradient)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 28 -5 Q 25 5 28 15"
+          fill="none" stroke="url(#brainGradient)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+    <!-- Bottom connection/stem -->
+    <path d="M -8 28 L -8 40 M 0 35 L 0 42 M 8 28 L 8 40"
+          fill="none" stroke="url(#brainGradient)" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

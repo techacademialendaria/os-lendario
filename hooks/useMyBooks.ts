@@ -24,6 +24,7 @@ export interface MyBook {
   title: string;
   slug: string;
   imageUrl: string | null;
+  author: string;
   readingStatus: ReadingStatus;
   isFavorite: boolean;
   rating: number | null;
@@ -75,8 +76,10 @@ interface UseBookInteractionsResult {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function callRpc<T>(fnName: string, params?: Record<string, unknown>): Promise<{ data: T | null; error: Error | null }> {
+  console.log('[callRpc] calling:', fnName, 'with params:', params);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result = await (supabase.rpc as any)(fnName, params);
+  console.log('[callRpc] result:', { data: result.data, error: result.error });
   return {
     data: result.data as T | null,
     error: result.error as Error | null,
@@ -92,6 +95,7 @@ interface RpcMyBook {
   title: string;
   slug: string;
   image_url: string | null;
+  author_name: string | null;
   reading_status: string;
   is_favorite: boolean;
   rating: number | null;
@@ -115,6 +119,7 @@ const transformMyBook = (row: RpcMyBook): MyBook => ({
   title: row.title,
   slug: row.slug,
   imageUrl: row.image_url,
+  author: row.author_name || 'Autor desconhecido',
   readingStatus: (row.reading_status || 'none') as ReadingStatus,
   isFavorite: row.is_favorite,
   rating: row.rating,
@@ -176,6 +181,9 @@ export function useMyBooks(
         callRpc<RpcReadingStats>('get_my_reading_stats'),
       ]);
 
+      console.log('[useMyBooks] booksResult:', booksResult);
+      console.log('[useMyBooks] statsResult:', statsResult);
+
       if (booksResult.error) throw booksResult.error;
       if (statsResult.error) throw statsResult.error;
 
@@ -183,6 +191,7 @@ export function useMyBooks(
       setBooks(transformedBooks);
 
       if (statsResult.data) {
+        console.log('[useMyBooks] raw stats data:', statsResult.data);
         setStats(transformStats(statsResult.data));
       }
     } catch (err) {
@@ -200,15 +209,19 @@ export function useMyBooks(
 
   const toggleFavorite = useCallback(
     async (contentId: string): Promise<boolean> => {
+      console.log('[useMyBooks] toggleFavorite called with contentId:', contentId);
       try {
         const { data, error: rpcError } = await callRpc<{ is_favorite: boolean }>(
           'toggle_favorite',
           { p_content_id: contentId }
         );
 
+        console.log('[useMyBooks] toggleFavorite response:', { data, error: rpcError });
+
         if (rpcError) throw rpcError;
 
         const isFavorite = data?.is_favorite ?? false;
+        console.log('[useMyBooks] toggleFavorite isFavorite:', isFavorite);
 
         setBooks((prev) =>
           prev.map((book) =>
@@ -383,15 +396,19 @@ export function useBookInteractions(contentId: string): UseBookInteractionsResul
   }, [fetchInteractions]);
 
   const toggleFavorite = useCallback(async (): Promise<boolean> => {
+    console.log('[useBookInteractions] toggleFavorite called with contentId:', contentId);
     try {
       const { data, error: rpcError } = await callRpc<{ is_favorite: boolean }>(
         'toggle_favorite',
         { p_content_id: contentId }
       );
 
+      console.log('[useBookInteractions] toggleFavorite response:', { data, error: rpcError });
+
       if (rpcError) throw rpcError;
 
       const isFavorite = data?.is_favorite ?? false;
+      console.log('[useBookInteractions] toggleFavorite isFavorite:', isFavorite);
 
       setInteractions((prev) =>
         prev ? { ...prev, isFavorite } : { readingStatus: 'none', isFavorite, rating: null }

@@ -1,0 +1,9 @@
+export { HeroSection } from './HeroSection';
+export { DiagnosisSection } from './DiagnosisSection';
+export { StatsSection } from './StatsSection';
+export { AuthoritySection } from './AuthoritySection';
+export { ModulesSection } from './ModulesSection';
+export { ToolsSection } from './ToolsSection';
+export { PricingSection } from './PricingSection';
+export { FaqSection } from './FaqSection';
+export { MobileFooterCTA } from './MobileFooterCTA';

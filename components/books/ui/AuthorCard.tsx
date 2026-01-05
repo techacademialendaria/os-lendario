@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../../lib/utils';
+import { generateGradient, getInitials } from '../utils';
 
 interface Author {
   id: string;
@@ -15,20 +16,7 @@ interface AuthorCardProps {
 }
 
 export const AuthorCard: React.FC<AuthorCardProps> = ({ author, onClick }) => {
-  // Generate a consistent gradient based on the author's name hash
-  const getGradient = (name: string) => {
-    const hash = name.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0);
-    const h1 = Math.abs(hash % 360);
-    const h2 = (h1 + 40) % 360;
-    return `linear-gradient(135deg, hsl(${h1}, 70%, 60%), hsl(${h2}, 80%, 40%))`;
-  };
-
-  const initials = author.name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .substring(0, 2);
+  const initials = getInitials(author.name);
 
   return (
     <div
@@ -53,11 +41,11 @@ export const AuthorCard: React.FC<AuthorCardProps> = ({ author, onClick }) => {
       {/* Avatar Container */}
       <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full ring-2 ring-border transition-all group-hover:ring-brand-gold/50">
         {author.avatar_url ? (
-          <img src={author.avatar_url} alt={author.name} className="h-full w-full object-cover" />
+          <img src={author.avatar_url} alt={author.name} loading="lazy" className="h-full w-full object-cover" />
         ) : (
           <div
             className="flex h-full w-full items-center justify-center text-xl font-bold text-white"
-            style={{ background: getGradient(author.name) }}
+            style={{ background: generateGradient(author.name) }}
           >
             {initials}
           </div>

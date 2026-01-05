@@ -1,24 +1,28 @@
 /**
  * Course Creator - Shared Types
  *
- * Types and mock data shared across course view components.
+ * Types, interfaces, and config constants for course components.
+ * Mock data is in data/mock-data.ts
  */
 
 // =============================================================================
-// VIEW STATE
+// VIEW & MODE STATES
 // =============================================================================
 
 export type ViewState =
   | 'list'
   | 'new'
   | 'brief'
-  | 'research_loading' // Agent Running: Market Research
-  | 'research_results' // Checkpoint: Review Market Data
-  | 'reformulation' // Checkpoint: Review Brief Updates
-  | 'curriculum' // Checkpoint: Approve Structure
-  | 'generation' // Agent Running: Lesson Gen + GPS/DL Validation
-  | 'lesson' // Manual: Review Lesson
-  | 'validation'; // Final QA
+  | 'research_loading'
+  | 'research_results'
+  | 'reformulation'
+  | 'curriculum'
+  | 'generation'
+  | 'lesson'
+  | 'validation';
+
+export type ViewMode = 'list' | 'grid';
+export type CourseMode = 'greenfield' | 'brownfield';
 
 // =============================================================================
 // PIPELINE STATE
@@ -33,6 +37,9 @@ export interface PipelineState {
   lessons: PipelineStepStatus;
   validation: PipelineStepStatus;
 }
+
+// Alias for backwards compatibility
+export type CoursePipeline = PipelineState;
 
 // =============================================================================
 // COURSE TYPES
@@ -56,21 +63,17 @@ export interface Course {
   icon: string;
   category: string;
   instructor: CourseInstructor;
-  // Content counts
   lessonsCount: number;
   modulesCount: number;
   researchCount: number;
   assessmentsCount: number;
   duration: string;
-  // Metadata
   type: 'Greenfield' | 'Brownfield';
-  frameworks: string[]; // e.g., ['GPS', 'Didatica Lendaria']
-  fidelityScore: number | null; // Average fidelity score (0-100)
-  // Status
+  frameworks: string[];
+  fidelityScore: number | null;
   statusLabel: string;
   progress: number;
   updatedAt: string;
-  // Alerts
   alerts?: CourseAlert[];
   pipeline: PipelineState;
 }
@@ -108,81 +111,106 @@ export interface GenerationLogEntry {
 }
 
 // =============================================================================
-// MOCK DATA - Didatica Lendaria Curriculum
+// BRIEF EDITOR TYPES
 // =============================================================================
 
-export const didaticaCurriculum: CurriculumModule[] = [
-  {
-    id: 1,
-    title: 'O Desafio do Engajamento',
-    description: 'Por que 70% dos alunos abandonam cursos.',
-    lessons: [
-      { id: '1.1', title: 'Introducao ao Desafio', duration: '8 min' },
-      { id: '1.2', title: 'A Curva da Atencao', duration: '7 min' },
-      { id: '1.3', title: 'Erros Comuns', duration: '8 min' },
-      { id: '1.4', title: 'Case de Sucesso', duration: '7 min' },
-    ],
+export interface PainPoint {
+  id: number;
+  text: string;
+  intensity: number;
+}
+
+// =============================================================================
+// PIPELINE STAGE CONFIG
+// =============================================================================
+
+export interface PipelineStageConfig {
+  id: string;
+  label: string;
+  icon: string;
+  status: 'active' | 'done' | 'pending';
+  count: number;
+}
+
+// =============================================================================
+// METRIC CARD CONFIG
+// =============================================================================
+
+export interface MetricConfig {
+  label: string;
+  value: string | number;
+  icon: string;
+  change: string;
+  changeLabel: string;
+  trendUp: boolean;
+  sparkline: string;
+}
+
+// =============================================================================
+// CONTENT TYPE CONFIG
+// =============================================================================
+
+export interface ContentTypeConfig {
+  label: string;
+  count: number;
+  percent: number;
+  icon: string;
+}
+
+// =============================================================================
+// CONFIG CONSTANTS
+// =============================================================================
+
+export const COURSE_STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  Completo: {
+    bg: 'bg-emerald-500/10',
+    text: 'text-emerald-600',
+    border: 'border-emerald-500/30',
   },
-  {
-    id: 2,
-    title: 'Metodo GPS',
-    description: 'Dominar Destino + Origem + Rota.',
-    lessons: [
-      { id: '2.1', title: 'Destino Claro', duration: '10 min' },
-      { id: '2.2', title: 'Origem (Empatia)', duration: '8 min' },
-      { id: '2.3', title: 'Rota Otimizada', duration: '9 min' },
-      { id: '2.4', title: 'Workshop GPS', duration: '8 min' },
-    ],
+  Produzindo: {
+    bg: 'bg-studio-primary/10',
+    text: 'text-studio-primary',
+    border: 'border-studio-primary/30',
   },
-  {
-    id: 3,
-    title: 'Didatica para o Aluno Lendario',
-    description: 'Adaptar para o ICP da Academia.',
-    lessons: [
-      { id: '3.1', title: 'Perfil do Aluno', duration: '10 min' },
-      { id: '3.2', title: 'Linguagem e Tom', duration: '8 min' },
-      { id: '3.3', title: 'Exemplos Praticos', duration: '12 min' },
-      { id: '3.4', title: 'Andragogia', duration: '10 min' },
-      { id: '3.5', title: 'Gamificacao', duration: '10 min' },
-      { id: '3.6', title: 'Feedback Loop', duration: '5 min' },
-      { id: '3.7', title: 'Conclusao do Modulo', duration: '5 min' },
-    ],
+  Validação: {
+    bg: 'bg-amber-500/10',
+    text: 'text-amber-600',
+    border: 'border-amber-500/30',
   },
-  {
-    id: 4,
-    title: 'Semiotica da Imagem',
-    description: 'Transformar conceitos em imagens mentais.',
-    lessons: [
-      { id: '4.1', title: 'Fundamentos da Semiotica', duration: '10 min' },
-      { id: '4.2', title: 'Metaforas Visuais', duration: '10 min' },
-      { id: '4.3', title: 'Storytelling Visual', duration: '10 min' },
-      { id: '4.4', title: 'Exercicio Pratico', duration: '10 min' },
-    ],
+  Planejamento: {
+    bg: 'bg-blue-500/10',
+    text: 'text-blue-600',
+    border: 'border-blue-500/30',
   },
-  {
-    id: 5,
-    title: 'Estrutura de Aula Completa',
-    description: 'As 7 partes de uma aula perfeita.',
-    lessons: [
-      { id: '5.1', title: 'O Hook (Gancho)', duration: '8 min' },
-      { id: '5.2', title: 'Desenvolvimento', duration: '12 min' },
-      { id: '5.3', title: 'Climax', duration: '8 min' },
-      { id: '5.4', title: 'Call to Action', duration: '7 min' },
-      { id: '5.5', title: 'Revisao', duration: '10 min' },
-    ],
-  },
+};
+
+export const PIPELINE_STATUS_COLORS: Record<PipelineStepStatus, string> = {
+  completed: 'text-studio-primary',
+  current: 'text-studio-primary animate-pulse',
+  pending: 'text-muted-foreground',
+};
+
+export const DEFAULT_CONTENT_TYPES: ContentTypeConfig[] = [
+  { label: 'Aulas', count: 161, percent: 55, icon: 'video-camera' },
+  { label: 'Planejamento', count: 35, percent: 12, icon: 'calendar' },
+  { label: 'Recursos', count: 28, percent: 10, icon: 'folder' },
+  { label: 'Quizzes', count: 20, percent: 7, icon: 'list-check' },
+  { label: 'Pesquisas', count: 17, percent: 6, icon: 'search' },
+  { label: 'Relatórios', count: 14, percent: 5, icon: 'chart-pie' },
+  { label: 'Projetos', count: 12, percent: 4, icon: 'rocket' },
+  { label: 'Validações', count: 4, percent: 1, icon: 'shield-check' },
 ];
 
 // =============================================================================
-// MOCK DATA - Generation Log
+// MOCK DATA (re-exported for backwards compatibility)
 // =============================================================================
 
 export const generationLog: GenerationLogEntry[] = [
-  { id: '1.1', title: 'Introducao', gps: 92, dl: 85, status: 'success', msg: 'Hook validado' },
-  { id: '1.2', title: 'Mindset', gps: 88, dl: 78, status: 'success', msg: 'Historia adicionada' },
+  { id: '1.1', title: 'Introdução', gps: 92, dl: 85, status: 'success', msg: 'Hook validado' },
+  { id: '1.2', title: 'Mindset', gps: 88, dl: 78, status: 'success', msg: 'História adicionada' },
   {
     id: '1.3',
-    title: 'Diagnostico',
+    title: 'Diagnóstico',
     gps: 45,
     dl: 82,
     status: 'retrying',

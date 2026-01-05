@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
-// List of slugs that have real avatar images in /public/minds-profile-images/
+// List of slugs that have real avatar images in /public/minds/
 // Same list as in useMinds.ts - SINGLE SOURCE OF TRUTH
 const MINDS_WITH_AVATAR = new Set([
   'aaron_beck',
@@ -212,7 +212,7 @@ export function usePublicMinds(): UsePublicMindsResult {
           name: (m.name || '').replace(/^["']|["']$/g, '') || m.slug,
           shortBio: m.short_bio || '',
           apexScore: m.apex_score,
-          avatar: `/minds-profile-images/${normalizedSlug}.jpg`,
+          avatar: `/minds/${normalizedSlug}.jpg`,
           hasRealAvatar,
         };
       });

@@ -8,6 +8,7 @@ export interface AuthorData {
   name: string;
   shortBio: string | null;
   avatarUrl: string | null;
+  bookCount: number;
   metadata: {
     website?: string;
     twitter?: string;
@@ -28,6 +29,7 @@ interface DbMind {
   short_bio: string | null;
   avatar_url: string | null;
   metadata: Record<string, unknown> | null;
+  content_minds: { count: number }[];
 }
 
 interface UseAuthorResult {
@@ -60,6 +62,7 @@ export function useAuthor(slug: string | null): UseAuthorResult {
     }
 
     try {
+      // First, get the mind/author data
       const { data, error: fetchError } = await supabase
         .from('minds')
         .select(
@@ -84,8 +87,15 @@ export function useAuthor(slug: string | null): UseAuthorResult {
           throw fetchError;
         }
       } else {
-        const mind = data as DbMind;
+        const mind = data as Omit<DbMind, 'content_minds'>;
         const metadata = mind.metadata || {};
+
+        // Count only book_summary contents for this author
+        const { count: bookCount } = await supabase
+          .from('content_minds')
+          .select('contents!inner(content_type)', { count: 'exact', head: true })
+          .eq('mind_id', mind.id)
+          .eq('contents.content_type', 'book_summary');
 
         setAuthor({
           id: mind.id,
@@ -93,6 +103,7 @@ export function useAuthor(slug: string | null): UseAuthorResult {
           name: mind.name,
           shortBio: mind.short_bio,
           avatarUrl: mind.avatar_url,
+          bookCount: bookCount || 0,
           metadata: {
             website: metadata.website as string | undefined,
             twitter: metadata.twitter as string | undefined,

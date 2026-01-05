@@ -1,0 +1,1 @@
+export { useIconSearch } from './useIconSearch';

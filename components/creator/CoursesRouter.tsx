@@ -3,13 +3,13 @@ import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-do
 import { Section } from '../../types';
 
 // Import course views
-import CoursesTemplate from './templates/CoursesTemplate';
-import CourseOverview from './views/CourseOverview';
+import { CoursesTemplate } from './courses';
+import { CourseOverview } from './course-overview';
 import CourseBrief from './views/CourseBrief';
 import CourseResearch from './views/CourseResearch';
-import CourseCurriculum from './views/CourseCurriculum';
+import CourseCurriculum from './course-curriculum';
 import CourseLessons from './views/CourseLessons';
-import CourseLesson from './views/CourseLesson';
+import CourseLesson from './views/course-lesson';
 import CourseValidation from './views/CourseValidation';
 import CourseNew from './views/CourseNew';
 

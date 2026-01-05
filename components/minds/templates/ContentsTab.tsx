@@ -14,7 +14,7 @@ import {
   CONTENT_CATEGORY_LABELS,
   CONTENT_CATEGORY_ICONS,
 } from '../../../hooks/useMindContents';
-import { YamlViewer, JsonViewer, isYamlContent, isJsonContent } from '../ui/YamlViewer';
+import { YamlViewer, JsonViewer, isYamlContent, isJsonContent } from '../ui/yaml-viewer';
 
 interface ContentsTabProps {
   contentsData: MindContentsResult | null;

@@ -75,8 +75,8 @@ const generateAvatar = (slug: string, dbAvatarUrl?: string | null): string => {
   if (dbAvatarUrl) {
     return dbAvatarUrl;
   }
-  // Use local image from /public/minds-profile-images/{slug}.jpg
-  return `/minds-profile-images/${slug}.jpg`;
+  // Use local image from /public/minds/{slug}.jpg
+  return `/minds/${slug}.jpg`;
 };
 
 // Derive tier from apex score

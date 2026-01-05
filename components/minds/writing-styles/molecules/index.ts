@@ -1,0 +1,1 @@
+export { ToneBar } from './ToneBar';

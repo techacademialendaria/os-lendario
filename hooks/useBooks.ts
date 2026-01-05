@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { stripMarkdown } from '../lib/utils';
 
@@ -170,32 +170,54 @@ const transformToBookData = (dbBook: DbBookContent): BookData => {
   };
 };
 
+interface UseBooksOptions {
+  limit?: number;
+  categorySlug?: string;
+}
+
 interface UseBooksResult {
   books: BookData[];
   loading: boolean;
+  loadingMore: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
+  loadMore: () => Promise<void>;
+  hasMore: boolean;
   totalBooks: number;
 }
 
-export function useBooks(): UseBooksResult {
+const DEFAULT_PAGE_SIZE = 12;
+
+export function useBooks(options: UseBooksOptions = {}): UseBooksResult {
+  const { limit = DEFAULT_PAGE_SIZE, categorySlug } = options;
   const [books, setBooks] = useState<BookData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
 
-  const fetchBooks = useCallback(async () => {
-    setLoading(true);
+  const fetchBooks = useCallback(async (isLoadMore = false) => {
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setOffset(0);
+    }
     setError(null);
 
     if (!isSupabaseConfigured()) {
       console.warn('Supabase not configured - no books available');
       setBooks([]);
       setLoading(false);
+      setLoadingMore(false);
       return;
     }
 
     try {
-      const { data: booksData, error: booksError } = await supabase
+      const currentOffset = isLoadMore ? offset : 0;
+
+      let query = supabase
         .from('contents')
         .select(
           `
@@ -219,7 +241,26 @@ export function useBooks(): UseBooksResult {
         `
         )
         .eq('content_type', 'book_summary')
-        .order('created_at', { ascending: false });
+        .eq('status', 'published')
+        .not('content', 'is', null)
+        .order('created_at', { ascending: false })
+        .range(currentOffset, currentOffset + limit - 1);
+
+      // Add category filter if provided
+      if (categorySlug) {
+        // We need to filter by tag - this requires a subquery approach
+        const { data: taggedContentIds } = await supabase
+          .from('content_tags')
+          .select('content_id, tags!inner(slug)')
+          .eq('tags.slug', categorySlug);
+
+        if (taggedContentIds && taggedContentIds.length > 0) {
+          const contentIds = (taggedContentIds as Array<{ content_id: string }>).map(tc => tc.content_id);
+          query = query.in('id', contentIds);
+        }
+      }
+
+      const { data: booksData, error: booksError } = await query;
 
       if (booksError) {
         throw booksError;
@@ -228,25 +269,47 @@ export function useBooks(): UseBooksResult {
       // Deduplicate books (prioritize PT over EN) then transform
       const deduplicatedBooks = deduplicateBooks(booksData || []);
       const transformedBooks = deduplicatedBooks.map(transformToBookData);
-      setBooks(transformedBooks);
+
+      // Check if there are more books
+      setHasMore(transformedBooks.length === limit);
+
+      if (isLoadMore) {
+        setBooks(prev => [...prev, ...transformedBooks]);
+        setOffset(currentOffset + limit);
+      } else {
+        setBooks(transformedBooks);
+        setOffset(limit);
+      }
     } catch (err) {
       console.error('Error fetching books:', err);
       setError(err as Error);
-      setBooks([]);
+      if (!isLoadMore) {
+        setBooks([]);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  }, []);
+  }, [limit, categorySlug, offset]);
+
+  const loadMore = useCallback(async () => {
+    if (!loadingMore && hasMore) {
+      await fetchBooks(true);
+    }
+  }, [fetchBooks, loadingMore, hasMore]);
 
   useEffect(() => {
-    fetchBooks();
-  }, [fetchBooks]);
+    fetchBooks(false);
+  }, [categorySlug]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     books,
     loading,
+    loadingMore,
     error,
-    refetch: fetchBooks,
+    refetch: () => fetchBooks(false),
+    loadMore,
+    hasMore,
     totalBooks: books.length,
   };
 }
@@ -401,6 +464,233 @@ export function useBookCategories(): UseBookCategoriesResult {
   }, []);
 
   return { categories, loading, error };
+}
+
+// Hook for quick book search (lightweight, for dropdown autocomplete)
+interface UseBookSearchResult {
+  results: BookData[];
+  loading: boolean;
+  search: (query: string) => void;
+  clearResults: () => void;
+}
+
+export function useBookSearch(): UseBookSearchResult {
+  const [results, setResults] = useState<BookData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const search = useCallback((query: string) => {
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (!query || query.length < 2) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
+    // Debounce search
+    searchTimeoutRef.current = setTimeout(async () => {
+      if (!isSupabaseConfigured()) {
+        setResults([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        interface SearchResult {
+          id: string;
+          slug: string;
+          title: string;
+          image_url: string | null;
+          metadata: { author?: string } | null;
+          content_minds: Array<{
+            role: string;
+            minds: { id: string; slug: string; name: string } | null;
+          }> | null;
+        }
+
+        // Search by title only (more reliable) - client-side will filter by author too
+        const { data, error } = await supabase
+          .from('contents')
+          .select(`
+            id,
+            slug,
+            title,
+            image_url,
+            metadata,
+            content_minds(role, minds(id, slug, name))
+          `)
+          .eq('content_type', 'book_summary')
+          .eq('status', 'published')
+          .ilike('title', `%${query}%`)
+          .limit(10);
+
+        if (error) throw error;
+
+        // Also search by author in metadata (client-side for reliability)
+        const searchLower = query.toLowerCase();
+        const transformedResults = ((data || []) as SearchResult[])
+          .map((item) => {
+            const authorMind = item.content_minds?.find((cm) => cm.role === 'author')?.minds;
+            const metadata = item.metadata || {};
+            return {
+              id: item.id,
+              slug: item.slug,
+              title: item.title,
+              author: authorMind?.name || metadata.author || 'Autor Desconhecido',
+              authorSlug: authorMind?.slug || null,
+              coverUrl: item.image_url,
+            } as BookData;
+          })
+          .filter((book) =>
+            book.title.toLowerCase().includes(searchLower) ||
+            book.author.toLowerCase().includes(searchLower)
+          )
+          .slice(0, 6);
+
+        setResults(transformedResults);
+      } catch (err) {
+        console.error('Search error:', err);
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+  }, []);
+
+  const clearResults = useCallback(() => {
+    setResults([]);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+  }, []);
+
+  return { results, loading, search, clearResults };
+}
+
+// Hook for featured books sections (with specific limits)
+interface UseFeaturedBooksResult {
+  recentBooks: BookData[];
+  popularBooks: BookData[];
+  audiobookBooks: BookData[];
+  loading: boolean;
+}
+
+export function useFeaturedBooks(): UseFeaturedBooksResult {
+  const [recentBooks, setRecentBooks] = useState<BookData[]>([]);
+  const [popularBooks, setPopularBooks] = useState<BookData[]>([]);
+  const [audiobookBooks, setAudiobookBooks] = useState<BookData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      if (!isSupabaseConfigured()) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch recent books (limit 2)
+        const { data: recentData } = await supabase
+          .from('contents')
+          .select(`
+            id, slug, title, content_type, status, content, image_url, metadata, created_at, updated_at,
+            content_tags(tags(id, slug, name)),
+            content_minds(role, minds(id, slug, name))
+          `)
+          .eq('content_type', 'book_summary')
+          .eq('status', 'published')
+          .not('content', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(4); // Fetch 4 to account for deduplication
+
+        // Fetch books with high rating (limit 5)
+        const { data: popularData } = await supabase
+          .from('contents')
+          .select(`
+            id, slug, title, content_type, status, content, image_url, metadata, created_at, updated_at,
+            content_tags(tags(id, slug, name)),
+            content_minds(role, minds(id, slug, name))
+          `)
+          .eq('content_type', 'book_summary')
+          .eq('status', 'published')
+          .not('content', 'is', null)
+          .not('metadata->averageRating', 'is', null)
+          .order('metadata->averageRating', { ascending: false })
+          .limit(8); // Fetch 8 to account for deduplication
+
+        // Fetch books with audio (limit 5)
+        const { data: audioData } = await supabase
+          .from('contents')
+          .select(`
+            id, slug, title, content_type, status, content, image_url, metadata, created_at, updated_at,
+            content_tags(tags(id, slug, name)),
+            content_minds(role, minds(id, slug, name))
+          `)
+          .eq('content_type', 'book_summary')
+          .eq('status', 'published')
+          .not('content', 'is', null)
+          .eq('metadata->hasAudio', true)
+          .limit(8);
+
+        // Deduplicate and transform
+        const dedupedRecent = deduplicateBooks(recentData || []).slice(0, 2);
+        const dedupedPopular = deduplicateBooks(popularData || []).slice(0, 5);
+        const dedupedAudio = deduplicateBooks(audioData || []).slice(0, 5);
+
+        setRecentBooks(dedupedRecent.map(transformToBookData));
+        setPopularBooks(dedupedPopular.map(transformToBookData));
+        setAudiobookBooks(dedupedAudio.map(transformToBookData));
+      } catch (err) {
+        console.error('Error fetching featured books:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeatured();
+  }, []);
+
+  return { recentBooks, popularBooks, audiobookBooks, loading };
+}
+
+// Hook for total book count (lightweight)
+export function useBookCount(): { count: number; loading: boolean } {
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCount = async () => {
+      if (!isSupabaseConfigured()) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { count: totalCount } = await supabase
+          .from('contents')
+          .select('*', { count: 'exact', head: true })
+          .eq('content_type', 'book_summary')
+          .eq('status', 'published')
+          .not('content', 'is', null);
+
+        setCount(totalCount || 0);
+      } catch (err) {
+        console.error('Error fetching book count:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCount();
+  }, []);
+
+  return { count, loading };
 }
 
 export default useBooks;

@@ -1,0 +1,21 @@
+/* =============================================================================
+   EXTERNAL LINK INDICATOR - Visual distinction for outbound links
+
+   Adds ↗ icon after external links for better UX (+distinguishability)
+   ============================================================================= */
+
+.prose a[href^="http"]:not([href*="mmos."])::after,
+.reading-article a[href^="http"]:not([href*="mmos."])::after,
+a.external-link::after {
+  content: " ↗";
+  font-size: 0.75em;
+  vertical-align: super;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.prose a[href^="http"]:not([href*="mmos."]):hover::after,
+.reading-article a[href^="http"]:not([href*="mmos."]):hover::after,
+a.external-link:hover::after {
+  opacity: 1;
+}

@@ -37,16 +37,19 @@ const BookCardHorizontal: React.FC<BookCardHorizontalProps> = ({
   return (
     <div
       className={cn(
-        'group flex cursor-pointer items-center gap-6 rounded-2xl p-6 shadow-lg transition-transform hover:scale-[1.01]',
+        'group relative flex cursor-pointer items-center gap-6 rounded-2xl p-6 shadow-lg transition-all duration-500 hover:shadow-2xl overflow-hidden',
         backgroundClass,
         className
       )}
       onClick={onClick}
     >
+      {/* Hover Glow Effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
       {/* Book Cover */}
-      <div className="relative h-40 w-28 shrink-0 overflow-hidden rounded-lg shadow-2xl">
+      <div className="relative h-40 w-28 shrink-0 overflow-hidden rounded-lg shadow-2xl transition-transform duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]">
         {book.coverUrl ? (
-          <img src={book.coverUrl} alt={book.title} className="h-full w-full object-cover" />
+          <img src={book.coverUrl} alt={book.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
         ) : (
           <div
             className={cn(
@@ -60,12 +63,12 @@ const BookCardHorizontal: React.FC<BookCardHorizontalProps> = ({
       </div>
 
       {/* Book Info */}
-      <div className="min-w-0 flex-1 space-y-3">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+      <div className="relative min-w-0 flex-1 space-y-3">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 transition-colors duration-300 group-hover:text-primary/80">
           {book.category || 'Livro'}
         </p>
         <div>
-          <h3 className="text-2xl font-bold leading-tight text-white">{book.title}</h3>
+          <h3 className="text-2xl font-bold leading-tight text-white transition-colors duration-300 group-hover:text-white">{book.title}</h3>
           <p className="mt-1 font-serif text-sm text-zinc-400">Por {book.author}</p>
         </div>
 
@@ -84,7 +87,12 @@ const BookCardHorizontal: React.FC<BookCardHorizontalProps> = ({
         )}
 
         {/* Curator */}
-        {curator && <p className={cn('text-sm font-medium', accentColor)}>{curator}</p>}
+        {curator && <p className={cn('text-sm font-medium transition-colors duration-300', accentColor)}>{curator}</p>}
+      </div>
+
+      {/* Arrow indicator on hover */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+        <Icon name="chevron-right" className="text-white/40" size="size-6" />
       </div>
     </div>
   );

@@ -1,14 +1,20 @@
-/**
- * Course Creator Module
- *
- * Modular course creation system with views for each pipeline stage.
- */
+// Courses Module - Barrel Exports
+// Following Atomic Design: atoms → molecules → organisms → templates
 
-// Types
+// Types (includes generationLog for backwards compatibility)
 export * from './types';
 
-// UI Components
-export * from './ui';
+// Data (coursesMock, didaticaCurriculum, mapHookCourseToTemplateCourse)
+export { coursesMock, didaticaCurriculum, mapHookCourseToTemplateCourse } from './data';
 
-// View Components
-export * from './views';
+// Hooks
+export * from './hooks';
+
+// Molecules
+export * from './molecules';
+
+// Organisms
+export * from './organisms';
+
+// Template (main component)
+export { default as CoursesTemplate } from './CoursesTemplate';

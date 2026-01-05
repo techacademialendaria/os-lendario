@@ -4,7 +4,7 @@ import { Section } from '../../../types';
 import MindsTopbar from '../MindsTopbar';
 import { debateService } from '../../../services/debateService';
 import { useArena, type Mind } from '../../../hooks/useArena';
-import { ArenaCreate, type DebateConfig } from './ArenaCreate';
+import { ArenaCreate, type DebateConfig } from '../arena-create';
 import { FrameworksLibrary } from '../arena/FrameworksLibrary';
 import { DebatesList } from '../arena/DebatesList';
 import { ArenaLiveView } from '../arena/ArenaLiveView';
@@ -43,7 +43,7 @@ const INITIAL_MINDS: Mind[] = [
     id: 'elon',
     name: 'Elon Musk',
     role: 'Visionary Engineer',
-    avatar: '/minds-profile-images/elon_musk.jpg',
+    avatar: '/minds/elon_musk.jpg',
     winRate: 70,
     debates: 127,
     fidelity: 92,
@@ -53,7 +53,7 @@ const INITIAL_MINDS: Mind[] = [
     id: 'naval',
     name: 'Naval Ravikant',
     role: 'Modern Philosopher',
-    avatar: '/minds-profile-images/naval_ravikant.jpg',
+    avatar: '/minds/naval_ravikant.jpg',
     winRate: 65,
     debates: 98,
     fidelity: 95,
@@ -63,7 +63,7 @@ const INITIAL_MINDS: Mind[] = [
     id: 'sam',
     name: 'Sam Altman',
     role: 'AI Architect',
-    avatar: '/minds-profile-images/sam_altman.jpg',
+    avatar: '/minds/sam_altman.jpg',
     winRate: 63,
     debates: 145,
     fidelity: 88,
@@ -73,7 +73,7 @@ const INITIAL_MINDS: Mind[] = [
     id: 'nassim',
     name: 'Nassim Taleb',
     role: 'Risk Analyst',
-    avatar: '/minds-profile-images/nassim_taleb.jpg',
+    avatar: '/minds/nassim_taleb.jpg',
     winRate: 60,
     debates: 73,
     fidelity: 90,
@@ -83,7 +83,7 @@ const INITIAL_MINDS: Mind[] = [
     id: 'ray',
     name: 'Ray Dalio',
     role: 'Macro Investor',
-    avatar: '/minds-profile-images/ray_dalio.jpg',
+    avatar: '/minds/ray_dalio.jpg',
     winRate: 54,
     debates: 54,
     fidelity: 85,

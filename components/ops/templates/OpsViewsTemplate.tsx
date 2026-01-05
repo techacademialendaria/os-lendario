@@ -4,7 +4,7 @@ import { Icon } from '../../ui/icon';
 import { Badge } from '../../ui/badge';
 import { cn } from '../../../lib/utils';
 import OpsTopbar from '../OpsTopbar';
-import ViewsSection from '../sections/ViewsSection';
+import { ViewsSection } from '../views-section';
 import { useOpsStats } from '../../../hooks/useOpsStats';
 import { useViewsData } from '../../../hooks/useViewsData';
 

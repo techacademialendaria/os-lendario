@@ -6,4 +6,5 @@ export { MermaidDiagram } from './MermaidDiagram';
 export { StatCard } from './StatCard';
 export { StatusBadge } from './StatusBadge';
 export { PhaseBadge } from './PhaseBadge';
-export { default as DataTable } from './DataTable';
+// DataTable has been refactored to ../data-table/
+export { DataTable } from '../data-table';

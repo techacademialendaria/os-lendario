@@ -10,7 +10,7 @@ import {
   PersonaThemes,
   PersonaSegments,
 } from '../details';
-import type { PersonasView } from './PersonasDashboard';
+import type { PersonasView } from '../personas-dashboard';
 import type { Persona } from '../../../../hooks/useAudienceProfiles';
 
 export type PersonaDetailTab = 'base' | 'psycho' | 'advanced' | 'themes' | 'segments';

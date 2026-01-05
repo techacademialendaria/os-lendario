@@ -22,6 +22,7 @@ const NAV_CATEGORIES: NavCategory[] = [
     items: [
       { label: 'Identidade', path: '/design/identity' },
       { label: 'Lendário vs Medíocre', path: '/design/legendary-vs-mediocre' },
+      { label: '✨ Lendário Luxe', path: '/design/lendario-luxe' },
     ],
   },
   {

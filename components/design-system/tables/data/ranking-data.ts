@@ -1,0 +1,40 @@
+import type { RankingContributor } from '../types';
+
+export const rankingContributors: RankingContributor[] = [
+  {
+    position: 1,
+    positionStyle: 'gold',
+    initials: 'DC',
+    name: 'Day Cavalcanti',
+    role: 'Engenheira de Prompts Sr',
+    promptsApproved: 5,
+    avgScore: 220,
+    views: 264,
+    favorites: 5,
+    reviews: 3,
+  },
+  {
+    position: 2,
+    positionStyle: 'silver',
+    initials: 'LC',
+    name: 'Lucas Charão',
+    role: 'Analista de Experiência Educacional',
+    promptsApproved: 6,
+    avgScore: 164,
+    views: 200,
+    favorites: 2,
+    reviews: 0,
+  },
+  {
+    position: 3,
+    positionStyle: 'bronze',
+    initials: 'AN',
+    name: 'Alan Nicolas',
+    role: 'CEO & Chief Strategist',
+    promptsApproved: 4,
+    avgScore: 125,
+    views: 166,
+    favorites: 1,
+    reviews: 0,
+  },
+];

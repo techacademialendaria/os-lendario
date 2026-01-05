@@ -3,20 +3,32 @@
 // =============================================================================
 
 export { PipelineSection } from './PipelineSection';
-export { MIUSection } from './MIUSection';
+// Refactored to Atomic Design pattern
+export { MIUSection } from '../miu-section';
 export { DriversSection } from './DriversSection';
-export { MappingSection } from './MappingSection';
-export { ToolsSection } from './ToolsSection';
+// Refactored to Atomic Design pattern
+export { MappingSection } from '../mapping-section';
+// Refactored to Atomic Design pattern
+export { ToolsSection } from '../tools-section';
 export { ToolStackMappingSection } from './ToolStackMappingSection';
 export { ToolStacksGridSection } from './ToolStacksGridSection';
-export { GapsSection } from './GapsSection';
+// Refactored to Atomic Design pattern
+export { GapsSection } from '../gaps-section';
 export { ExampleSection } from './ExampleSection';
 export { AssessmentSystemsSection } from './AssessmentSystemsSection';
-export { MindsSection } from './MindsSection';
-export { ContentsSection } from './ContentsSection';
-export { JobsSection } from './JobsSection';
-export { RelationshipsSection } from './RelationshipsSection';
+// Refactored to Atomic Design pattern
+export { MindsSection } from '../minds-section';
+// Refactored to Atomic Design pattern
+export { ContentsSection } from '../contents-section';
+// Refactored to Atomic Design pattern
+export { JobsSection } from '../jobs-section';
+// Refactored to Atomic Design pattern
+export { RelationshipsSection } from '../relationships-section';
 export { InferenceBridgeSection } from './InferenceBridgeSection';
-export { default as MentalModelsSection } from './MentalModelsSection';
-export { default as ViewsSection } from './ViewsSection';
+// Refactored to Atomic Design pattern
+export { MentalModelsSection } from '../mental-models-section';
+// Refactored to Atomic Design pattern
+export { ViewsSection } from '../views-section';
 export { GroupsSection } from './GroupsSection';
+// Refactored to Atomic Design pattern
+export { BookSummarySection } from '../book-summary';

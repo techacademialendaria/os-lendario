@@ -1,0 +1,210 @@
+/* ============================================================================
+   DYNAMIC COLOR UTILITIES - Studio-specific colors via CSS variables
+
+   Essas classes usam as variáveis CSS que já estão sendo aplicadas
+   automaticamente quando cada Studio é ativado (no App.tsx).
+
+   Benefício: Trocar de Studio = cores mudam automaticamente
+   ============================================================================ */
+
+@layer components {
+  /* Primary Colors - Dynamic */
+  .bg-studio-primary {
+    @apply bg-[hsl(var(--primary-color))];
+  }
+
+  .bg-studio-primary-dark {
+    @apply bg-[hsl(var(--primary-dark))];
+  }
+
+  .bg-studio-primary-light {
+    @apply bg-[hsl(var(--primary-light))];
+  }
+
+  .bg-studio-primary-lighter {
+    @apply bg-[hsl(var(--primary-lighter))];
+  }
+
+  /* Text Colors - Dynamic */
+  .text-studio-primary {
+    @apply text-[hsl(var(--primary-color))];
+  }
+
+  .text-studio-primary-dark {
+    @apply text-[hsl(var(--primary-dark))];
+  }
+
+  /* Borders - Dynamic */
+  .border-studio-primary {
+    @apply border-[hsl(var(--primary-color))];
+  }
+
+  .border-studio-primary-dark {
+    @apply border-[hsl(var(--primary-dark))];
+  }
+
+  /* Secondary Colors - Dynamic */
+  .bg-studio-secondary {
+    @apply bg-[hsl(var(--secondary-color))];
+  }
+
+  .bg-studio-secondary-dark {
+    @apply bg-[hsl(var(--secondary-dark))];
+  }
+
+  .bg-studio-secondary-light {
+    @apply bg-[hsl(var(--secondary-light))];
+  }
+
+  /* Accent Colors - Dynamic */
+  .bg-studio-accent {
+    @apply bg-[hsl(var(--accent-color))];
+  }
+
+  .bg-studio-accent-dark {
+    @apply bg-[hsl(var(--accent-dark))];
+  }
+
+  /* Studio Backgrounds - Dynamic */
+  .bg-studio {
+    @apply bg-[hsl(var(--studio-bg))];
+  }
+
+  .bg-studio-card {
+    @apply bg-[hsl(var(--studio-card-bg))];
+  }
+
+  /* Borders - Dynamic */
+  .border-studio {
+    @apply border-[hsl(var(--studio-border))];
+  }
+
+  /* Text - Dynamic */
+  .text-studio {
+    @apply text-[hsl(var(--text-primary))];
+  }
+
+  .text-studio-secondary {
+    @apply text-[hsl(var(--text-secondary))];
+  }
+
+  .text-studio-muted {
+    @apply text-[hsl(var(--text-muted))];
+  }
+
+  /* Status Colors - Dynamic */
+  .bg-status-success {
+    @apply bg-[hsl(var(--status-success))];
+  }
+
+  .bg-status-warning {
+    @apply bg-[hsl(var(--status-warning))];
+  }
+
+  .bg-status-error {
+    @apply bg-[hsl(var(--status-error))];
+  }
+
+  .bg-status-info {
+    @apply bg-[hsl(var(--status-info))];
+  }
+
+  .text-status-success {
+    @apply text-[hsl(var(--status-success))];
+  }
+
+  .text-status-warning {
+    @apply text-[hsl(var(--status-warning))];
+  }
+
+  .text-status-error {
+    @apply text-[hsl(var(--status-error))];
+  }
+
+  .text-status-info {
+    @apply text-[hsl(var(--status-info))];
+  }
+
+  /* ============================================================================
+     BACKWARD COMPATIBILITY - Legacy Hardcoded Colors (mapped to variables)
+
+     Essas classes são um mapa temporário para cores hardcoded específicas
+     que ainda existem em componentes. Quando o Studio muda, estas cores
+     também mudam automaticamente.
+
+     Estratégia de refatoração:
+     1. Substituir bg-[#111116] por bg-studio-card
+     2. Substituir text-[#538096] por text-studio-primary
+     3. Etc...
+     ============================================================================ */
+
+  /* Studio Petróleo (#538096) - Maps to Primary */
+  .bg-studio-petrol {
+    @apply bg-[hsl(var(--primary-color))];
+  }
+
+  .text-studio-petrol {
+    @apply text-[hsl(var(--primary-color))];
+  }
+
+  .border-studio-petrol {
+    @apply border-[hsl(var(--primary-color))];
+  }
+
+  /* Gold (#C9B298) - Maps to Secondary/Accent */
+  .bg-studio-gold {
+    @apply bg-[hsl(var(--accent-color))];
+  }
+
+  .text-studio-gold {
+    @apply text-[hsl(var(--accent-color))];
+  }
+
+  .border-studio-gold {
+    @apply border-[hsl(var(--accent-color))];
+  }
+
+  /* Dark Card (#111116) - Maps to Card BG */
+  .bg-studio-card-dark {
+    @apply bg-[hsl(var(--studio-card-bg))];
+  }
+
+  /* ============================================================================
+     COMMON PATTERNS - Studio-specific utility combinations
+     ============================================================================ */
+
+  /* Primary Button */
+  .btn-studio-primary {
+    @apply bg-studio-primary font-medium text-white transition-colors hover:bg-studio-primary-dark;
+  }
+
+  /* Secondary Button */
+  .btn-studio-secondary {
+    @apply bg-studio-secondary font-medium text-white transition-colors hover:bg-studio-secondary-dark;
+  }
+
+  /* Outline Button */
+  .btn-studio-outline {
+    @apply border-2 border-studio-primary font-medium text-studio-primary transition-colors hover:bg-studio-primary/10;
+  }
+
+  /* Card Container */
+  .card-studio {
+    @apply bg-studio-card rounded-xl border border-studio-primary/20 p-4 transition-colors;
+  }
+
+  /* Badge */
+  .badge-studio {
+    @apply rounded-full bg-studio-primary/20 px-3 py-1 text-sm font-medium text-studio-primary;
+  }
+
+  /* Section Header */
+  .section-header-studio {
+    @apply text-lg font-bold text-studio-primary md:text-2xl;
+  }
+
+  /* Divider */
+  .divider-studio {
+    @apply border-t border-studio-primary/20;
+  }
+}

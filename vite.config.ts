@@ -5,8 +5,13 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  envDir: path.resolve(__dirname, '..'),
-  publicDir: path.resolve(__dirname, '../public'),
+  envDir: '.',
+  publicDir: 'public',
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, '.'),
+    },
+  },
   build: {
     rollupOptions: {
       output: {
@@ -53,6 +58,13 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // Book Summary Pipeline Server (localhost:8001)
+      '/api/pipeline': {
+        target: 'http://localhost:8001',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/pipeline/, ''),
+      },
+      // MMOS Debate API (localhost:8000)
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,

@@ -14,7 +14,7 @@ import {
   CATEGORY_LABELS,
   CATEGORY_ICONS,
 } from '../../../hooks/useMindArtifacts';
-import { YamlViewer, isYamlContent } from '../ui/YamlViewer';
+import { YamlViewer, isYamlContent } from '../ui/yaml-viewer';
 
 interface ArtifactsTabProps {
   artifactsData: MindArtifactsResult | null;

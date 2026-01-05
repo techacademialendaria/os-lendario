@@ -110,16 +110,20 @@ const SECTION_TITLES: Record<Section, string> = {
   [Section.STUDIO_OPS_VIEWS]: 'Views',
   [Section.STUDIO_OPS_TOOL_STACKS]: 'Tool Stacks',
   [Section.STUDIO_OPS_USERS]: 'Usuários',
+  [Section.STUDIO_OPS_EMAILS]: 'Email Templates',
 
   // Books App
   [Section.APP_BOOKS_LIBRARY]: 'Biblioteca',
+  [Section.APP_BOOKS_MY_LIBRARY]: 'Meus Livros',
   [Section.APP_BOOKS_DETAIL]: 'Detalhes do Livro',
   [Section.APP_BOOKS_READER]: 'Leitor',
+  [Section.APP_BOOKS_RATING]: 'Avaliar Livro',
   [Section.APP_BOOKS_COLLECTION]: 'Coleção',
   [Section.APP_BOOKS_COLLECTIONS]: 'Coleções',
   [Section.APP_BOOKS_AUTHOR]: 'Livros do Autor',
   [Section.APP_BOOKS_AUTHORS]: 'Autores',
   [Section.APP_BOOKS_CATEGORY]: 'Categoria',
+  [Section.APP_BOOKS_HIGHLIGHTS]: 'Highlights',
   [Section.APP_BOOKS_ADMIN]: 'Gestão de Acervo',
 };
 

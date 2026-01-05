@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GroupsOverview } from '../groups/GroupsOverview';
-import { GroupsDashboard } from '../groups/GroupsDashboard';
-import { GroupsReports } from '../groups/GroupsReports';
+import { GroupsDashboard } from '../groups-dashboard';
+import { GroupsReports } from '../groups-reports';
 import type { GroupsViewMode } from '../../../types/groups';
 
 /**

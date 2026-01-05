@@ -109,16 +109,20 @@ export enum Section {
   STUDIO_OPS_VIEWS = 'studio_ops_views',
   STUDIO_OPS_TOOL_STACKS = 'studio_ops_tool_stacks',
   STUDIO_OPS_USERS = 'studio_ops_users',
+  STUDIO_OPS_EMAILS = 'studio_ops_emails',
 
   // Books Library
   APP_BOOKS_LIBRARY = 'app_books_library',
+  APP_BOOKS_MY_LIBRARY = 'app_books_my_library',
   APP_BOOKS_DETAIL = 'app_books_detail',
   APP_BOOKS_READER = 'app_books_reader',
+  APP_BOOKS_RATING = 'app_books_rating',
   APP_BOOKS_COLLECTION = 'app_books_collection',
   APP_BOOKS_COLLECTIONS = 'app_books_collections',
   APP_BOOKS_AUTHOR = 'app_books_author',
   APP_BOOKS_AUTHORS = 'app_books_authors',
   APP_BOOKS_CATEGORY = 'app_books_category',
+  APP_BOOKS_HIGHLIGHTS = 'app_books_highlights',
   APP_BOOKS_ADMIN = 'app_books_admin',
 }
 
