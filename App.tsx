@@ -10,15 +10,17 @@ import { cn } from './lib/utils';
 import AppRoutes from './components/AppRoutes';
 import useAppSection from './hooks/useAppSection';
 import { useAuth } from './lib/AuthContext';
+import { useRBAC } from './hooks/useRBAC';
 
 const App: React.FC = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const { isAdminOrAbove } = useRBAC();
   const isAuthPage = location.pathname.startsWith('/auth');
   const isBooksPage = location.pathname.startsWith('/books');
 
-  // Hide sidebar for non-authenticated users
-  const showSidebar = isAuthenticated && !isAuthPage;
+  // Hide sidebar for non-admin users (only owner/admin can see full menu)
+  const showSidebar = isAuthenticated && isAdminOrAbove && !isAuthPage;
 
   // Section & theme management via custom hook
   const {

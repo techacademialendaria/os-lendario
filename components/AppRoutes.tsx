@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, Outlet } from 'react-router-dom';
 import { Section } from '../types';
 import { AuthGuard } from './auth/AuthGuard';
 import { RBACGuard } from './auth/RBACGuard';
+import { SubscriptionGuard } from './auth/SubscriptionGuard';
 
 // Auth Pages (public routes)
 const LoginPage = React.lazy(() => import('../pages/auth/LoginPage'));
@@ -205,12 +206,14 @@ const AppRoutes: React.FC<AppRoutesProps> = ({
         />
 
         {/* ============================================= */}
-        {/* PROTECTED ROUTES (Auth required) */}
+        {/* PROTECTED ROUTES (Auth required + Admin only) */}
         {/* ============================================= */}
         <Route
           element={
             <AuthGuard>
-              <Outlet />
+              <SubscriptionGuard>
+                <Outlet />
+              </SubscriptionGuard>
             </AuthGuard>
           }
         >
