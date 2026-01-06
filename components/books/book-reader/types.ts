@@ -40,6 +40,9 @@ export interface ReaderContentAreaProps {
   onNavigateToLogin: () => void;
   onNavigateToDetails: () => void;
   onMarkAsRead: () => void;
+  // Edit mode
+  isEditMode: boolean;
+  onUpdateContent: (value: string) => void;
 }
 
 export interface ChapterSplashProps {
@@ -69,6 +72,9 @@ export interface ReaderArticleProps {
   onCopy: (text: string) => void;
   onNavigateToLogin: () => void;
   onNavigateToDetails: () => void;
+  // Edit mode
+  isEditMode: boolean;
+  onUpdateContent: (value: string) => void;
 }
 
 export interface NavigationFooterProps {
@@ -149,6 +155,14 @@ export interface UseBookReaderReturn {
   navigateToLogin: () => void;
   navigateToRating: () => void;
   navigateToCategory: (slug: string) => void;
+
+  // Edit mode
+  canEdit: boolean;
+  isEditMode: boolean;
+  isSaving: boolean;
+  saveSuccess: boolean;
+  toggleEditMode: () => void;
+  updateContent: (value: string) => void;
 }
 
 export interface UseReaderUIReturn {

@@ -27,146 +27,75 @@ export interface BookData {
   wordCount: number | null;
 }
 
-// Database content record for books
-interface DbBookContent {
+// View record structure (from v_books_pt / v_books_by_category)
+interface DbBookView {
   id: string;
   slug: string;
   title: string;
-  content_type: string;
-  status: string;
   content: string | null;
   image_url: string | null;
-  metadata: {
-    author?: string;
-    description?: string;
-    categories?: string[];
-    category?: string;
-    pageCount?: number;
-    publishedDate?: string;
-    isbn?: string;
-    averageRating?: number;
-    duration?: string;
-    hasAudio?: boolean;
-    word_count?: number;
-    reading_time_minutes?: number;
-    language?: string;
-    original_title?: string;
-  } | null;
+  status: string;
   created_at: string;
   updated_at: string;
-  content_tags?: Array<{
-    tags: { id: string; slug: string; name: string } | null;
-  }>;
-  content_minds?: Array<{
-    role: string;
-    minds: { id: string; slug: string; name: string } | null;
-  }>;
+  metadata: Record<string, unknown> | null;
+  // Pre-joined author fields
+  author_id: string | null;
+  author_slug: string | null;
+  author_name: string | null;
+  author_avatar: string | null;
+  // Extracted metadata fields
+  language: string | null;
+  rating: number | null;
+  has_audio: boolean | null;
+  page_count: number | null;
+  duration: string | null;
+  description: string | null;
+  // Pre-joined category fields
+  category_slug: string | null;
+  category_name: string | null;
+  // From v_books_by_category (optional)
+  tag_slug?: string;
+  tag_name?: string;
 }
 
-// Normalize title for deduplication (remove punctuation, underscores, lowercase)
-const normalizeTitle = (title: string): string => {
-  return title
-    .toLowerCase()
-    .replace(/[_\-,.:;!?'"()]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-};
+// V1: Only Portuguese books - no deduplication needed
 
-// Deduplicate books by original_title or normalized title, prioritizing PT
-const deduplicateBooks = (books: DbBookContent[]): DbBookContent[] => {
-  const groups = new Map<string, DbBookContent[]>();
-
-  for (const book of books) {
-    const metadata = book.metadata || {};
-    const originalTitle = metadata.original_title as string | undefined;
-    const key = normalizeTitle(originalTitle || book.title);
-
-    if (!groups.has(key)) {
-      groups.set(key, []);
-    }
-    groups.get(key)!.push(book);
-  }
-
-  // Select best version per group: pt > es > en, then by content length
-  const deduplicated: DbBookContent[] = [];
-  for (const [, versions] of groups) {
-    if (versions.length === 1) {
-      deduplicated.push(versions[0]);
-    } else {
-      // Sort by language priority (pt=1, en=2, es=3) then by content length
-      versions.sort((a, b) => {
-        const langA = (a.metadata?.language as string) || 'en';
-        const langB = (b.metadata?.language as string) || 'en';
-        const priorityA = langA === 'pt' ? 1 : langA === 'en' ? 2 : 3;
-        const priorityB = langB === 'pt' ? 1 : langB === 'en' ? 2 : 3;
-
-        if (priorityA !== priorityB) return priorityA - priorityB;
-
-        // Tie-breaker: longer content
-        const lenA = (a.content || '').length;
-        const lenB = (b.content || '').length;
-        return lenB - lenA;
-      });
-      deduplicated.push(versions[0]);
-    }
-  }
-
-  return deduplicated;
-};
-
-// Transform database book to UI BookData
-const transformToBookData = (dbBook: DbBookContent): BookData => {
-  const metadata = dbBook.metadata || {};
-
-  // Extract author from content_minds (role = 'author') or metadata
-  const authorMind = dbBook.content_minds?.find((cm) => cm.role === 'author')?.minds;
-  const author = authorMind?.name || metadata.author || 'Autor Desconhecido';
-  const authorSlug = authorMind?.slug || null;
-
-  // Extract tags
-  const tags = (dbBook.content_tags || [])
-    .filter((ct) => ct.tags?.slug)
-    .map((ct) => ({
-      slug: ct.tags!.slug,
-      name: ct.tags!.name,
-    }));
-
-  // Get primary category (first tag or from metadata)
-  const primaryTag = tags[0];
-  const category = primaryTag?.name || metadata.category || metadata.categories?.[0] || null;
-  const categorySlug = primaryTag?.slug || null;
-
-  // Extract year from publishedDate
-  const publishedYear = metadata.publishedDate
-    ? parseInt(metadata.publishedDate.split('-')[0], 10) || null
-    : null;
+// Transform view record to UI BookData (simplified - data already joined)
+const transformViewToBookData = (row: DbBookView): BookData => {
+  const metadata = (row.metadata || {}) as Record<string, unknown>;
 
   return {
-    id: dbBook.id,
-    slug: dbBook.slug,
-    title: dbBook.title,
-    author,
-    authorSlug,
-    coverUrl: dbBook.image_url,
-    content: dbBook.content || null,
-    summary: metadata.description
-      ? stripMarkdown(metadata.description)
-      : dbBook.content
-        ? stripMarkdown(dbBook.content.substring(0, 300))
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    // Author already joined in view
+    author: row.author_name || 'Autor Desconhecido',
+    authorSlug: row.author_slug,
+    coverUrl: row.image_url,
+    content: row.content,
+    // Description already extracted in view
+    summary: row.description
+      ? stripMarkdown(row.description)
+      : row.content
+        ? stripMarkdown(row.content.substring(0, 300))
         : null,
-    category,
-    categorySlug,
-    tags,
-    hasAudio: metadata.hasAudio || false,
-    duration: metadata.duration || null,
-    pageCount: metadata.pageCount || null,
-    publishedYear,
-    isbn: metadata.isbn || null,
-    rating: metadata.averageRating || null,
-    status: dbBook.status === 'published' ? 'published' : 'draft',
-    createdAt: dbBook.created_at,
-    readingTime: metadata.reading_time_minutes || null,
-    wordCount: metadata.word_count || null,
+    // Category already joined in view
+    category: row.category_name,
+    categorySlug: row.category_slug,
+    tags: [], // Tags not needed for listing
+    // Metadata already extracted in view
+    hasAudio: row.has_audio || false,
+    duration: row.duration,
+    pageCount: row.page_count,
+    publishedYear: metadata.publishedDate
+      ? parseInt(String(metadata.publishedDate).split('-')[0], 10) || null
+      : null,
+    isbn: (metadata.isbn as string) || null,
+    rating: row.rating,
+    status: row.status === 'published' ? 'published' : 'draft',
+    createdAt: row.created_at,
+    readingTime: (metadata.reading_time_minutes as number) || null,
+    wordCount: (metadata.word_count as number) || null,
   };
 };
 
@@ -217,47 +146,19 @@ export function useBooks(options: UseBooksOptions = {}): UseBooksResult {
     try {
       const currentOffset = isLoadMore ? offset : 0;
 
+      // Use optimized view (v_books_pt already filters PT + published)
+      // For category filter, use v_books_by_category view
+      const viewName = categorySlug ? 'v_books_by_category' : 'v_books_pt';
+
       let query = supabase
-        .from('contents')
-        .select(
-          `
-          id,
-          slug,
-          title,
-          content_type,
-          status,
-          content,
-          image_url,
-          metadata,
-          created_at,
-          updated_at,
-          content_tags(
-            tags(id, slug, name)
-          ),
-          content_minds(
-            role,
-            minds(id, slug, name)
-          )
-        `
-        )
-        .eq('content_type', 'book_summary')
-        .eq('status', 'published')
-        .not('content', 'is', null)
+        .from(viewName)
+        .select('*')
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + limit - 1);
 
-      // Add category filter if provided
+      // Add category filter if provided (single query now!)
       if (categorySlug) {
-        // We need to filter by tag - this requires a subquery approach
-        const { data: taggedContentIds } = await supabase
-          .from('content_tags')
-          .select('content_id, tags!inner(slug)')
-          .eq('tags.slug', categorySlug);
-
-        if (taggedContentIds && taggedContentIds.length > 0) {
-          const contentIds = (taggedContentIds as Array<{ content_id: string }>).map(tc => tc.content_id);
-          query = query.in('id', contentIds);
-        }
+        query = query.eq('tag_slug', categorySlug);
       }
 
       const { data: booksData, error: booksError } = await query;
@@ -266,9 +167,8 @@ export function useBooks(options: UseBooksOptions = {}): UseBooksResult {
         throw booksError;
       }
 
-      // Deduplicate books (prioritize PT over EN) then transform
-      const deduplicatedBooks = deduplicateBooks(booksData || []);
-      const transformedBooks = deduplicatedBooks.map(transformToBookData);
+      // V1: No deduplication needed - only PT books, data already joined in view
+      const transformedBooks = (booksData || []).map(transformViewToBookData);
 
       // Check if there are more books
       setHasMore(transformedBooks.length === limit);
@@ -345,38 +245,18 @@ export function useBook(slug: string): UseBookResult {
     }
 
     try {
+      // Use optimized view for single book lookup
       const { data: bookData, error: bookError } = await supabase
-        .from('contents')
-        .select(
-          `
-          id,
-          slug,
-          title,
-          content_type,
-          status,
-          content,
-          image_url,
-          metadata,
-          created_at,
-          updated_at,
-          content_tags(
-            tags(id, slug, name)
-          ),
-          content_minds(
-            role,
-            minds(id, slug, name)
-          )
-        `
-        )
+        .from('v_books_pt')
+        .select('*')
         .eq('slug', slug)
-        .eq('content_type', 'book_summary')
         .single();
 
       if (bookError) {
         throw bookError;
       }
 
-      setBook(bookData ? transformToBookData(bookData) : null);
+      setBook(bookData ? transformViewToBookData(bookData) : null);
     } catch (err) {
       console.error('Error fetching book:', err);
       setError(err as Error);
@@ -421,35 +301,18 @@ export function useBookCategories(): UseBookCategoriesResult {
       }
 
       try {
-        // Get categories with book count
+        // Use optimized view (already has PT book counts)
         const { data, error: catError } = await supabase
-          .from('tags')
-          .select(
-            `
-            slug,
-            name,
-            content_tags(count)
-          `
-          )
-          .eq('tag_type', 'book_category');
+          .from('v_categories_with_count')
+          .select('slug, name, book_count');
 
         if (catError) throw catError;
 
-        // Type assertion for the query result
-        type TagWithCount = {
-          slug: string;
-          name: string;
-          content_tags: Array<{ count: number }>;
-        };
-
-        const categoriesWithCount = ((data || []) as TagWithCount[])
-          .map((cat) => ({
-            slug: cat.slug,
-            name: cat.name,
-            count: cat.content_tags?.[0]?.count || 0,
-          }))
-          .filter((c) => c.count > 0)
-          .sort((a, b) => b.count - a.count);
+        const categoriesWithCount = (data || []).map((cat) => ({
+          slug: cat.slug,
+          name: cat.name,
+          count: cat.book_count,
+        }));
 
         setCategories(categoriesWithCount);
       } catch (err) {
@@ -595,57 +458,35 @@ export function useFeaturedBooks(): UseFeaturedBooksResult {
       }
 
       try {
-        // Fetch recent books (limit 2)
-        const { data: recentData } = await supabase
-          .from('contents')
-          .select(`
-            id, slug, title, content_type, status, content, image_url, metadata, created_at, updated_at,
-            content_tags(tags(id, slug, name)),
-            content_minds(role, minds(id, slug, name))
-          `)
-          .eq('content_type', 'book_summary')
-          .eq('status', 'published')
-          .not('content', 'is', null)
-          .order('created_at', { ascending: false })
-          .limit(4); // Fetch 4 to account for deduplication
+        // V1: Use optimized view (already filtered PT + published + joined)
+        const [recentResult, popularResult, audioResult] = await Promise.all([
+          // Recent books
+          supabase
+            .from('v_books_pt')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(2),
 
-        // Fetch books with high rating (limit 5)
-        const { data: popularData } = await supabase
-          .from('contents')
-          .select(`
-            id, slug, title, content_type, status, content, image_url, metadata, created_at, updated_at,
-            content_tags(tags(id, slug, name)),
-            content_minds(role, minds(id, slug, name))
-          `)
-          .eq('content_type', 'book_summary')
-          .eq('status', 'published')
-          .not('content', 'is', null)
-          .not('metadata->averageRating', 'is', null)
-          .order('metadata->averageRating', { ascending: false })
-          .limit(8); // Fetch 8 to account for deduplication
+          // Popular books by rating
+          supabase
+            .from('v_books_pt')
+            .select('*')
+            .not('rating', 'is', null)
+            .order('rating', { ascending: false })
+            .limit(5),
 
-        // Fetch books with audio (limit 5)
-        const { data: audioData } = await supabase
-          .from('contents')
-          .select(`
-            id, slug, title, content_type, status, content, image_url, metadata, created_at, updated_at,
-            content_tags(tags(id, slug, name)),
-            content_minds(role, minds(id, slug, name))
-          `)
-          .eq('content_type', 'book_summary')
-          .eq('status', 'published')
-          .not('content', 'is', null)
-          .eq('metadata->hasAudio', true)
-          .limit(8);
+          // Audiobooks
+          supabase
+            .from('v_books_pt')
+            .select('*')
+            .eq('has_audio', true)
+            .limit(5),
+        ]);
 
-        // Deduplicate and transform
-        const dedupedRecent = deduplicateBooks(recentData || []).slice(0, 2);
-        const dedupedPopular = deduplicateBooks(popularData || []).slice(0, 5);
-        const dedupedAudio = deduplicateBooks(audioData || []).slice(0, 5);
-
-        setRecentBooks(dedupedRecent.map(transformToBookData));
-        setPopularBooks(dedupedPopular.map(transformToBookData));
-        setAudiobookBooks(dedupedAudio.map(transformToBookData));
+        // Transform using view structure
+        setRecentBooks((recentResult.data || []).map(transformViewToBookData));
+        setPopularBooks((popularResult.data || []).map(transformViewToBookData));
+        setAudiobookBooks((audioResult.data || []).map(transformViewToBookData));
       } catch (err) {
         console.error('Error fetching featured books:', err);
       } finally {
@@ -672,12 +513,10 @@ export function useBookCount(): { count: number; loading: boolean } {
       }
 
       try {
+        // Use optimized view (already filtered to PT + published)
         const { count: totalCount } = await supabase
-          .from('contents')
-          .select('*', { count: 'exact', head: true })
-          .eq('content_type', 'book_summary')
-          .eq('status', 'published')
-          .not('content', 'is', null);
+          .from('v_books_pt')
+          .select('*', { count: 'exact', head: true });
 
         setCount(totalCount || 0);
       } catch (err) {

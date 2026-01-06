@@ -10,3 +10,4 @@ export { RelatedBooks } from './RelatedBooks';
 export { BookErrorView } from './BookErrorView';
 export { BookBackdrop } from './BookBackdrop';
 export { BookContentColumn } from './BookContentColumn';
+export { EditModeToggle } from './EditModeToggle';

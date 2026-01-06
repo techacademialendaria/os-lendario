@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
+import TurndownService from 'turndown';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { MarkdownRenderer } from '@/components/shared';
@@ -7,6 +8,13 @@ import { getPreviewContent, getTeaserContent } from '@/lib/reading-utils';
 import { cn } from '@/lib/utils';
 import type { ThemeStyle } from '../../reader';
 import type { BookData } from '@/hooks/useBooks';
+
+// Initialize Turndown for HTML to Markdown conversion
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
+  bulletListMarker: '-',
+});
 
 interface ReaderArticleProps {
   articleRef: React.RefObject<HTMLDivElement | null>;
@@ -21,6 +29,9 @@ interface ReaderArticleProps {
   onCopy: (text: string) => void;
   onNavigateToLogin: () => void;
   onNavigateToDetails: () => void;
+  // Edit mode
+  isEditMode: boolean;
+  onUpdateContent: (value: string) => void;
 }
 
 export const ReaderArticle: React.FC<ReaderArticleProps> = ({
@@ -29,14 +40,26 @@ export const ReaderArticle: React.FC<ReaderArticleProps> = ({
   showFullContent,
   canHighlight,
   book,
-  bookSlug,
+  bookSlug: _bookSlug,
   fontSize,
   currentMode,
   onHighlight,
   onCopy,
   onNavigateToLogin,
   onNavigateToDetails,
+  isEditMode,
+  onUpdateContent,
 }) => {
+  const editableRef = useRef<HTMLDivElement>(null);
+
+  // Convert HTML to Markdown and trigger save
+  const handleContentChange = useCallback(() => {
+    if (!editableRef.current) return;
+    const html = editableRef.current.innerHTML;
+    const markdown = turndownService.turndown(html);
+    onUpdateContent(markdown);
+  }, [onUpdateContent]);
+
   if (!displayContent) {
     return (
       <div className="py-12 text-center text-muted-foreground">
@@ -64,16 +87,27 @@ export const ReaderArticle: React.FC<ReaderArticleProps> = ({
         color: currentMode.text,
       }}
     >
-      {/* Text Selection Toolbar */}
+      {/* Text Selection Toolbar - disabled in edit mode */}
       <TextSelectionToolbar
         containerRef={articleRef as React.RefObject<HTMLElement>}
         onHighlight={onHighlight}
         onCopy={onCopy}
-        disabled={!showFullContent || !canHighlight}
+        disabled={!showFullContent || !canHighlight || isEditMode}
       />
 
       {showFullContent ? (
-        <MarkdownRenderer content={displayContent} variant="article" inheritColors leadParagraph />
+        <div
+          ref={editableRef}
+          contentEditable={isEditMode}
+          suppressContentEditableWarning
+          onInput={isEditMode ? handleContentChange : undefined}
+          className={cn(
+            'outline-none',
+            isEditMode && 'cursor-text rounded-lg ring-2 ring-primary/20 focus:ring-primary/40'
+          )}
+        >
+          <MarkdownRenderer content={displayContent} variant="article" inheritColors leadParagraph />
+        </div>
       ) : (
         /* Paywall Preview for non-authenticated users */
         <div className="relative">

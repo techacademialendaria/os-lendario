@@ -98,13 +98,32 @@ export function useTextSelection({
     [containerRef, disabled, mode, reset, toolbarRef]
   );
 
+  // Prevent native context menu when selection exists in container
+  const handleContextMenu = useCallback(
+    (e: MouseEvent) => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      // Only prevent if the click is inside the container and we have a selection
+      if (container.contains(e.target as Node)) {
+        const selection = window.getSelection();
+        if (selection && !selection.isCollapsed && selection.toString().trim().length >= 3) {
+          e.preventDefault();
+        }
+      }
+    },
+    [containerRef]
+  );
+
   // Event listeners
   useEffect(() => {
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('contextmenu', handleContextMenu);
     return () => {
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('contextmenu', handleContextMenu);
     };
-  }, [handleMouseUp]);
+  }, [handleMouseUp, handleContextMenu]);
 
   return {
     state: {

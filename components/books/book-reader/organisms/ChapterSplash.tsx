@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
@@ -11,11 +11,27 @@ export const ChapterSplash: React.FC<ChapterSplashProps> = ({
   currentMode,
   isFocusMode,
 }) => {
+  // State-based animation to ensure it plays on mount/reload
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Reset on book change and trigger animation
+    setIsVisible(false);
+    const timer = requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
+    return () => cancelAnimationFrame(timer);
+  }, [book.title]); // Re-trigger when book changes
+
   return (
     <div
       className={cn(
         'mb-24 space-y-8 text-center transition-all duration-500 md:mb-40 md:space-y-10',
-        isFocusMode ? 'opacity-0 blur-sm -translate-y-4' : 'opacity-100 blur-0 translate-y-0'
+        isFocusMode
+          ? 'opacity-0 blur-sm -translate-y-4'
+          : isVisible
+            ? 'opacity-100 blur-0 translate-y-0'
+            : 'opacity-0 blur-sm translate-y-4'
       )}
     >
       <div className="flex flex-wrap items-center justify-center gap-3">

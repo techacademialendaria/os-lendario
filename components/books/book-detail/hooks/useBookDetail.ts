@@ -4,7 +4,7 @@ import { useBook, useBooks } from '@/hooks/useBooks';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useBookInteractions, ReadingStatus } from '@/hooks/useMyBooks';
 import { useAuthor } from '@/hooks/useAuthor';
-import { useRBAC } from '@/hooks/useRBAC';
+import { useAuth } from '@/lib/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { STATUS_CONFIG, COVER_GRADIENTS, DESCRIPTION_LIMIT, AUTHOR_BIO_LIMIT } from '../data';
@@ -54,8 +54,8 @@ export function useBookDetail() {
   } = useBookInteractions(book?.id || '');
   const { author, loading: authorLoading } = useAuthor(book?.authorSlug || null);
 
-  // RBAC for edit permissions
-  const { isCollaboratorOrAbove } = useRBAC();
+  // Auth for edit permissions (temporarily showing for all authenticated users)
+  const { isAuthenticated } = useAuth();
 
   // Local state
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -270,6 +270,7 @@ export function useBookDetail() {
 
   const navigateToBook = useCallback(
     (slug: string) => {
+      window.scrollTo(0, 0);
       navigate(`/books/${slug}`);
     },
     [navigate]
@@ -278,6 +279,10 @@ export function useBookDetail() {
   const navigateToLibrary = useCallback(() => {
     navigate('/books');
   }, [navigate]);
+
+  // Computed values for display (use edited values if in edit mode)
+  const displayTitle = editedTitle ?? book?.title ?? '';
+  const displayDescriptionText = editedDescription ?? description;
 
   return {
     // Data
@@ -320,5 +325,15 @@ export function useBookDetail() {
     navigateToCategory,
     navigateToBook,
     navigateToLibrary,
+
+    // Edit mode
+    canEdit: isAuthenticated,
+    isEditMode,
+    isSaving,
+    toggleEditMode,
+    displayTitle,
+    displayDescriptionText,
+    updateTitle,
+    updateDescription,
   };
 }

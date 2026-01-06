@@ -10,6 +10,7 @@ import { useAllHighlights } from '../../../hooks/useHighlights';
 import { usePageTitle } from '../../../hooks/usePageTitle';
 import { useAuth } from '../../../lib/AuthContext';
 import { useReadingStreak } from '../../../hooks/useReadingStreak';
+import { toast } from '../../../hooks/use-toast';
 import BooksTopbar from '../topbar';
 import BookCard from '../ui/BookCard';
 import { BookCardSkeleton } from '../ui/BookSkeletons';
@@ -93,6 +94,7 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
     stats,
     isLoading: myBooksLoading,
     error: myBooksError,
+    toggleFavorite,
   } = useMyBooks(
     isNotesTab ? undefined : (selectedFilter as 'read' | 'reading' | 'want_to_read' | 'favorite')
   );
@@ -357,11 +359,32 @@ const MyBooksTemplate: React.FC<MyBooksTemplateProps> = ({ setSection }) => {
                 }
               };
 
+              const handleToggleFavorite = async (_bookData: typeof bookData) => {
+                try {
+                  const isFavorite = await toggleFavorite(book.contentId);
+                  toast({
+                    title: isFavorite ? 'Adicionado aos favoritos' : 'Removido dos favoritos',
+                    description: isFavorite
+                      ? 'Livro salvo nos seus favoritos.'
+                      : 'Livro removido dos favoritos.',
+                    variant: 'success',
+                  });
+                } catch (err) {
+                  console.error('Failed to toggle favorite:', err);
+                  toast({
+                    title: 'Erro ao favoritar',
+                    description: 'Não foi possível salvar. Tente novamente.',
+                    variant: 'destructive',
+                  });
+                }
+              };
+
               return (
                 <BookCard
                   key={book.contentId}
                   book={bookData}
                   onClick={handleBookClick}
+                  onBookmark={handleToggleFavorite}
                   isBookmarked={book.isFavorite}
                   readingStatus={book.readingStatus}
                 />

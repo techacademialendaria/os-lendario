@@ -29,6 +29,12 @@ interface BookContentColumnProps {
     navigateToCategory: (slug: string) => void;
     navigateToBook: (slug: string) => void;
     handleToggleFavorite: () => void;
+    // Edit mode
+    isEditMode?: boolean;
+    displayTitle?: string;
+    displayDescriptionText?: string;
+    updateTitle?: (value: string) => void;
+    updateDescription?: (value: string) => void;
   };
 }
 
@@ -37,17 +43,27 @@ export const BookContentColumn: React.FC<BookContentColumnProps> = ({ detail }) 
 
   return (
     <div className="space-y-8 md:col-span-8 lg:col-span-9">
-      <BookInfoHeader book={book} loading={loading} onAuthorClick={detail.navigateToAuthor} />
+      <BookInfoHeader
+        book={book}
+        loading={loading}
+        onAuthorClick={detail.navigateToAuthor}
+        isEditMode={detail.isEditMode}
+        displayTitle={detail.displayTitle}
+        onTitleChange={detail.updateTitle}
+      />
 
-      {!loading && book && detail.description && (
+      {(!loading && book && detail.description) || detail.isEditMode ? (
         <BookDescription
           description={detail.description}
           displayedDescription={detail.displayedDescription}
           shouldTruncate={detail.shouldTruncateDescription}
           isExpanded={detail.isDescriptionExpanded}
           onToggle={detail.toggleDescription}
+          isEditMode={detail.isEditMode}
+          fullDescription={detail.displayDescriptionText}
+          onDescriptionChange={detail.updateDescription}
         />
-      )}
+      ) : null}
 
       {!loading && book && (
         <BookTagsRow

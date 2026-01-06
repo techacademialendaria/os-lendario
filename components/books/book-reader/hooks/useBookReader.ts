@@ -6,6 +6,7 @@ import { useBookInteractions, type ReadingStatus } from '@/hooks/useMyBooks';
 import { useAuth } from '@/lib/AuthContext';
 import { useHighlights } from '@/hooks/useHighlights';
 import { toast } from '@/hooks/use-toast';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import {
   calculateReadingTime,
   extractTLDR,
@@ -39,13 +40,80 @@ export function useBookReader(): UseBookReaderReturn {
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
   const [isMarkingRead, setIsMarkingRead] = useState(false);
 
+  // Edit mode state
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [editedContent, setEditedContent] = useState<string | null>(null);
+
+  // Update content handler (just stores, doesn't save)
+  const updateContent = useCallback((value: string) => {
+    setEditedContent(value);
+  }, []);
+
+  // Toggle edit mode - saves on exit
+  const toggleEditMode = useCallback(async () => {
+    if (isEditMode && editedContent !== null) {
+      // Exiting edit mode - save first
+      if (!book?.id || !isSupabaseConfigured()) {
+        setIsEditMode(false);
+        setEditedContent(null);
+        return;
+      }
+
+      setIsSaving(true);
+      try {
+        const { error } = await (supabase as any)
+          .from('contents')
+          .update({
+            content: editedContent,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', book.id);
+
+        if (error) throw error;
+
+        // Show success animation
+        setSaveSuccess(true);
+        setTimeout(() => {
+          setSaveSuccess(false);
+          setIsEditMode(false);
+          setEditedContent(null);
+        }, 800);
+      } catch (err) {
+        console.error('Failed to save content:', err);
+        toast({
+          title: 'Erro ao salvar',
+          description: 'Não foi possível salvar as alterações.',
+          variant: 'destructive',
+        });
+        setIsSaving(false);
+      } finally {
+        setIsSaving(false);
+      }
+    } else if (isEditMode) {
+      // Exiting without changes
+      setIsEditMode(false);
+      setEditedContent(null);
+    } else {
+      // Entering edit mode
+      setIsEditMode(true);
+    }
+  }, [isEditMode, editedContent, book?.id]);
+
   // Page title
   usePageTitle(book?.title ? `Lendo: ${book.title}` : 'Carregando...');
 
   // Derived data
   const showFullContent = !authLoading && isAuthenticated;
-  const displayContent = book?.content || book?.summary || null;
+  const rawContent = book?.content || book?.summary || null;
+  // Don't use editedContent for display - it causes re-renders during editing
+  // editedContent is only used for saving
+  const displayContent = rawContent;
   const fallbackGradient = getCoverGradient(bookSlug || '');
+
+  // Edit permission (for authenticated users)
+  const canEdit = isAuthenticated;
 
   const keyQuotes = useMemo(() => extractQuotes(book?.content || null), [book?.content]);
   const chapters = useMemo(() => extractChapters(book?.content || null), [book?.content]);
@@ -187,5 +255,13 @@ export function useBookReader(): UseBookReaderReturn {
     navigateToLogin,
     navigateToRating,
     navigateToCategory,
+
+    // Edit mode
+    canEdit,
+    isEditMode,
+    isSaving,
+    saveSuccess,
+    toggleEditMode,
+    updateContent,
   };
 }

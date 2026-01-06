@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useHighlights } from '@/hooks/useHighlights';
 import { ReaderHeader, MobileReaderToolbar } from '../reader';
 import { ReaderSidebar } from '../reader-sidebar';
+import { EditModeToggle } from '../ui';
 import { useBookReader, useReaderUI, useReaderLifecycle } from './hooks';
 import {
   ReaderErrorView,
@@ -46,6 +47,7 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
 
   return (
     <div
+      key={reader.bookSlug}
       className="relative flex h-screen animate-fade-in overflow-hidden font-sans transition-colors duration-500"
       style={{ backgroundColor: ui.currentMode.bg, color: ui.currentMode.text }}
     >
@@ -94,8 +96,21 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
         onNavigateToLogin={reader.navigateToLogin}
         onNavigateToDetails={reader.navigateToDetails}
         onMarkAsRead={reader.handleMarkAsRead}
+        isEditMode={reader.isEditMode}
+        onUpdateContent={reader.updateContent}
       />
 
+      {/* Edit Mode Toggle FAB - for authenticated users */}
+      {reader.canEdit && reader.showFullContent && (
+        <EditModeToggle
+          isEditMode={reader.isEditMode}
+          isSaving={reader.isSaving}
+          saveSuccess={reader.saveSuccess}
+          onToggle={reader.toggleEditMode}
+        />
+      )}
+
+      {/* Sidebar - only for authenticated users */}
       {reader.showFullContent && createPortal(
         <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
           <ReaderSidebar
@@ -119,7 +134,13 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
             onNavigateBack={reader.navigateToDetails}
             onNavigateToCategory={reader.navigateToCategory}
           />
+        </div>,
+        document.body
+      )}
 
+      {/* Mobile Toolbar - always visible (with limited features for logged out users) */}
+      {createPortal(
+        <div className="pointer-events-none fixed inset-0 z-[9998] overflow-hidden">
           <MobileReaderToolbar
             readingMode={ui.readingMode}
             fontSize={ui.fontSize}
@@ -130,10 +151,20 @@ const BookReaderTemplate: React.FC<BookReaderTemplateProps> = ({
             currentMode={ui.currentMode}
             onFontSizeChange={ui.setFontSize}
             onOpenSidebar={() => {
-              ui.setActiveTab('chapters');
-              ui.setSidebarOpen(true);
+              if (reader.showFullContent) {
+                ui.setActiveTab('chapters');
+                ui.setSidebarOpen(true);
+              } else {
+                reader.navigateToLogin();
+              }
             }}
-            onToggleFavorite={reader.handleToggleFavorite}
+            onToggleFavorite={() => {
+              if (reader.showFullContent) {
+                reader.handleToggleFavorite();
+              } else {
+                reader.navigateToLogin();
+              }
+            }}
             onReadingModeChange={ui.setReadingMode}
           />
         </div>,

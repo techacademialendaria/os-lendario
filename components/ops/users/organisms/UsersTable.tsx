@@ -13,8 +13,7 @@ interface UsersTableProps {
   sortBy: UserSortKey;
   sortOrder: SortOrder;
   onSort: (key: UserSortKey) => void;
-  onLinkClick: (user: UserManagementView) => void;
-  onRoleClick: (user: UserManagementView) => void;
+  onEditClick: (user: UserManagementView) => void;
   onCreateUser: () => void;
 }
 
@@ -61,8 +60,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({
   sortBy,
   sortOrder,
   onSort,
-  onLinkClick,
-  onRoleClick,
+  onEditClick,
   onCreateUser,
 }) => {
   return (
@@ -127,8 +125,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({
                   <UserTableRow
                     key={user.user_id}
                     user={user}
-                    onLinkClick={onLinkClick}
-                    onRoleClick={onRoleClick}
+                    onEditClick={onEditClick}
                   />
                 ))}
               </tbody>

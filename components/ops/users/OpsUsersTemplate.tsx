@@ -3,7 +3,7 @@ import { Section } from '../../../types';
 import OpsTopbar from '../OpsTopbar';
 
 // Hooks
-import { useUsersData, useLinkMindDialog, useCreateUserDialog, useRoleDialog } from './hooks';
+import { useUsersData, useCreateUserDialog, useEditUserDialog } from './hooks';
 
 // Molecules
 import { SearchInput, AlertMessage } from './molecules';
@@ -13,14 +13,13 @@ import {
   UsersPageHeader,
   UsersStatsGrid,
   UsersTable,
-  LinkMindDialog,
   CreateUserDialog,
-  RoleDialog,
+  EditUserDialog,
   PendingInvitesSection,
 } from './organisms';
 
 // Types
-import type { UserSortKey, SortOrder, UserManagementView } from './types';
+import type { UserSortKey, SortOrder } from './types';
 
 interface OpsUsersTemplateProps {
   setSection: (s: Section) => void;
@@ -40,21 +39,15 @@ const OpsUsersTemplate: React.FC<OpsUsersTemplateProps> = ({ setSection }) => {
   // Success message
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Link Dialog
-  const linkDialog = useLinkMindDialog(() => {
-    refetch();
-    setSuccess('Vínculo atualizado com sucesso!');
-  });
-
   // Create Dialog
   const createDialog = useCreateUserDialog(() => {
     refetch();
   });
 
-  // Role Dialog
-  const roleDialog = useRoleDialog(() => {
+  // Edit Dialog
+  const editDialog = useEditUserDialog(() => {
     refetch();
-    setSuccess('Role atualizado com sucesso!');
+    setSuccess('Usuário atualizado com sucesso!');
   });
 
   // Sort handler
@@ -185,27 +178,12 @@ const OpsUsersTemplate: React.FC<OpsUsersTemplateProps> = ({ setSection }) => {
               sortBy={sortBy}
               sortOrder={sortOrder}
               onSort={handleSort}
-              onLinkClick={linkDialog.open}
-              onRoleClick={roleDialog.open}
+              onEditClick={editDialog.open}
               onCreateUser={createDialog.open}
             />
           </div>
         </main>
       </div>
-
-      {/* Link Mind Dialog */}
-      <LinkMindDialog
-        isOpen={linkDialog.isOpen}
-        onOpenChange={(open) => !open && linkDialog.close()}
-        selectedUser={linkDialog.selectedUser}
-        selectedMindId={linkDialog.selectedMindId}
-        onMindChange={linkDialog.setSelectedMindId}
-        minds={minds}
-        saving={linkDialog.saving}
-        error={linkDialog.error}
-        onSave={linkDialog.save}
-        onCancel={linkDialog.close}
-      />
 
       {/* Create User Dialog */}
       <CreateUserDialog
@@ -241,20 +219,23 @@ const OpsUsersTemplate: React.FC<OpsUsersTemplateProps> = ({ setSection }) => {
         onCopyUrl={createDialog.copyInviteUrl}
       />
 
-      {/* Role Dialog */}
-      <RoleDialog
-        isOpen={roleDialog.isOpen}
-        onOpenChange={(open) => !open && roleDialog.close()}
-        selectedUser={roleDialog.selectedUser}
-        selectedRoleId={roleDialog.selectedRoleId}
-        onRoleChange={roleDialog.setSelectedRoleId}
-        selectedAreas={roleDialog.selectedAreas}
-        onToggleArea={roleDialog.toggleArea}
+      {/* Edit User Dialog */}
+      <EditUserDialog
+        isOpen={editDialog.isOpen}
+        onOpenChange={(open) => !open && editDialog.close()}
+        user={editDialog.user}
+        selectedRoleId={editDialog.selectedRoleId}
+        onRoleChange={editDialog.setSelectedRoleId}
+        selectedAreas={editDialog.selectedAreas}
+        onToggleArea={editDialog.toggleArea}
+        selectedMindId={editDialog.selectedMindId}
+        onMindChange={editDialog.setSelectedMindId}
         roles={roles}
-        saving={roleDialog.saving}
-        error={roleDialog.error}
-        onSave={roleDialog.save}
-        onCancel={roleDialog.close}
+        minds={minds}
+        saving={editDialog.saving}
+        error={editDialog.error}
+        onSave={editDialog.save}
+        onCancel={editDialog.close}
       />
     </div>
   );

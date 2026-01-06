@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icon } from '@/components/ui/icon';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 interface BookInfoHeaderProps {
   book: {
@@ -11,9 +12,20 @@ interface BookInfoHeaderProps {
   } | null;
   loading: boolean;
   onAuthorClick: () => void;
+  // Edit mode props
+  isEditMode?: boolean;
+  displayTitle?: string;
+  onTitleChange?: (value: string) => void;
 }
 
-export const BookInfoHeader: React.FC<BookInfoHeaderProps> = ({ book, loading, onAuthorClick }) => {
+export const BookInfoHeader: React.FC<BookInfoHeaderProps> = ({
+  book,
+  loading,
+  onAuthorClick,
+  isEditMode = false,
+  displayTitle,
+  onTitleChange,
+}) => {
   if (loading) {
     return (
       <div className="space-y-4 text-center md:text-left">
@@ -25,11 +37,30 @@ export const BookInfoHeader: React.FC<BookInfoHeaderProps> = ({ book, loading, o
 
   if (!book) return null;
 
+  const title = displayTitle ?? book.title;
+
   return (
     <div className="space-y-4 text-center md:text-left">
-      <h1 className="font-serif text-4xl font-bold leading-[0.95] tracking-tight text-foreground md:text-5xl lg:text-6xl">
-        {book.title}
-      </h1>
+      {isEditMode && onTitleChange ? (
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => onTitleChange(e.target.value)}
+          className={cn(
+            'w-full bg-transparent font-serif text-4xl font-bold leading-[0.95] tracking-tight text-foreground md:text-5xl lg:text-6xl',
+            'rounded-lg border-0 px-2 py-1 -mx-2',
+            'ring-2 ring-primary/20 focus:ring-primary/40',
+            'bg-primary/5 focus:bg-primary/10',
+            'outline-none transition-all duration-200',
+            'text-center md:text-left'
+          )}
+          placeholder="Título do livro"
+        />
+      ) : (
+        <h1 className="font-serif text-4xl font-bold leading-[0.95] tracking-tight text-foreground md:text-5xl lg:text-6xl">
+          {title}
+        </h1>
+      )}
       <button
         className="font-serif text-xl italic text-muted-foreground transition-colors duration-300 hover:text-foreground"
         onClick={onAuthorClick}

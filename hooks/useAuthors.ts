@@ -10,22 +10,6 @@ export interface Author {
   book_count: number;
 }
 
-// Type for the Supabase query result
-interface AuthorQueryResult {
-  id: string;
-  slug: string;
-  name: string;
-  avatar_url: string | null;
-  short_bio: string | null;
-  content_minds: Array<{
-    role: string;
-    contents: {
-      id: string;
-      content_type: string;
-    } | null;
-  }>;
-}
-
 interface UseAuthorsResult {
   authors: Author[];
   loading: boolean;
@@ -50,61 +34,22 @@ export function useAuthors(): UseAuthorsResult {
     }
 
     try {
-      // Fetch minds that are linked as authors to book_summary contents
-      // Using a join through content_minds
+      // Use optimized view (already has book counts for PT books)
       const { data, error: fetchError } = await supabase
-        .from('minds')
-        .select(
-          `
-          id,
-          slug,
-          name,
-          avatar_url,
-          short_bio,
-          content_minds!inner(
-            role,
-            contents!inner(
-              id,
-              content_type
-            )
-          )
-        `
-        )
-        .eq('content_minds.role', 'author')
-        .eq('content_minds.contents.content_type', 'book_summary')
-        .is('deleted_at', null);
+        .from('v_authors_with_books')
+        .select('*');
 
       if (fetchError) throw fetchError;
 
-      // Transform and count books per author
-      const authorMap = new Map<string, Author>();
-      const minds = (data || []) as AuthorQueryResult[];
-
-      for (const mind of minds) {
-        if (!authorMap.has(mind.id)) {
-          // Count unique book contents
-          const bookIds = new Set<string>();
-          for (const cm of mind.content_minds || []) {
-            if (cm.contents?.id) {
-              bookIds.add(cm.contents.id);
-            }
-          }
-
-          authorMap.set(mind.id, {
-            id: mind.id,
-            slug: mind.slug,
-            name: mind.name,
-            avatar_url: mind.avatar_url,
-            short_bio: mind.short_bio,
-            book_count: bookIds.size,
-          });
-        }
-      }
-
-      // Convert to array and sort by name
-      const authorsList = Array.from(authorMap.values()).sort((a, b) =>
-        a.name.localeCompare(b.name, 'pt-BR')
-      );
+      // Transform to Author interface (view already has all fields)
+      const authorsList: Author[] = (data || []).map((row) => ({
+        id: row.id,
+        slug: row.slug,
+        name: row.name,
+        avatar_url: row.avatar_url,
+        short_bio: row.short_bio,
+        book_count: row.book_count,
+      }));
 
       setAuthors(authorsList);
     } catch (err) {

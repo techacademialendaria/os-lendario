@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '@/components/ui/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,7 +12,6 @@ import {
 import { cn } from '@/lib/utils';
 import { Section } from '@/types';
 import { useAuth } from '@/lib/AuthContext';
-import { useRBAC } from '@/hooks/useRBAC';
 import { NAV_ITEMS, type NavItem } from '../types';
 
 interface MobileNavigationProps {
@@ -45,20 +44,9 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { isCollaboratorOrAbove } = useRBAC();
 
-  // Add "Editar" for users with edit permissions (admin, owner, collaborator)
-  const navItems = useMemo(() => {
-    const items = [...NAV_ITEMS];
-    if (isCollaboratorOrAbove) {
-      items.push({
-        label: 'Editar',
-        section: Section.APP_BOOKS_ADMIN,
-        path: '/books/admin',
-      });
-    }
-    return items;
-  }, [isCollaboratorOrAbove]);
+  // Mobile navigation doesn't show "Editar" - edit is desktop only
+  const navItems = NAV_ITEMS;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-xl md:hidden">

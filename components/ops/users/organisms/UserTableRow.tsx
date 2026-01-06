@@ -9,14 +9,12 @@ import type { UserManagementView } from '../types';
 
 interface UserTableRowProps {
   user: UserManagementView;
-  onLinkClick: (user: UserManagementView) => void;
-  onRoleClick: (user: UserManagementView) => void;
+  onEditClick: (user: UserManagementView) => void;
 }
 
 export const UserTableRow: React.FC<UserTableRowProps> = ({
   user,
-  onLinkClick,
-  onRoleClick,
+  onEditClick,
 }) => {
   return (
     <tr className="group transition-colors hover:bg-muted/30">
@@ -71,24 +69,14 @@ export const UserTableRow: React.FC<UserTableRowProps> = ({
 
       {/* Actions */}
       <td className="py-3 text-right">
-        <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onRoleClick(user)}
-            title="Gerenciar role"
-          >
-            <Icon name="shield" className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onLinkClick(user)}
-            title={user.mind_id ? 'Alterar mind' : 'Vincular mind'}
-          >
-            <Icon name="link" className="size-4" />
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onEditClick(user)}
+          title="Editar usuário"
+        >
+          <Icon name="pencil" className="size-4" />
+        </Button>
       </td>
     </tr>
   );

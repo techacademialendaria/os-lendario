@@ -28,6 +28,8 @@ export const ReaderContentArea: React.FC<ReaderContentAreaProps> = ({
   onNavigateToLogin,
   onNavigateToDetails,
   onMarkAsRead,
+  isEditMode,
+  onUpdateContent,
 }) => {
   return (
     <div
@@ -68,6 +70,8 @@ export const ReaderContentArea: React.FC<ReaderContentAreaProps> = ({
           onCopy={onCopy}
           onNavigateToLogin={onNavigateToLogin}
           onNavigateToDetails={onNavigateToDetails}
+          isEditMode={isEditMode}
+          onUpdateContent={onUpdateContent}
         />
 
         {/* Navigation Footer */}

@@ -10,6 +10,7 @@ import {
   BookBackdrop,
   BookContentColumn,
   BookErrorView,
+  EditModeToggle,
 } from './organisms';
 
 interface BookDetailTemplateProps {
@@ -81,6 +82,15 @@ const BookDetailTemplate: React.FC<BookDetailTemplateProps> = ({ setSection }) =
           onChangeStatus={detail.handleChangeStatus}
           onToggleFavorite={detail.handleToggleFavorite}
           onNavigateToReader={detail.navigateToReader}
+        />
+      )}
+
+      {/* Edit Mode Toggle - only for users with edit permission */}
+      {detail.canEdit && !detail.loading && detail.book && (
+        <EditModeToggle
+          isEditMode={detail.isEditMode}
+          isSaving={detail.isSaving}
+          onToggle={detail.toggleEditMode}
         />
       )}
     </div>

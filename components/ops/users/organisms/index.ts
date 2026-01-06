@@ -5,4 +5,5 @@ export { UsersTable } from './UsersTable';
 export { LinkMindDialog } from './LinkMindDialog';
 export { CreateUserDialog } from './CreateUserDialog';
 export { RoleDialog } from './RoleDialog';
+export { EditUserDialog } from './EditUserDialog';
 export { PendingInvitesSection } from './PendingInvitesSection';

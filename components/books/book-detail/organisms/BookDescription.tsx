@@ -8,6 +8,10 @@ interface BookDescriptionProps {
   shouldTruncate: boolean;
   isExpanded: boolean;
   onToggle: () => void;
+  // Edit mode props
+  isEditMode?: boolean;
+  fullDescription?: string;
+  onDescriptionChange?: (value: string) => void;
 }
 
 export const BookDescription: React.FC<BookDescriptionProps> = ({
@@ -15,8 +19,34 @@ export const BookDescription: React.FC<BookDescriptionProps> = ({
   shouldTruncate,
   isExpanded,
   onToggle,
+  isEditMode = false,
+  fullDescription,
+  onDescriptionChange,
 }) => {
-  if (!displayedDescription) return null;
+  if (!displayedDescription && !isEditMode) return null;
+
+  // In edit mode, always show the full description
+  const textToEdit = fullDescription ?? displayedDescription;
+
+  if (isEditMode && onDescriptionChange) {
+    return (
+      <div className="space-y-4">
+        <textarea
+          value={textToEdit}
+          onChange={(e) => onDescriptionChange(e.target.value)}
+          rows={6}
+          className={cn(
+            'w-full resize-none bg-transparent font-serif text-lg leading-relaxed text-muted-foreground md:text-xl',
+            'rounded-lg border-0 px-3 py-2 -mx-3',
+            'ring-2 ring-primary/20 focus:ring-primary/40',
+            'bg-primary/5 focus:bg-primary/10',
+            'outline-none transition-all duration-200'
+          )}
+          placeholder="Descrição do livro..."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

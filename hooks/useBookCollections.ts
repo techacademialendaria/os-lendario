@@ -76,31 +76,21 @@ export function useBookCollections(): UseBookCollectionsResult {
     }
 
     try {
-      // Fetch collections (tags with tag_type = 'collection')
+      // Use optimized view (already has PT book counts)
       const { data, error: fetchError } = await supabase
-        .from('tags')
-        .select(`
-          id,
-          slug,
-          name,
-          description,
-          content_tags(count)
-        `)
-        .eq('tag_type', 'collection')
-        .order('name');
+        .from('v_collections_with_count')
+        .select('*');
 
       if (fetchError) throw fetchError;
 
       // Transform to BookCollection format
-      const transformedCollections: BookCollection[] = ((data || []) as DbCollectionTag[]).map(
-        (tag) => ({
-          id: tag.id,
-          slug: tag.slug,
-          name: tag.name,
-          description: tag.description,
-          bookCount: tag.content_tags?.[0]?.count || 0,
-        })
-      );
+      const transformedCollections: BookCollection[] = (data || []).map((row) => ({
+        id: String(row.id),
+        slug: row.slug,
+        name: row.name,
+        description: row.description,
+        bookCount: row.book_count,
+      }));
 
       setCollections(transformedCollections);
     } catch (err) {
@@ -159,89 +149,66 @@ export function useBookCollection(slug: string): UseBookCollectionResult {
     }
 
     try {
-      // Fetch collection tag
-      const { data: tagData, error: tagError } = await supabase
-        .from('tags')
-        .select(`
-          id,
-          slug,
-          name,
-          description
-        `)
-        .eq('slug', slug)
-        .eq('tag_type', 'collection')
-        .single();
-
-      if (tagError) throw tagError;
-
-      const tagRecord = tagData as { id: string; slug: string; name: string; description: string | null };
-
-      // Fetch books in this collection via content_tags join
+      // Use optimized view - SINGLE query for collection + books!
       const { data: booksData, error: booksError } = await supabase
-        .from('contents')
-        .select(`
-          id,
-          slug,
-          title,
-          content_type,
-          status,
-          content,
-          image_url,
-          metadata,
-          created_at,
-          content_tags!inner(
-            tags!inner(id, slug)
-          ),
-          content_minds(
-            role,
-            minds(id, slug, name)
-          )
-        `)
-        .eq('content_type', 'book_summary')
-        .eq('content_tags.tags.slug', slug);
+        .from('v_books_by_collection')
+        .select('*')
+        .eq('tag_slug', slug);
 
       if (booksError) throw booksError;
 
-      // Transform books
-      const transformedBooks: BookData[] = ((booksData || []) as DbBookContent[]).map((book) => {
-        const metadata = book.metadata || {};
-        const authorMind = book.content_minds?.find((cm) => cm.role === 'author')?.minds;
-        const author = authorMind?.name || metadata.author || 'Autor Desconhecido';
+      // Transform books using view structure
+      const transformedBooks: BookData[] = (booksData || []).map((row) => ({
+        id: row.id,
+        slug: row.slug,
+        title: row.title,
+        author: row.author_name || 'Autor Desconhecido',
+        authorSlug: row.author_slug,
+        coverUrl: row.image_url,
+        content: row.content,
+        summary: row.description || row.content?.substring(0, 300) || null,
+        category: row.category_name,
+        categorySlug: row.category_slug,
+        tags: [],
+        hasAudio: row.has_audio || false,
+        duration: row.duration,
+        pageCount: row.page_count,
+        publishedYear: null,
+        isbn: null,
+        rating: row.rating,
+        status: row.status === 'published' ? 'published' : 'draft',
+        createdAt: row.created_at,
+        readingTime: null,
+        wordCount: null,
+      }));
 
-        return {
-          id: book.id,
-          slug: book.slug,
-          title: book.title,
-          author,
-          authorSlug: authorMind?.slug || null,
-          coverUrl: book.image_url,
-          content: book.content || null,
-          summary: metadata.description || book.content?.substring(0, 300) || null,
-          category: metadata.category || null,
-          categorySlug: null,
-          tags: [],
-          hasAudio: metadata.hasAudio || false,
-          duration: metadata.duration || null,
-          pageCount: metadata.pageCount || null,
-          publishedYear: metadata.publishedDate
-            ? parseInt(metadata.publishedDate.split('-')[0], 10) || null
-            : null,
-          isbn: metadata.isbn || null,
-          rating: metadata.averageRating || null,
-          status: book.status === 'published' ? 'published' : 'draft',
-          createdAt: book.created_at,
-          readingTime: metadata.reading_time_minutes || null,
-          wordCount: metadata.word_count || null,
-        };
-      });
+      // Get collection info from first book row (or fetch separately if no books)
+      if (booksData && booksData.length > 0) {
+        setCollection({
+          id: String(booksData[0].tag_id),
+          slug: booksData[0].tag_slug,
+          name: booksData[0].tag_name,
+          description: booksData[0].tag_description || null,
+          bookCount: transformedBooks.length,
+        });
+      } else {
+        // Fetch collection info even if no books
+        const { data: collData } = await supabase
+          .from('v_collections_with_count')
+          .select('*')
+          .eq('slug', slug)
+          .single();
 
-      setCollection({
-        id: tagRecord.id,
-        slug: tagRecord.slug,
-        name: tagRecord.name,
-        description: tagRecord.description,
-        bookCount: transformedBooks.length,
-      });
+        if (collData) {
+          setCollection({
+            id: String(collData.id),
+            slug: collData.slug,
+            name: collData.name,
+            description: collData.description,
+            bookCount: 0,
+          });
+        }
+      }
       setBooks(transformedBooks);
     } catch (err) {
       console.error('Error fetching collection:', err);
